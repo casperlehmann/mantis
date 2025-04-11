@@ -1,0 +1,4 @@
+[jira]
+user = "user@domain.com"
+url = "https://account.atlassian.net"
+personal-access-token = "zxcv_JIRA_TOKEN"
