@@ -1,5 +1,7 @@
 import pytest
 import requests
+import inspect
+
 from jira import JiraOptions, JiraAuth, JiraClient, parse_args
 from jira import fetch_enums
 from dataclasses import dataclass
@@ -37,11 +39,11 @@ class cli:
     personal_access_token = 'SECRET'
     no_verify_ssl = False
 
-def test_fetch_enums_mock():
+def test_fetch_issuetype_enums_mock():
     opts = JiraOptions(parser = cli())
-    assert opts.user == 'admin@domain.com'
-    assert opts.url == 'https://admin.atlassian.net'
-    assert opts.personal_access_token == 'SECRET'
+    assert opts.user == 'admin@domain.com', 'Bad value from cli dataclass'
+    assert opts.url == 'https://admin.atlassian.net', 'Bad value from cli dataclass'
+    assert opts.personal_access_token == 'SECRET', 'Bad value from cli dataclass'
     auth = JiraAuth(opts)
     jira = JiraClient(opts, auth, requestsMock())
 
@@ -49,12 +51,32 @@ def test_fetch_enums_mock():
     mapping = {'id': 'id', 'description': 'description', 'untranslatedName': 'name'}
     caster_functions = {'id': int}
     issue_enums = fetch_enums(jira, endpoint = 'issuetype', filter = types_filter, mapping = mapping, caster_functions = caster_functions)
-    assert len(issue_enums) == 7
+    assert len(issue_enums) == 7, f'Exactly seven matches the filter: {str(inspect.getsource(types_filter)).strip()}'
     issue_type_1_bugs = [_ for _ in issue_enums if _['id'] == 1]
-    assert len(issue_type_1_bugs) == 1
+    assert len(issue_type_1_bugs) == 1, f'Exactly one with id == 1'
     issue_type_1_bug = issue_type_1_bugs[0]
-    assert issue_type_1_bug['name'] == 'Bug'
-    assert issue_type_1_bug['description'] == 'A problem or error.'
+    assert issue_type_1_bug['name'] == 'Bug', 'Issue of id == 1 has wrong name'
+    assert issue_type_1_bug['description'] == 'A problem or error.', 'Issue of id == 1 has wrong description'
+
+def test_fetch_issuetype_enums_real():
+    opts = JiraOptions()
+    assert opts.user != 'admin@domain.com'
+    assert opts.url != 'https://admin.atlassian.net'
+    assert opts.personal_access_token != 'SECRET'
+    auth = JiraAuth(opts)
+    jira = JiraClient(opts, auth, requests)
+
+    types_filter = lambda d: int(d['id']) < 100 and d['name'] in ('Bug', 'Task', 'Epic', 'Story', 'Incident', 'New Feature', 'Sub-Task')
+    mapping = {'id': 'id', 'description': 'description', 'untranslatedName': 'name'}
+    caster_functions = {'id': int}
+    issue_enums = fetch_enums(jira, endpoint = 'issuetype', filter = types_filter, mapping = mapping, caster_functions = caster_functions)
+    assert len(issue_enums) == 7, f'Exactly seven matches the filter: {str(inspect.getsource(types_filter)).strip()}'
+    issue_type_1_bugs = [_ for _ in issue_enums if _['id'] == 1]
+    assert len(issue_type_1_bugs) == 1, f'Exactly one with id == 1'
+    issue_type_1_bug = issue_type_1_bugs[0]
+    assert issue_type_1_bug['name'] == 'Bug', 'Issue of id == 1 has wrong name'
+    assert issue_type_1_bug['description'] == 'A problem or error.', 'Issue of id == 1 has wrong description'
+
 
 def test_fetch_enums_real():
     opts = JiraOptions()
@@ -68,30 +90,9 @@ def test_fetch_enums_real():
     mapping = {'id': 'id', 'description': 'description', 'untranslatedName': 'name'}
     caster_functions = {'id': int}
     issue_enums = fetch_enums(jira, endpoint = 'issuetype', filter = types_filter, mapping = mapping, caster_functions = caster_functions)
-    assert len(issue_enums) == 7
+    assert len(issue_enums) == 7, f'Exactly seven matches the filter: {str(inspect.getsource(types_filter)).strip()}'
     issue_type_1_bugs = [_ for _ in issue_enums if _['id'] == 1]
-    assert len(issue_type_1_bugs) == 1
+    assert len(issue_type_1_bugs) == 1, f'Exactly one with id == 1'
     issue_type_1_bug = issue_type_1_bugs[0]
-    assert issue_type_1_bug['name'] == 'Bug'
-    assert issue_type_1_bug['description'] == 'A problem or error.'
-
-
-def test_fetch_enums_real():
-    opts = JiraOptions()
-    assert opts.user != 'admin@domain.com'
-    assert opts.url != 'https://admin.atlassian.net'
-    assert opts.personal_access_token != 'SECRET'
-    auth = JiraAuth(opts)
-    jira = JiraClient(opts, auth, requests)
-
-    types_filter = lambda d: int(d['id']) < 100 and d['name'] in ('Bug', 'Task', 'Epic', 'Story', 'Incident', 'New Feature', 'Sub-Task')
-    mapping = {'id': 'id', 'description': 'description', 'untranslatedName': 'name'}
-    caster_functions = {'id': int}
-    issue_enums = fetch_enums(jira, endpoint = 'issuetype', filter = types_filter, mapping = mapping, caster_functions = caster_functions)
-    assert len(issue_enums) == 7
-    issue_type_1_bugs = [_ for _ in issue_enums if _['id'] == 1]
-    assert len(issue_type_1_bugs) == 1
-    issue_type_1_bug = issue_type_1_bugs[0]
-    assert issue_type_1_bug['name'] == 'Bug'
-    assert issue_type_1_bug['description'] == 'A problem or error.'
-    
+    assert issue_type_1_bug['name'] == 'Bug', 'Issue of id == 1 has wrong name'
+    assert issue_type_1_bug['description'] == 'A problem or error.', 'Issue of id == 1 has wrong description'
