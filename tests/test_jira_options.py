@@ -3,24 +3,27 @@ from dataclasses import dataclass
 
 from jira import JiraOptions
 
-OPTIONS_CONTENT = '''
-[jira]
-user = "user@domain.com"
-url = "https://account.atlassian.net"
-personal-access-token = "zxcv_JIRA_TOKEN"
-'''
+@pytest.fixture
+def fake_toml():
+    return '\n'.join((
+        '[jira]',
+        'user = "user@domain.com"',
+        'url = "https://account.atlassian.net"',
+        'personal-access-token = "zxcv_JIRA_TOKEN"',
+        ''
+    ))
 
-def test_JiraOptions(tmpdir):
+def test_JiraOptions(tmpdir, fake_toml):
     toml = tmpdir / "options.toml"
-    toml.write(OPTIONS_CONTENT)
+    toml.write(fake_toml)
     opts = JiraOptions(toml_source = toml)
     assert opts.user == 'user@domain.com'
     assert opts.url == 'https://account.atlassian.net'
     assert opts.personal_access_token == 'zxcv_JIRA_TOKEN'
 
-def test_JiraOptionsOverride(tmpdir):
+def test_JiraOptionsOverride(tmpdir, fake_toml):
     toml = tmpdir / "options.toml"
-    toml.write(OPTIONS_CONTENT)
+    toml.write(fake_toml)
     @dataclass
     class cli:
         user = 'admin@domain.com'
