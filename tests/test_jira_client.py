@@ -1,37 +1,15 @@
 import pytest
 from dataclasses import dataclass
 
-class requestsMock:
-    def get(self, *args, **kwargs):
-        return self
-    def raise_for_status(self):
-        return {}
-    def json(self):
-        return {}
+from jira import JiraOptions, JiraAuth, JiraClient
 
-from jira import JiraOptions, JiraAuth, JiraClient, parse_args
+from .conftest import RequestsMock, RequestsResultMock
 
-@dataclass
-class cli:
-    user = 'admin@domain.com'
-    jira_url = 'https://admin.atlassian.net'
-    personal_access_token = 'SECRET'
-    no_verify_ssl = False
+@pytest.fixture
+def fake_jira_client_for_test_auth(opts_from_fake_cli):
+    request_mock = RequestsMock(get_return = {})
+    auth = JiraAuth(opts_from_fake_cli)
+    return JiraClient(opts_from_fake_cli, auth, request_mock)
 
-OPTIONS_CONTENT = '''
-[jira]
-user = "user@domain.com"
-url = "https://account.atlassian.net"
-personal-access-token = "zxcv_JIRA_TOKEN"
-'''
-
-def test_JiraOptionsOverride(tmpdir):
-    toml = tmpdir / "options.toml"
-    toml.write(OPTIONS_CONTENT)
-    opts = JiraOptions(toml_source = toml, parser = cli())
-    assert opts.user == 'admin@domain.com'
-    assert opts.url == 'https://admin.atlassian.net'
-    assert opts.personal_access_token == 'SECRET'
-    auth = JiraAuth(opts)
-    jira = JiraClient(opts, auth, requestsMock())
-    jira.test_auth()
+def test_JiraOptionsOverride(fake_toml, fake_jira_client_for_test_auth):
+    fake_jira_client_for_test_auth.test_auth()

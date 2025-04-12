@@ -1,31 +1,6 @@
 import pytest
-from dataclasses import dataclass
 
 from jira import JiraOptions
-
-@pytest.fixture
-def fake_toml(tmpdir):
-    toml_contents = '\n'.join((
-        '[jira]',
-        'user = "user@domain.com"',
-        'url = "https://account.atlassian.net"',
-        'personal-access-token = "zxcv_JIRA_TOKEN"',
-        ''
-    ))
-    toml = tmpdir / "options.toml"
-    toml.write(toml_contents)
-    return toml
-
-@dataclass
-class Cli:
-    user = 'admin@domain.com'
-    jira_url = 'https://admin.atlassian.net'
-    personal_access_token = 'SECRET'
-    no_verify_ssl = False
-
-@pytest.fixture
-def fake_cli():
-    return Cli()
 
 def test_JiraOptions(fake_toml):
     opts = JiraOptions(toml_source = fake_toml)
@@ -46,3 +21,8 @@ def test_JiraOptionsNotSet(tmpdir):
     toml.write('')
     with pytest.raises(AssertionError) as e:
         opts = JiraOptions(toml_source = toml)
+
+def test_opts_from_user_toml_values(opts_from_user_toml):
+    assert opts_from_user_toml.user != 'admin@domain.com'
+    assert opts_from_user_toml.url != 'https://admin.atlassian.net'
+    assert opts_from_user_toml.personal_access_token != 'SECRET'
