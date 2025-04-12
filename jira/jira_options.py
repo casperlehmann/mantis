@@ -24,7 +24,7 @@ def parse_args():
     parser.add_argument('-t', '--personal-access-token', dest='personal_access_token',
                         default=None, help='Personal Access Token from JIRA')
     parser.add_argument('-j', '--jira-url', dest='jira_url',
-                        default='https://account.atlassian.net', help='JIRA Tenant base URL (e.g. https://account.atlassian.net)')
+                        help='JIRA Tenant base URL (e.g. https://account.atlassian.net)')
     return parser.parse_args()
 
 if __name__ == '__main__':
