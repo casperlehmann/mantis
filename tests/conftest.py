@@ -8,9 +8,9 @@ from dataclasses import dataclass
 
 @dataclass
 class Cli:
-    user = 'admin@domain.com'
-    url = 'https://admin.atlassian.net'
-    personal_access_token = 'SECRET'
+    user = 'user_1@domain.com'
+    url = 'https://account_1.atlassian.net'
+    personal_access_token = 'SECRET_1'
     no_verify_ssl = False
 
 class RequestsResultMock:
@@ -37,9 +37,9 @@ class RequestsMock:
 def fake_toml(tmpdir):
     toml_contents = '\n'.join((
         '[jira]',
-        'user = "user@domain.com"',
-        'url = "https://account.atlassian.net"',
-        'personal-access-token = "zxcv_JIRA_TOKEN"',
+        'user = "user_2@domain.com"',
+        'url = "https://account_2.atlassian.net"',
+        'personal-access-token = "SECRET_2"',
         ''
     ))
     toml = tmpdir / "options.toml"
