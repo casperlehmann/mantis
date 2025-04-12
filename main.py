@@ -21,6 +21,6 @@ if __name__ == '__main__':
 
     types_filter = lambda d: int(d['id']) < 100 and d['name'] in ('Bug', 'Task', 'Epic', 'Story', 'Incident', 'New Feature', 'Sub-Task')
     mapping = {'id': 'id', 'description': 'description', 'untranslatedName': 'name'}
-    cast = {'id': int}
-    issue_enums = fetch_enums(jira, endpoint = 'issuetype', filter = types_filter, mapping = mapping, cast = cast)
+    caster_functions = {'id': int}
+    issue_enums = fetch_enums(jira, endpoint = 'issuetype', filter = types_filter, mapping = mapping, caster_functions = caster_functions)
     pprint(issue_enums)

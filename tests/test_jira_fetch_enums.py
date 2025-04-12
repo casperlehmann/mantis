@@ -47,8 +47,8 @@ def test_fetch_enums_mock():
 
     types_filter = lambda d: int(d['id']) < 100 and d['name'] in ('Bug', 'Task', 'Epic', 'Story', 'Incident', 'New Feature', 'Sub-Task')
     mapping = {'id': 'id', 'description': 'description', 'untranslatedName': 'name'}
-    cast = {'id': int}
-    issue_enums = fetch_enums(jira, endpoint = 'issuetype', filter = types_filter, mapping = mapping, cast = cast)
+    caster_functions = {'id': int}
+    issue_enums = fetch_enums(jira, endpoint = 'issuetype', filter = types_filter, mapping = mapping, caster_functions = caster_functions)
     assert len(issue_enums) == 7
     issue_type_1_bugs = [_ for _ in issue_enums if _['id'] == 1]
     assert len(issue_type_1_bugs) == 1
@@ -66,8 +66,28 @@ def test_fetch_enums_real():
 
     types_filter = lambda d: int(d['id']) < 100 and d['name'] in ('Bug', 'Task', 'Epic', 'Story', 'Incident', 'New Feature', 'Sub-Task')
     mapping = {'id': 'id', 'description': 'description', 'untranslatedName': 'name'}
-    cast = {'id': int}
-    issue_enums = fetch_enums(jira, endpoint = 'issuetype', filter = types_filter, mapping = mapping, cast = cast)
+    caster_functions = {'id': int}
+    issue_enums = fetch_enums(jira, endpoint = 'issuetype', filter = types_filter, mapping = mapping, caster_functions = caster_functions)
+    assert len(issue_enums) == 7
+    issue_type_1_bugs = [_ for _ in issue_enums if _['id'] == 1]
+    assert len(issue_type_1_bugs) == 1
+    issue_type_1_bug = issue_type_1_bugs[0]
+    assert issue_type_1_bug['name'] == 'Bug'
+    assert issue_type_1_bug['description'] == 'A problem or error.'
+
+
+def test_fetch_enums_real():
+    opts = JiraOptions()
+    assert opts.user != 'admin@domain.com'
+    assert opts.url != 'https://admin.atlassian.net'
+    assert opts.personal_access_token != 'SECRET'
+    auth = JiraAuth(opts)
+    jira = JiraClient(opts, auth, requests)
+
+    types_filter = lambda d: int(d['id']) < 100 and d['name'] in ('Bug', 'Task', 'Epic', 'Story', 'Incident', 'New Feature', 'Sub-Task')
+    mapping = {'id': 'id', 'description': 'description', 'untranslatedName': 'name'}
+    caster_functions = {'id': int}
+    issue_enums = fetch_enums(jira, endpoint = 'issuetype', filter = types_filter, mapping = mapping, caster_functions = caster_functions)
     assert len(issue_enums) == 7
     issue_type_1_bugs = [_ for _ in issue_enums if _['id'] == 1]
     assert len(issue_type_1_bugs) == 1
