@@ -13,9 +13,9 @@ class JiraOptions:
         self.user = parser and parser.user or options.get('jira', {}).get('user')
         self.personal_access_token = parser and parser.personal_access_token or options.get('jira', {}).get('personal-access-token')
         self.url = parser and parser.jira_url or options.get('jira', {}).get('url')
-        assert self.user
-        assert self.personal_access_token
-        assert self.url
+        assert self.user, 'JiraOptions.user not set'
+        assert self.personal_access_token, 'JiraOptions.personal_access_token not set'
+        assert self.url, 'JiraOptions.url not set'
 
 def parse_args():
     parser = argparse.ArgumentParser()

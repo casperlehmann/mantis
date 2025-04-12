@@ -19,3 +19,9 @@ $ cp options-example.toml options.toml
 $ vi options.toml
 ```
 
+Run the tests:
+
+```sh
+pytest
+```
+
