@@ -13,6 +13,7 @@ class JiraOptions:
         self.user = parser and parser.user or options.get('jira', {}).get('user')
         self.personal_access_token = parser and parser.personal_access_token or options.get('jira', {}).get('personal-access-token')
         self.url = parser and parser.jira_url or options.get('jira', {}).get('url')
+        self.no_verify_ssl = bool(parser and parser.no_verify_ssl or options.get('jira', {}).get('no-verify-ssl'))
         assert self.user, 'JiraOptions.user not set'
         assert self.personal_access_token, 'JiraOptions.personal_access_token not set'
         assert self.url, 'JiraOptions.url not set'
@@ -25,6 +26,8 @@ def parse_args():
                         default=None, help='Personal Access Token from JIRA')
     parser.add_argument('-j', '--jira-url', dest='jira_url',
                         help='JIRA Tenant base URL (e.g. https://account.atlassian.net)')
+    parser.add_argument('--no-verify-ssl', dest='no_verify_ssl', default=False,
+                        action='store_true', help='Do not verify SSL certificates for requests')
     return parser.parse_args()
 
 if __name__ == '__main__':
