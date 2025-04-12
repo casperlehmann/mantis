@@ -13,8 +13,24 @@ class JiraAuth:
         assert self.options.url
 
     @property
+    def jira_url(self):
+        return self.options.jira_url
+
+    @property
+    def no_verify_ssl(self):
+        return self.options.no_verify_ssl
+
+    @property
+    def user(self):
+        return self.options.user
+
+    @property
+    def personal_access_token(self):
+        return self.options.personal_access_token
+
+    @property
     def auth(self):
-        if self.options.personal_access_token:
+        if self.personal_access_token:
             assert self.options.user
-            return HTTPBasicAuth(self.options.user, self.options.personal_access_token)
+            return HTTPBasicAuth(self.user, self.personal_access_token)
         raise PermissionError
