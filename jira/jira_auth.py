@@ -13,8 +13,8 @@ class JiraAuth:
         assert self.options.url
 
     @property
-    def jira_url(self):
-        return self.options.jira_url
+    def url(self):
+        return self.options.url
 
     @property
     def no_verify_ssl(self):

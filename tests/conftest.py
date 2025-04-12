@@ -9,7 +9,7 @@ from dataclasses import dataclass
 @dataclass
 class Cli:
     user = 'admin@domain.com'
-    jira_url = 'https://admin.atlassian.net'
+    url = 'https://admin.atlassian.net'
     personal_access_token = 'SECRET'
     no_verify_ssl = False
 
