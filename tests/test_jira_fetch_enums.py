@@ -1,5 +1,6 @@
 import pytest
 import inspect
+import os
 
 from jira import JiraOptions, JiraAuth, JiraClient, parse_args
 from jira import fetch_enums
@@ -60,6 +61,8 @@ def test_fetch_issuetype_enums_mock_no_casting(fake_jira_client_for_issue_type):
     assert issue_type_1_bug['name'] == 'Bug', 'Issue of id == \'1\' has wrong name'
     assert issue_type_1_bug['description'] == 'A problem or error.', 'Issue of id == \'1\' has wrong description'
 
+@pytest.mark.skipif(not os.path.exists("options.toml"), reason='File "options.toml" does not exist')
+@pytest.mark.skip(reason="This is a live test against the Jira api")
 def test_fetch_issuetype_enums_real(jira_client_from_user_toml):
     types_filter = lambda d: int(d['id']) < 100 and d['name'] in ('Bug', 'Task', 'Epic', 'Story', 'Incident', 'New Feature', 'Sub-Task')
     mapping = {'id': 'id', 'description': 'description', 'untranslatedName': 'name'}
@@ -72,6 +75,8 @@ def test_fetch_issuetype_enums_real(jira_client_from_user_toml):
     assert issue_type_1_bug['name'] == 'Bug', 'Issue of id == 1 has wrong name'
     assert issue_type_1_bug['description'] == 'A problem or error.', 'Issue of id == 1 has wrong description'
 
+@pytest.mark.skipif(not os.path.exists("options.toml"), reason='File "options.toml" does not exist')
+@pytest.mark.skip(reason="This is a live test against the Jira api")
 def test_fetch_issuetype_enums_real_no_casting(jira_client_from_user_toml):
     types_filter = lambda d: d['id'] == '1'
     mapping = {'id': 'id', 'description': 'description', 'untranslatedName': 'name'}

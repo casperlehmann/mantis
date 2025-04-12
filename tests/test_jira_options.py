@@ -1,4 +1,5 @@
 import pytest
+import os
 
 from jira import JiraOptions
 
@@ -22,6 +23,7 @@ def test_JiraOptionsNotSet(tmpdir):
     with pytest.raises(AssertionError) as e:
         opts = JiraOptions(toml_source = toml)
 
+@pytest.mark.skipif(not os.path.exists("options.toml"), reason='File "options.toml" does not exist')
 def test_OptsFromUserTomlValues(opts_from_user_toml):
     assert opts_from_user_toml.user != 'user_1@domain.com'
     assert opts_from_user_toml.url != 'https://account_1.atlassian.net'
