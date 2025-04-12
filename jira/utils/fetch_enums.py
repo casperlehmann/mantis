@@ -25,10 +25,16 @@ def fetch_enums(jira, endpoint = 'issuetype', filter = None, mapping = {}, caste
     schemas = []
     for entry in data:
         schema = {}
-        for api_name, rename in mapping.items():
-            cast = caster_functions.get(rename, lambda unchanged: unchanged)
-            api_value = cast(entry.get(api_name))
-            schema[rename] = api_value
+        if mapping:
+            for api_name, rename in mapping.items():
+                cast = caster_functions.get(rename, lambda unchanged: unchanged)
+                api_value = cast(entry.get(api_name))
+                schema[rename] = api_value
+        else:
+            for api_name, api_value in entry.items():
+                cast = caster_functions.get(api_name, lambda unchanged: unchanged)
+                api_value = cast(entry.get(api_name))
+                schema[api_name] = api_value
         if filter and filter(schema):
             schemas.append(schema)
     return schemas
