@@ -1,15 +1,24 @@
 import argparse
 import tomllib
+from typing import Optional
 
 class JiraOptions:
     """Collects options from toml file, allowing for command line overrides
     
     python jira/jira_options.py --user user@domain.com --personal-access-token $JIRA_TOKEN --jira-url=https://account.atlassian.net
     """
+    default_toml_source = "options.toml"
 
-    def __init__(self, parser: 'argparse.Namespace' = None, toml_source: str = "options.toml", ):
-        with open(toml_source, "rb") as f:
-            options = tomllib.load(f)
+    def __init__(self, parser: Optional['argparse.Namespace'] = None, toml_source: Optional[str] = None, ):
+        if not toml_source:
+            toml_source = self.default_toml_source
+        try:
+            with open(toml_source, "rb") as f:
+                options = tomllib.load(f)
+        except FileNotFoundError:
+            print ('No toml_source provided and default "options.toml" does not exist')
+            toml_source = None
+            options = {}
         self.user = parser and parser.user or options.get('jira', {}).get('user')
         self.personal_access_token = parser and parser.personal_access_token or options.get('jira', {}).get('personal-access-token')
         self.url = parser and parser.url or options.get('jira', {}).get('url')
