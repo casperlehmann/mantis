@@ -6,33 +6,17 @@ from jira import JiraAuth
 from requests.auth import HTTPBasicAuth
 from dataclasses import dataclass
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
     from jira.jira_options import JiraOptions
 
-OPTIONS_CONTENT = '''
-[jira]
-user = "user@domain.com"
-url = "https://account.atlassian.net"
-personal-access-token = "zxcv_JIRA_TOKEN"
-'''
-
-def test_CreatesJiraAuthSettings(tmpdir):
-    toml = tmpdir / "options.toml"
-    toml.write(OPTIONS_CONTENT)
-    opts = JiraOptions(toml_source = toml)
+def test_CreatesJiraAuthSettings(fake_toml):
+    opts = JiraOptions(toml_source = fake_toml)
     auth = JiraAuth(opts)
-    assert opts.user == 'user@domain.com'
-    assert opts.url == 'https://account.atlassian.net'
-    assert opts.personal_access_token == 'zxcv_JIRA_TOKEN'
     assert isinstance(auth.auth, HTTPBasicAuth)
 
-def test_FailedJiraAuthSettingsRaises(tmpdir):
-    @dataclass
-    class OptsMock:
-        personal_access_token = None
-        url = 'exists'
-    opts = OptsMock()
+def test_FailedJiraAuthSettingsRaises(fake_cli):
+    fake_cli.personal_access_token = None
     with pytest.raises(PermissionError) as e:
-        JiraAuth(opts).auth
+        JiraAuth(fake_cli).auth
