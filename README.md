@@ -25,3 +25,14 @@ Run the tests:
 pytest
 ```
 
+Run your first script:
+
+```sh
+$ python jira/jira_options.py
+```
+
+Or to overwrite options on the command line:
+
+```sh
+$ python jira/jira_options.py --user user@domain.com --personal-access-token $JIRA_TOKEN --jira-url=https://account.atlassian.net
+```
