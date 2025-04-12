@@ -1,0 +1,4 @@
+[mypy]
+
+[[requests.auth]]
+follow_untyped_imports = "True"
