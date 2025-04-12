@@ -11,6 +11,13 @@ class requestsMock:
 
 from jira import JiraOptions, JiraAuth, JiraClient, parse_args
 
+@dataclass
+class cli:
+    user = 'admin@domain.com'
+    jira_url = 'https://admin.atlassian.net'
+    personal_access_token = 'SECRET'
+    no_verify_ssl = False
+
 OPTIONS_CONTENT = '''
 [jira]
 user = "user@domain.com"
@@ -21,12 +28,6 @@ personal-access-token = "zxcv_JIRA_TOKEN"
 def test_JiraOptionsOverride(tmpdir):
     toml = tmpdir / "options.toml"
     toml.write(OPTIONS_CONTENT)
-    @dataclass
-    class cli:
-        user = 'admin@domain.com'
-        jira_url = 'https://admin.atlassian.net'
-        personal_access_token = 'SECRET'
-        no_verify_ssl = False
     opts = JiraOptions(toml_source = toml, parser = cli())
     assert opts.user == 'admin@domain.com'
     assert opts.url == 'https://admin.atlassian.net'
