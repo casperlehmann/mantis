@@ -17,6 +17,13 @@ def test_JiraOptions(tmpdir, fake_toml):
     toml = tmpdir / "options.toml"
     toml.write(fake_toml)
     opts = JiraOptions(toml_source = toml)
+@dataclass
+class cli:
+    user = 'admin@domain.com'
+    jira_url = 'https://admin.atlassian.net'
+    personal_access_token = 'SECRET'
+    no_verify_ssl = False
+
     assert opts.user == 'user@domain.com'
     assert opts.url == 'https://account.atlassian.net'
     assert opts.personal_access_token == 'zxcv_JIRA_TOKEN'
@@ -24,13 +31,6 @@ def test_JiraOptions(tmpdir, fake_toml):
 def test_JiraOptionsOverride(tmpdir, fake_toml):
     toml = tmpdir / "options.toml"
     toml.write(fake_toml)
-    @dataclass
-    class cli:
-        user = 'admin@domain.com'
-        jira_url = 'https://admin.atlassian.net'
-        personal_access_token = 'SECRET'
-        no_verify_ssl = False
-    opts = JiraOptions(toml_source = toml, parser = cli())
     assert opts.user == 'admin@domain.com'
     assert opts.url == 'https://admin.atlassian.net'
     assert opts.personal_access_token == 'SECRET'
