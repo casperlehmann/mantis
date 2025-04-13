@@ -1,9 +1,5 @@
 #!/usr/bin/env python
 
-import requests
-import json
-import requests
-
 from pprint import pprint
 
 from mantis.jira import JiraClient, JiraOptions, JiraAuth, parse_args
