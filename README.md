@@ -29,6 +29,12 @@ $ EXECUTE_SKIPPED=1 pytest
 
 # Run tests every time a file changes (using `pytest-xdist`):
 $ pytest -f
+
+# Show test coverage for each file
+$ pytest --cov
+
+# Generate coverage report (written to ./htmlcov)
+$ pytest --cov-report html --cov
 ```
 
 Executing the script:
