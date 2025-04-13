@@ -28,6 +28,10 @@ class JiraClient:
         url = f'{self.api_url}/{uri}'
         return self.request_handler.get(url, params=params, **self.requests_kwargs)
 
+    def _post(self, uri, data):
+        url = f'{self.api_url}/{uri}'
+        return self.request_handler.post(url, json=data, **self.requests_kwargs)
+
     def get_current_user(self) -> dict:
         response = self._get('myself')
         response.raise_for_status()
