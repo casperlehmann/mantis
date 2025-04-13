@@ -12,6 +12,16 @@ $ . .venv/bin/activate
 $ pip install -r requirements.txt
 ```
 
+Head over to your Jira and under [manage-profile / security 
+/ api-tokens](https://id.atlassian.com/manage-profile/security/api-tokens),
+click on `Create API token`
+
+> [!WARNING]
+> Don't share this code with anyone, please read the official Jira docs on
+[API authentication](https://developer.atlassian.com/cloud/jira/platform/basic-auth-for-rest-apis/))
+and [API tokens](https://support.atlassian.com/atlassian-account/docs/manage-api-tokens-for-your-atlassian-account/)
+if you need more information.
+
 Fill out the options toml:
 
 ```sh
@@ -43,10 +53,13 @@ Updated local cache for issuetypes:
 [...]
 ```
 
-Or to overwrite options on the command line:
+Or to overwrite options on the command line (remember to set the JIRA_TOKEN env var):
 
 ```sh
-$ python jira/jira_options.py --user user@domain.com --personal-access-token $JIRA_TOKEN --jira-url=https://account.atlassian.net
+$ python jira/jira_options.py \
+    --user user@domain.com \
+    --personal-access-token $JIRA_TOKEN \
+    --jira-url=https://account.atlassian.net
 ```
 
 # Extended testing
