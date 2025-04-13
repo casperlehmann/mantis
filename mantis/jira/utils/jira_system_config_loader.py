@@ -55,7 +55,10 @@ class JiraSystemConfigLoader:
     def __init__(self, client: 'JiraClient') -> None:
         self.client = client
 
-    def update_issuetypes_cache(self):
+    def write_to_system_cache(self, file_name: str) -> None:
+        self.client.write_to_cache(f'system/{file_name}', json.dumps(issue_enums))
+
+    def update_issuetypes_cache(self) -> None:
         types_filter = lambda d: int(d['id']) < 100 and d['name'] in ('Bug', 'Task', 'Epic', 'Story', 'Incident', 'New Feature', 'Sub-Task')
         mapping = {'id': 'id', 'description': 'description', 'untranslatedName': 'name'}
         caster_functions = {'id': int}
@@ -66,9 +69,9 @@ class JiraSystemConfigLoader:
             mapping = mapping,
             caster_functions = caster_functions
         )
-        self.client.write_to_cache('issue_types.json', json.dumps(issue_enums))
+        self.write_to_system_cache('issue_types.json', json.dumps(issue_enums))
 
-    def get_issuetypes_names_from_cache(self):
+    def get_issuetypes_names_from_cache(self) -> set[str]:
         issuetypes = self.client.get_from_cache('issue_types.json')
         if issuetypes:
             return json.loads(issuetypes)
