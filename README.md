@@ -25,6 +25,12 @@ Run the tests:
 pytest
 ```
 
+Run also the tests marked as skipped (Note: This will make calls to Jira api if configured):
+
+```sh
+EXECUTE_SKIPPED=1 pytest
+```
+
 Run your first script:
 
 ```sh
