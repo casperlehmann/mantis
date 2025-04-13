@@ -46,20 +46,6 @@ class JiraClient:
         with open(self.cache_dir / file_name, 'r') as f:
             return f.read()
 
-    def get_project_keys(self):
-        for issue_type in self.issues.allowed_types:
-            url = (
-                f'issue/createmeta'
-                f'?projectKeys={self.project_name}'
-                f'&issuetypeNames={issue_type}'
-                '&expand=projects.issuetypes.fields'
-            )
-            response = self._get(url)
-            response.raise_for_status()
-            data = response.json()
-            self.write_to_cache(f'issue_type_fields_{issue_type}.json', json.dumps(data))
-        return self.issues.allowed_types
-
     def write_issue_to_cache(self, key: str, data):
         self.write_to_cache(f'issues/{key}.json', json.dumps(data))
 

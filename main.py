@@ -28,4 +28,5 @@ if __name__ == '__main__':
             draft = Draft(issue)
     elif jira_options.action == 'get-project-keys':
         print('Dumped field values for:')
-        pprint(jira.get_project_keys())
+        pprint(jira.system_config_loader.get_project_keys())
+
