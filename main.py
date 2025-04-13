@@ -20,6 +20,8 @@ if __name__ == '__main__':
 
     if jira_options.action == 'test-auth':
         jira.test_auth()
+    elif jira_options.action == 'me-as-assignee':
+        print(jira.get_current_user_as_assignee())
     elif jira_options.action == 'fetch-issuetypes':
         jira.update_issuetypes_cache()
         print('Updated local cache for issuetypes:')

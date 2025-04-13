@@ -83,6 +83,12 @@ class JiraClient:
         data = response.json()
         return data
 
+    def get_current_user_account_id(self) -> str:
+        return self.get_current_user().get('accountId')
+
+    def get_current_user_as_assignee(self) -> dict:
+        return {"assignee": {"accountId": self.get_current_user_account_id()}}
+
     def test_auth(self):
         try:
             user = self.get_current_user()
