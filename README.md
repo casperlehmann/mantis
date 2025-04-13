@@ -32,6 +32,20 @@ $ cp options-example.toml options.toml
 $ vi options.toml
 ```
 
+Your `options.toml` needs to be filled out with your personal data,
+including the Jira token you just created.
+It should **not** be added to source control.
+You new file should look something like the following example:
+
+```toml
+[jira]
+user = "name@company.com"
+url = "https://company-account.atlassian.net"
+project = "TEAMNAME"
+personal-access-token = "qwerqwer-asdfasdf-zxcvzxcv"
+cache-dir = ".jira_cache"
+```
+
 ### Then run the tests:
 
 ```sh
