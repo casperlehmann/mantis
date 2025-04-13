@@ -8,15 +8,10 @@ from pprint import pprint
 
 from jira import JiraClient, JiraOptions, JiraAuth, parse_args
 
-import json
-
-def log(*args):
-    print(*args, file=sys.stderr)
-
 if __name__ == '__main__':
     jira_options = JiraOptions(parse_args(), 'options.toml')
     auth = JiraAuth(jira_options)
-    jira = JiraClient(jira_options, auth, requests)
+    jira = JiraClient(jira_options, auth)
 
     if jira_options.action == 'test-auth':
         jira.test_auth()

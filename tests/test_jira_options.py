@@ -17,17 +17,19 @@ def test_JiraOptionsOverride(fake_toml, fake_cli):
 
 def test_JiraOptionsNotSet(tmpdir, capfd):
     toml = tmpdir / "options.toml"
-    with pytest.raises(AssertionError) as e:
+    with pytest.raises(AssertionError):
         opts = JiraOptions(toml_source = toml)
-    out, err = capfd.readouterr()
+    out, _ = capfd.readouterr()
     assert out == 'No toml_source provided and default "options.toml" does not exist\n'
     toml.write('')
-    with pytest.raises(AssertionError) as e:
+    with pytest.raises(AssertionError):
         opts = JiraOptions(toml_source = toml)
-        out, err = capfd.readouterr()
+        out, _ = capfd.readouterr()
+    assert out == 'No toml_source provided and default "options.toml" does not exist\n'
 
 @pytest.mark.skipif(not os.path.exists("options.toml"), reason='File "options.toml" does not exist')
 def test_OptsFromUserTomlValues(opts_from_user_toml):
     assert opts_from_user_toml.user != 'user_1@domain.com'
     assert opts_from_user_toml.url != 'https://account_1.atlassian-host.net'
     assert opts_from_user_toml.personal_access_token != 'SECRET_1'
+

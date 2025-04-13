@@ -1,24 +1,21 @@
-from os.path import exists
-from requests.exceptions import ConnectionError
-
 from typing import TYPE_CHECKING
 from pathlib import Path
 import json
+import requests
 
 from .jira_issues import JiraIssues
 from .utils import fetch_enums
 
 if TYPE_CHECKING:
-    from jira.jira_auth import JiraAuth
-    from jira.cli import JiraOptions
+    from .jira_auth import JiraAuth
+    from .jira_options import JiraOptions
 
 class JiraClient:
-    def __init__(self, jira_option: 'JiraOptions', auth: 'JiraAuth', request_handler):
+    def __init__(self, jira_option: 'JiraOptions', auth: 'JiraAuth'):
         self.options = jira_option
         self.auth = auth.auth
         self.no_verify_ssl = auth.no_verify_ssl
         self.project_name = jira_option.project
-        self.request_handler = request_handler
         self.requests_kwargs = {
             'auth': self.auth,
             'headers': {'Content-Type': 'application/json'},
@@ -80,11 +77,11 @@ class JiraClient:
 
     def _get(self, uri, params={}):
         url = f'{self.api_url}/{uri}'
-        return self.request_handler.get(url, params=params, **self.requests_kwargs)
+        return requests.get(url, params=params, **self.requests_kwargs)
 
     def _post(self, uri, data):
         url = f'{self.api_url}/{uri}'
-        return self.request_handler.post(url, json=data, **self.requests_kwargs)
+        return requests.post(url, json=data, **self.requests_kwargs)
 
     def get_issue(self, key):
         return self._get(f'issue/{key}')
@@ -108,7 +105,7 @@ class JiraClient:
         try:
             user = self.get_current_user()
             print(f'Connected as user: {user.get('displayName', 'ERROR: No displayName')}')
-        except ConnectionError as e:
+        except requests.exceptions.ConnectionError as e:
             print('Connection error. Run it like this:')
             print("export JIRA_TOKEN=$(cat secret.txt)")
             print("python main.py")
@@ -117,3 +114,4 @@ class JiraClient:
             print(e.with_traceback)
             print('\ntest_auth failed for unknown reasons.')
             raise e
+

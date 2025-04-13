@@ -7,7 +7,7 @@ from jira import JiraAuth, JiraClient
 def fake_jira_client_for_test_auth(opts_from_fake_cli, mock_get_request):
     mock_get_request.return_value.json.return_value = {}
     auth = JiraAuth(opts_from_fake_cli)
-    return JiraClient(opts_from_fake_cli, auth, requests)
+    return JiraClient(opts_from_fake_cli, auth)
 
 @pytest.mark.skipif(not os.path.exists("options.toml"), reason='File "options.toml" does not exist')
 def test_JiraOptionsOverride(fake_jira_client_for_test_auth):

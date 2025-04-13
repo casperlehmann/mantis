@@ -9,7 +9,7 @@ class JiraOptions:
     """
     default_toml_source = "options.toml"
 
-    def __init__(self, parser: Optional['argparse.Namespace'] = None, toml_source: Optional[str] = None, ):
+    def __init__(self, parser: Optional['argparse.Namespace'] = None, toml_source: Optional[str] = None):
         if not toml_source:
             toml_source = self.default_toml_source
         try:
@@ -52,3 +52,4 @@ def parse_args():
 
 if __name__ == '__main__':
     print(JiraOptions(parse_args()) and 'JiraOptions successfully instantiated')
+

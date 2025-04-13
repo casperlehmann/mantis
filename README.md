@@ -19,25 +19,19 @@ $ cp options-example.toml options.toml
 $ vi options.toml
 ```
 
-Run the tests:
+Then run the tests:
 
 ```sh
-pytest
+$ pytest
+
+#Run also the tests marked as skipped (Note: This will make calls to Jira api if configured):
+$ EXECUTE_SKIPPED=1 pytest
+
+# Run tests every time a file changes (using `pytest-xdist`):
+$ pytest -f
 ```
 
-Run also the tests marked as skipped (Note: This will make calls to Jira api if configured):
-
-```sh
-EXECUTE_SKIPPED=1 pytest
-```
-
-Run tests every time a file changes (using `pytest-xdist`):
-
-```sh
-pytest -f
-```
-
-Run your first script:
+Executing the script:
 
 ```sh
 $ python main.py test-auth

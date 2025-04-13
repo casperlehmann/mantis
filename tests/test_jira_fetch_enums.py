@@ -1,11 +1,9 @@
 import pytest
 import inspect
 import os
-import requests
 
-from jira import JiraOptions, JiraAuth, JiraClient, parse_args
+from jira import JiraAuth, JiraClient
 from jira import fetch_enums
-
 
 VAL = [
     {
@@ -37,7 +35,7 @@ VAL = [
 def fake_jira_client_for_issue_type(opts_from_fake_cli, mock_get_request):
     mock_get_request.return_value.json.return_value = VAL
     auth = JiraAuth(opts_from_fake_cli)
-    return JiraClient(opts_from_fake_cli, auth, requests)
+    return JiraClient(opts_from_fake_cli, auth)
 
 def test_fetch_issuetype_enums_mock(fake_jira_client_for_issue_type):
     types_filter = lambda d: int(d['id']) < 100 and d['name'] in ('Bug', 'Task', 'Epic', 'Story', 'Incident', 'New Feature', 'Sub-Task')
@@ -86,3 +84,4 @@ def test_fetch_issuetype_enums_real_no_casting(jira_client_from_user_toml):
     issue_type_1_bug = issue_enums[0]
     assert issue_type_1_bug['name'] == 'Bug', 'Issue of id == \'1\' has wrong name'
     assert issue_type_1_bug['description'] == 'A problem or error.', 'Issue of id == \'1\' has wrong description'
+
