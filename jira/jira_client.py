@@ -18,7 +18,6 @@ class JiraClient:
         self.auth = auth.auth
         self.no_verify_ssl = auth.no_verify_ssl
         self.request_handler = request_handler
-        self.issues = JiraIssues(self)
         self.requests_kwargs = {
             'auth': self.auth,
             'headers': {'Content-Type': 'application/json'},
@@ -26,6 +25,7 @@ class JiraClient:
         }
         self.cache_dir = Path(self.options.cache_dir)
         self.cache_dir.mkdir(exist_ok=True)
+        self.issues = JiraIssues(self)
 
     def write_to_cache(self, file_name: str, contents: str):
         with open(self.cache_dir / file_name, 'w') as f:
@@ -45,7 +45,9 @@ class JiraClient:
         self.write_to_cache('issue_types.json', json.dumps(issue_enums))
 
     def get_issuetypes_names_from_cache(self):
-        return json.loads(self.get_from_cache('issue_types.json'))
+        issuetypes = self.get_from_cache('issue_types.json')
+        if issuetypes:
+            return json.loads(issuetypes)
 
     @property
     def api_url(self):
