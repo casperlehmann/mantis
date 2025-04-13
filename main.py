@@ -32,4 +32,6 @@ if __name__ == '__main__':
             key = issue.get('key', 'N/A')
             title = issue.get('fields', {}).get('summary')
             print(f'[{key}] {title}')
-
+    elif jira_options.action == 'get-project-keys':
+        print('Dumped field values for:')
+        pprint(jira.get_project_keys())
