@@ -25,6 +25,7 @@ class JiraClient:
         }
         self.cache_dir = Path(self.options.cache_dir)
         self.cache_dir.mkdir(exist_ok=True)
+        (self.cache_dir / 'issues').mkdir(exist_ok=True)
         self.issues = JiraIssues(self)
 
     def write_to_cache(self, file_name: str, contents: str):
@@ -48,6 +49,14 @@ class JiraClient:
         issuetypes = self.get_from_cache('issue_types.json')
         if issuetypes:
             return json.loads(issuetypes)
+
+    def write_issue_to_cache(self, key: str, data):
+        self.write_to_cache(f'issues/{key}.json', json.dumps(data))
+
+    def get_issue_from_cache(self, key: str):
+        issue_data = self.get_from_cache(f'issues/{key}.json')
+        if issue_data:
+            return json.loads(issue_data)
 
     @property
     def api_url(self):

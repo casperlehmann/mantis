@@ -13,10 +13,14 @@ class JiraIssues:
             self.allowed_types = {_.get('name') for _ in cached_issuetypes}
 
     def get(self, key: str) -> dict:
+        issue_from_cache = self.client.get_issue_from_cache(key)
+        if issue_from_cache:
+            return issue_from_cache
         response = self.client.get_issue(key)
         response.raise_for_status()
         data = response.json()
         assert data.get('key', 'NO_KEY_IN_RESPONSE_PAYLOAD') == key 
+        self.client.write_issue_to_cache(key, data)
         return data
 
     def create(self, issue_type, title, data):
