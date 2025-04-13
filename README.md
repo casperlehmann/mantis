@@ -1,16 +1,19 @@
 # Mantis
 
-Quick actions for Jira.
+Command line interface for writing and maintaining your Jira tasks from the command line.
+Edit locally in your preferred editor and sync to Jira when ready.
 
 ## Getting started
 
-Setup environment with venv:
+### Setup environment with venv:
 
 ```sh
 $ python -m venv .venv
 $ . .venv/bin/activate
 $ pip install -r requirements.txt
 ```
+
+### Generate a Jira token:
 
 Head over to your Jira and under [manage-profile / security 
 / api-tokens](https://id.atlassian.com/manage-profile/security/api-tokens),
@@ -22,20 +25,20 @@ click on `Create API token`
 and [API tokens](https://support.atlassian.com/atlassian-account/docs/manage-api-tokens-for-your-atlassian-account/)
 if you need more information.
 
-Fill out the options toml:
+### Fill out the options toml:
 
 ```sh
 $ cp options-example.toml options.toml
 $ vi options.toml
 ```
 
-Then run the tests:
+### Then run the tests:
 
 ```sh
 $ pytest
 ```
 
-# Running the CLI
+## Running the CLI
 
 ```sh
 $ python main.py test-auth
@@ -62,7 +65,7 @@ $ python jira/jira_options.py \
     --jira-url=https://account.atlassian.net
 ```
 
-# Extended testing
+## Extended testing
 
 ```sh
 $ pytest
