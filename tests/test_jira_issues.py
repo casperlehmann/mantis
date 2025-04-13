@@ -27,3 +27,17 @@ def test_JiraIssuesGetReal(jira_client_from_user_toml):
     test_3_status_name = test_3_status.get('name', {})
     assert test_3_status_name == 'In Progress'
 
+def test_JiraIssuesCreate(jira_issues_from_fake_cli, mock_post_request):
+    with pytest.raises(ValueError):
+        issue = jira_issues_from_fake_cli.create(issue_type='Bug', title='Tester', data={})
+    expected = {'key': 'TASK-1', 'fields': {'status': {'name': 'In Progress'}, 'issuetype': {'name': 'Bug'}}}
+    mock_post_request.return_value.json.return_value = expected
+    issue = jira_issues_from_fake_cli.create(issue_type='Bug', title='Tester', data={'Summary':'a'})
+    fields = issue.get('fields', {})
+    assert fields != {}, "Object 'fields' is empty"
+    issuetype = fields.get('issuetype', {})
+    assert issuetype != {}, "Object 'issuetype' is empty"
+    name = issuetype.get('name')
+    assert name is not None, "Expected 'name' to be present in 'issuetype'"
+    assert name == 'Bug', "Expected issue type name to be 'Bug'"
+

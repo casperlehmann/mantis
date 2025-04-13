@@ -4,7 +4,7 @@ from unittest.mock import patch
 from dataclasses import dataclass
 import requests
 
-from jira import JiraOptions, JiraAuth, JiraClient
+from jira import JiraOptions, JiraAuth, JiraClient, JiraIssues
 
 @dataclass
 class Cli:
@@ -54,3 +54,13 @@ def opts_from_user_toml():
 def jira_client_from_user_toml(opts_from_user_toml):
     auth = JiraAuth(opts_from_user_toml)
     return JiraClient(opts_from_user_toml, auth, requests)
+
+@pytest.fixture
+def jira_client_from_fake_cli(opts_from_fake_cli):
+    auth = JiraAuth(opts_from_fake_cli)
+    return JiraClient(opts_from_fake_cli, auth, requests)
+
+@pytest.fixture
+def jira_issues_from_fake_cli(jira_client_from_fake_cli):
+    return JiraIssues(jira_client_from_fake_cli)
+
