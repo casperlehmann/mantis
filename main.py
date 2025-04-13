@@ -5,10 +5,8 @@ import json
 import requests
 
 from pprint import pprint
-from typing import TYPE_CHECKING
 
 from jira import JiraClient, JiraOptions, JiraAuth, parse_args
-from jira import fetch_enums
 
 import json
 
@@ -22,12 +20,9 @@ if __name__ == '__main__':
     jira.test_auth()
 
     if jira_options.action == 'fetch-issuetypes':
-        types_filter = lambda d: int(d['id']) < 100 and d['name'] in ('Bug', 'Task', 'Epic', 'Story', 'Incident', 'New Feature', 'Sub-Task')
-        mapping = {'id': 'id', 'description': 'description', 'untranslatedName': 'name'}
-        caster_functions = {'id': int}
-        issue_enums = fetch_enums(jira, endpoint = 'issuetype', filter = types_filter, mapping = mapping, caster_functions = caster_functions)
-        jira.write_to_cache('issue_types.json', json.dumps(issue_enums))
-        pprint(jira.get_from_cache('issue_types.json'))
+        jira.update_issuetypes_cache()
+        print('Updated local cache for issuetypes:')
+        pprint(jira.get_issuetypes_names_from_cache())
     elif jira_options.action == 'get-issue':
         for issue_key in jira_options.issues:
             issue = jira.issues.get(key=issue_key)

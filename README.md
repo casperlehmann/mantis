@@ -42,6 +42,14 @@ Run your first script:
 ```sh
 $ python main.py TASK-1
 [TASK-1] Setup Jira
+
+$ python main.py --action fetch-issuetypes
+Updated local cache for issuetypes:
+[{'description': 'Created by Jira Agile - do not edit or delete. Issue type '
+                 'for a user story.',
+  'id': 6,
+  'name': 'Story'},
+[...]
 ```
 
 Or to overwrite options on the command line:
