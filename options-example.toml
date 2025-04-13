@@ -1,6 +1,7 @@
 [jira]
 user = "user@domain.com"
 url = "https://account.atlassian.net"
+project = "TEST"
 personal-access-token = "zxcv_JIRA_TOKEN"
 cache-dir = ".jira_cache"
 

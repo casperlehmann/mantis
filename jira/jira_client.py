@@ -17,6 +17,7 @@ class JiraClient:
         self.options = jira_option
         self.auth = auth.auth
         self.no_verify_ssl = auth.no_verify_ssl
+        self.project_name = jira_option.project
         self.request_handler = request_handler
         self.requests_kwargs = {
             'auth': self.auth,

@@ -22,6 +22,7 @@ class JiraOptions:
         self.user = parser and parser.user or options.get('jira', {}).get('user')
         self.personal_access_token = parser and parser.personal_access_token or options.get('jira', {}).get('personal-access-token')
         self.url = parser and parser.url or options.get('jira', {}).get('url')
+        self.project = parser and parser.project or options.get('jira', {}).get('project')
         self.no_verify_ssl = bool(parser and parser.no_verify_ssl or options.get('jira', {}).get('no-verify-ssl'))
         self.cache_dir = parser and parser.cache_dir or options.get('jira', {}).get('cache-dir')
         self.action = parser and parser.action or ''
@@ -29,6 +30,7 @@ class JiraOptions:
         assert self.user, 'JiraOptions.user not set'
         assert self.personal_access_token, 'JiraOptions.personal_access_token not set'
         assert self.url, 'JiraOptions.url not set'
+        assert self.project, 'JiraOptions.project not set'
         assert self.cache_dir, 'JiraOptions.cache_dir not set'
 
 def parse_args():
@@ -39,6 +41,8 @@ def parse_args():
                         default=None, help='Personal Access Token from JIRA')
     parser.add_argument('-j', '--jira-url', dest='url',
                         help='JIRA Tenant base URL (e.g. https://account.atlassian.net)')
+    parser.add_argument('-p', '--jira-project', dest='project',
+                        help='JIRA project (i.e. the thing in front of the hyphen in your task key)')
     parser.add_argument('--no-verify-ssl', dest='no_verify_ssl', default=False,
                         action='store_true', help='Do not verify SSL certificates for requests')
     parser.add_argument('--cache-dir', dest='cache_dir', default=None, help='Set the local cache for Jira data')

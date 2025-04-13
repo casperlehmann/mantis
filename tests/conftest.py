@@ -11,6 +11,7 @@ class Cli:
     user = 'user_1@domain.com'
     url = 'https://account_1.atlassian-host.net'
     personal_access_token = 'SECRET_1'
+    project = 'TEST'
     no_verify_ssl = False
     cache_dir = ".jira_cache_test"
     action = ''
@@ -33,7 +34,8 @@ def fake_toml(tmpdir):
         'user = "user_2@domain.com"',
         'url = "https://account_2.atlassian-host.net"',
         'personal-access-token = "SECRET_2"',
-        'cache-dir = ".jira_cache_test"'
+        'project = "TEST"',
+        'cache-dir = ".jira_cache_test"',
         ''
     ))
     toml = tmpdir / "options.toml"
