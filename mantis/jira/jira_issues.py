@@ -24,7 +24,7 @@ class JiraIssues:
 
     def __init__(self, client: 'JiraClient'):
         self.client = client
-        cached_issuetypes = client.get_issuetypes_names_from_cache()
+        cached_issuetypes = client.system_config_loader.get_issuetypes_names_from_cache()
         if cached_issuetypes:
             self.allowed_types = {_.get('name') for _ in cached_issuetypes}
 

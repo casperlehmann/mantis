@@ -1,4 +1,16 @@
-def fetch_enums(jira, endpoint = 'issuetype', filter = None, mapping = {}, caster_functions = {}):
+import json
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from jira_client import JiraClient
+
+def fetch_enums(jira: 'JiraClient',
+                endpoint = 'issuetype',
+                filter = None,
+                mapping = {},
+                caster_functions = {}
+                ) -> list:
     """Get the enums of the fields in a jira tenant
 
     Args:
@@ -10,13 +22,13 @@ def fetch_enums(jira, endpoint = 'issuetype', filter = None, mapping = {}, caste
 
     Returns:
         _type_: _description_
-    
+
     Example for /rest/api/2/issuetype:
         types_filter = lambda d: int(d['id']) < 100 and d['name'] in ('Bug', 'Task', 'Epic', 'Story', 'Incident', 'New Feature', 'Sub-Task')
         mapping = {'id': 'id', 'description': 'description', 'untranslatedName': 'name'}
         caster_functions = {'id': int}
         issue_enums = fetch_enums(jira, endpoint = 'issuetype', filter = types_filter, mapping = mapping, caster_functions = caster_functions)
-    
+
     See https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issue-types/#api-rest-api-2-issuetype-get
     """
     response = jira._get(f'/{endpoint}')
@@ -38,3 +50,25 @@ def fetch_enums(jira, endpoint = 'issuetype', filter = None, mapping = {}, caste
         if not filter or filter(schema):
             schemas.append(schema)
     return schemas
+
+class JiraSystemConfigLoader:
+    def __init__(self, client: 'JiraClient') -> None:
+        self.client = client
+
+    def update_issuetypes_cache(self):
+        types_filter = lambda d: int(d['id']) < 100 and d['name'] in ('Bug', 'Task', 'Epic', 'Story', 'Incident', 'New Feature', 'Sub-Task')
+        mapping = {'id': 'id', 'description': 'description', 'untranslatedName': 'name'}
+        caster_functions = {'id': int}
+        issue_enums = fetch_enums(
+            self.client,
+            endpoint = 'issuetype',
+            filter = types_filter,
+            mapping = mapping,
+            caster_functions = caster_functions
+        )
+        self.client.write_to_cache('issue_types.json', json.dumps(issue_enums))
+
+    def get_issuetypes_names_from_cache(self):
+        issuetypes = self.client.get_from_cache('issue_types.json')
+        if issuetypes:
+            return json.loads(issuetypes)
