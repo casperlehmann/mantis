@@ -1,4 +1,4 @@
-import requests
+from requests.exceptions import ConnectionError
 
 from typing import TYPE_CHECKING
 
@@ -34,7 +34,7 @@ class JiraClient:
         try:
             user = self.get_current_user()
             print(f'Connected as user: {user.get('displayName', 'ERROR: No displayName')}')
-        except requests.exceptions.ConnectionError as e:
+        except ConnectionError as e:
             print('Connection error. Run it like this:')
             print("export JIRA_TOKEN=$(cat secret.txt)")
             print("python main.py")
