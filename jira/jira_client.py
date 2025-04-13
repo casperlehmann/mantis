@@ -1,6 +1,8 @@
+from os.path import exists
 from requests.exceptions import ConnectionError
 
 from typing import TYPE_CHECKING
+from pathlib import Path
 
 from .jira_issues import JiraIssues
 
@@ -20,6 +22,9 @@ class JiraClient:
             'headers': {'Content-Type': 'application/json'},
             'verify': (not self.no_verify_ssl)
         }
+        self.cache_dir = Path(self.options.cache_dir)
+        self.cache_dir.mkdir(exist_ok=True)
+
 
     @property
     def api_url(self):
