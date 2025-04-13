@@ -30,6 +30,7 @@ class JiraClient:
         self.drafts_dir = Path(self.options.drafts_dir)
         self.drafts_dir.mkdir(exist_ok=True)
         (self.cache_dir / 'system').mkdir(exist_ok=True)
+        (self.cache_dir / 'system' / 'issue_type_fields').mkdir(exist_ok=True)
         self.system_config_loader = JiraSystemConfigLoader(self)
         self.issues = JiraIssues(self)
 
