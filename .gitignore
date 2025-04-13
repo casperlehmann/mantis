@@ -1,2 +1,4 @@
 options.toml
 .jira_cache
+.jira_cache_test
+
