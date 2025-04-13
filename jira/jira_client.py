@@ -13,6 +13,11 @@ class JiraClient:
         self.no_verify_ssl = auth.no_verify_ssl
         self.request_handler = request_handler
         # self.issue = JiraIssue(self, jira_option, auth)
+        self.requests_kwargs = {
+            'auth': self.auth,
+            'headers': {'Content-Type': 'application/json'},
+            'verify': (not self.no_verify_ssl)
+        }
 
     @property
     def api_url(self):
@@ -20,12 +25,11 @@ class JiraClient:
         return self.options.url + '/rest/api/latest'
 
     def _get(self, uri, params={}):
-        headers = {'Content-Type': 'application/json'}
-        url = self.api_url + uri
-        return self.request_handler.get(url, params=params, auth=self.auth, headers=headers, verify=(not self.no_verify_ssl))
+        url = f'{self.api_url}/{uri}'
+        return self.request_handler.get(url, params=params, **self.requests_kwargs)
 
     def get_current_user(self) -> dict:
-        response = self._get('/myself')
+        response = self._get('myself')
         response.raise_for_status()
         data = response.json()
         return data
