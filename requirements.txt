@@ -2,3 +2,5 @@ pytest
 requests
 types-requests
 requests.auth
+pytest-xdist
+

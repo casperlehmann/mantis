@@ -31,6 +31,12 @@ Run also the tests marked as skipped (Note: This will make calls to Jira api if 
 EXECUTE_SKIPPED=1 pytest
 ```
 
+Run tests every time a file changes (using `pytest-xdist`):
+
+```sh
+pytest -f
+```
+
 Run your first script:
 
 ```sh
