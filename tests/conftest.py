@@ -1,10 +1,10 @@
 import pytest
+from unittest.mock import patch
+
 from dataclasses import dataclass
 import requests
 
 from jira import JiraOptions, JiraAuth, JiraClient
-
-from dataclasses import dataclass
 
 @dataclass
 class Cli:
@@ -13,25 +13,15 @@ class Cli:
     personal_access_token = 'SECRET_1'
     no_verify_ssl = False
 
-class RequestsResultMock:
-    def __init__(self, get_return):
-        self._get_return = get_return
+@pytest.fixture
+def mock_post_request():
+    with patch('requests.post') as mock_post:
+        yield mock_post
 
-    def get(self):
-        return self
-    
-    def raise_for_status(self):
-        return self
-
-    def json(self):
-        return self._get_return
-
-class RequestsMock:
-    def __init__(self, get_return):
-        self._get_return = get_return
-
-    def get(self, *args, **kwargs):
-        return RequestsResultMock(self._get_return)
+@pytest.fixture
+def mock_get_request():
+    with patch('requests.get') as mock_get:
+        yield mock_get
 
 @pytest.fixture
 def fake_toml(tmpdir):

@@ -1,11 +1,11 @@
 import pytest
 import inspect
 import os
+import requests
 
 from jira import JiraOptions, JiraAuth, JiraClient, parse_args
 from jira import fetch_enums
 
-from .conftest import RequestsMock, RequestsResultMock
 
 VAL = [
     {
@@ -34,10 +34,10 @@ VAL = [
 ]
 
 @pytest.fixture
-def fake_jira_client_for_issue_type(opts_from_fake_cli):
-    request_mock = RequestsMock(get_return = VAL)
+def fake_jira_client_for_issue_type(opts_from_fake_cli, mock_get_request):
+    mock_get_request.return_value.json.return_value = VAL
     auth = JiraAuth(opts_from_fake_cli)
-    return JiraClient(opts_from_fake_cli, auth, request_mock)
+    return JiraClient(opts_from_fake_cli, auth, requests)
 
 def test_fetch_issuetype_enums_mock(fake_jira_client_for_issue_type):
     types_filter = lambda d: int(d['id']) < 100 and d['name'] in ('Bug', 'Task', 'Epic', 'Story', 'Incident', 'New Feature', 'Sub-Task')
