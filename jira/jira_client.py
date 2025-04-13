@@ -25,6 +25,15 @@ class JiraClient:
         self.cache_dir = Path(self.options.cache_dir)
         self.cache_dir.mkdir(exist_ok=True)
 
+    def write_to_cache(self, file_name: str, contents: str):
+        with open(self.cache_dir / file_name, 'w') as f:
+            return f.write(contents)
+
+    def get_from_cache(self, file_name: str):
+        if not (self.cache_dir / file_name).exists():
+            return
+        with open(self.cache_dir / file_name, 'r') as f:
+            return f.read()
 
     @property
     def api_url(self):

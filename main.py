@@ -10,6 +10,8 @@ from typing import TYPE_CHECKING
 from jira import JiraClient, JiraOptions, JiraAuth, parse_args
 from jira import fetch_enums
 
+import json
+
 def log(*args):
     print(*args, file=sys.stderr)
 
@@ -24,7 +26,8 @@ if __name__ == '__main__':
         mapping = {'id': 'id', 'description': 'description', 'untranslatedName': 'name'}
         caster_functions = {'id': int}
         issue_enums = fetch_enums(jira, endpoint = 'issuetype', filter = types_filter, mapping = mapping, caster_functions = caster_functions)
-        pprint(issue_enums)
+        jira.write_to_cache('issue_types.json', json.dumps(issue_enums))
+        pprint(jira.get_from_cache('issue_types.json'))
     elif jira_options.action == 'get-issue':
         for issue_key in jira_options.issues:
             issue = jira.issues.get(key=issue_key)
