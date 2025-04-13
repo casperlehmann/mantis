@@ -16,3 +16,17 @@ class JiraIssues:
         assert data.get('key', 'NO_KEY_IN_RESPONSE_PAYLOAD') == key 
         return data
 
+    def create(self, issue_type, title, data):
+        assert issue_type in self.allowed_types
+        issue_type = issue_type or data.get('issuetype')
+        if len(data.keys()) == 0:
+            raise ValueError('The data object is an empty payload')
+        print (f'Create issue ({issue_type}): {title}')
+
+        response = self.client.post_issue(data)
+        from pprint import pprint
+        pprint( response.json())
+        response.raise_for_status()
+        data = response.json()
+        return data
+

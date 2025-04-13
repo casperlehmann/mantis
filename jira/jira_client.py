@@ -37,6 +37,9 @@ class JiraClient:
     def get_issue(self, key):
         return self._get(f'issue/{key}')
 
+    def post_issue(self, data):
+        return self._post('issue', data=data)
+
     def get_current_user(self) -> dict:
         response = self._get('myself')
         response.raise_for_status()
