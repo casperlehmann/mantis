@@ -17,9 +17,10 @@ if __name__ == '__main__':
     jira_options = JiraOptions(parse_args(), 'options.toml')
     auth = JiraAuth(jira_options)
     jira = JiraClient(jira_options, auth, requests)
-    jira.test_auth()
 
-    if jira_options.action == 'fetch-issuetypes':
+    if jira_options.action == 'test-auth':
+        jira.test_auth()
+    elif jira_options.action == 'fetch-issuetypes':
         jira.update_issuetypes_cache()
         print('Updated local cache for issuetypes:')
         pprint(jira.get_issuetypes_names_from_cache())

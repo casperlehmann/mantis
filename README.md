@@ -40,6 +40,9 @@ pytest -f
 Run your first script:
 
 ```sh
+$ python main.py test-auth
+Connected as user: Admin9000
+
 $ python main.py TASK-1
 [TASK-1] Setup Jira
 
