@@ -1,4 +1,5 @@
 import json
+from pprint import pprint
 
 from typing import TYPE_CHECKING
 
@@ -51,6 +52,31 @@ def fetch_enums(jira: 'JiraClient',
             schemas.append(schema)
     return schemas
 
+class ProjectFieldKeys:
+    def __init__(self, name, data) -> None:
+        assert data
+        self.name = name
+        self.data = data
+
+    @property
+    def fields(self):
+        projects = self.data.get('projects')
+        assert projects, 'Data does not contain "projects" field'
+        assert len(projects) == 1, 'Expected exactly one project'
+        issue_types = projects[0].get('issuetypes')
+        assert issue_types, 'Projects does not contain "issuetypes" field'
+        assert len(issue_types) == 1, 'Expected exactly one issue_type'
+        fields = issue_types[0].get('fields')
+        assert fields, 'Issue_types does not contain "fields" field'
+        assert len(fields) > 0
+        return list(fields.keys())
+
+    def show(self):
+        pprint(', '.join(self.fields))
+        return self.fields
+        # for field in self.fields:
+        #     print (field)
+
 class JiraSystemConfigLoader:
     def __init__(self, client: 'JiraClient') -> None:
         self.client = client
@@ -58,11 +84,14 @@ class JiraSystemConfigLoader:
     def write_to_system_cache(self, file_name: str, issue_enums) -> None:
         self.client.write_to_cache(f'system/{file_name}', issue_enums)
 
-    def get_from_system_cache(self, file_name: str) -> None:
+    def get_from_system_cache(self, file_name: str) -> str:
         return self.client.get_from_cache(f'system/{file_name}')
 
     def update_issuetypes_cache(self) -> None:
-        types_filter = lambda d: int(d['id']) < 100 and d['name'] in ('Bug', 'Task', 'Epic', 'Story', 'Incident', 'New Feature', 'Sub-Task')
+        types_filter = lambda d: int(d['id']) < 100 and d['name'] in (
+            'Bug', 'Task', 'Epic', 'Story', 'Sub-Task',
+            #'Incident', 'New Feature'
+        )
         mapping = {'id': 'id', 'description': 'description', 'untranslatedName': 'name'}
         caster_functions = {'id': int}
         issue_enums = fetch_enums(
@@ -79,7 +108,7 @@ class JiraSystemConfigLoader:
         if issuetypes:
             return json.loads(issuetypes)
 
-    def get_project_keys(self) -> set[str]:
+    def update_project_field_keys(self) -> set[str]:
         for issue_type in self.client.issues.allowed_types:
             url = (
                 f'issue/createmeta'
@@ -92,4 +121,11 @@ class JiraSystemConfigLoader:
             data = response.json()
             self.write_to_system_cache(f'issue_type_fields/{issue_type}.json', json.dumps(data))
         return self.client.issues.allowed_types
+
+    def get_project_field_keys_from_cache(self) -> dict:
+        d = {}
+        for issue_type in self.client.issues.allowed_types:
+            c = self.get_from_system_cache(f'issue_type_fields/{issue_type}.json')
+            d[issue_type] = ProjectFieldKeys(issue_type, json.loads(c))
+        return d
 
