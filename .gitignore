@@ -1,4 +1,6 @@
-options.toml
+.coverage
 .jira_cache
 .jira_cache_test
+
+options.toml
 

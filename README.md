@@ -23,15 +23,9 @@ Then run the tests:
 
 ```sh
 $ pytest
-
-#Run also the tests marked as skipped (Note: This will make calls to Jira api if configured):
-$ EXECUTE_SKIPPED=1 pytest
-
-# Run tests every time a file changes (using `pytest-xdist`):
-$ pytest -f
 ```
 
-Executing the script:
+# Running the CLI
 
 ```sh
 $ python main.py test-auth
@@ -54,4 +48,26 @@ Or to overwrite options on the command line:
 ```sh
 $ python jira/jira_options.py --user user@domain.com --personal-access-token $JIRA_TOKEN --jira-url=https://account.atlassian.net
 ```
+
+# Extended testing
+
+```sh
+$ pytest
+
+#Run also the tests marked as skipped (Note: This will make calls to Jira api if configured):
+$ EXECUTE_SKIPPED=1 pytest
+
+# Run tests every time a file changes (using `pytest-xdist`):
+$ pytest -f
+
+# Show test coverage for each file
+$ pytest --cov
+
+# Generate coverage report (written to ./htmlcov)
+$ pytest --cov-report html --cov
+```
+
+An example of the coverage report:
+
+![Markdown coverage report](docs/img/pytest-coverage-html-report.png)
 
