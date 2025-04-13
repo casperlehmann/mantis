@@ -75,3 +75,18 @@ class JiraSystemConfigLoader:
         issuetypes = self.client.get_from_cache('issue_types.json')
         if issuetypes:
             return json.loads(issuetypes)
+
+    def get_project_keys(self) -> set[str]:
+        for issue_type in self.client.issues.allowed_types:
+            url = (
+                f'issue/createmeta'
+                f'?projectKeys={self.client.project_name}'
+                f'&issuetypeNames={issue_type}'
+                '&expand=projects.issuetypes.fields'
+            )
+            response = self.client._get(url)
+            response.raise_for_status()
+            data = response.json()
+            self.client.write_to_cache(f'issue_type_fields_{issue_type}.json', json.dumps(data))
+        return self.client.issues.allowed_types
+
