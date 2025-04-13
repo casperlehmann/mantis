@@ -2,6 +2,8 @@ from requests.exceptions import ConnectionError
 
 from typing import TYPE_CHECKING
 
+from .jira_issues import JiraIssues
+
 if TYPE_CHECKING:
     from jira.jira_auth import JiraAuth
     from jira.cli import JiraOptions
@@ -12,7 +14,7 @@ class JiraClient:
         self.auth = auth.auth
         self.no_verify_ssl = auth.no_verify_ssl
         self.request_handler = request_handler
-        # self.issue = JiraIssue(self, jira_option, auth)
+        self.issues = JiraIssues(self)
         self.requests_kwargs = {
             'auth': self.auth,
             'headers': {'Content-Type': 'application/json'},
@@ -31,6 +33,9 @@ class JiraClient:
     def _post(self, uri, data):
         url = f'{self.api_url}/{uri}'
         return self.request_handler.post(url, json=data, **self.requests_kwargs)
+
+    def get_issue(self, key):
+        return self._get(f'issue/{key}')
 
     def get_current_user(self) -> dict:
         response = self._get('myself')

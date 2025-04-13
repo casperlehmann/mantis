@@ -12,6 +12,8 @@ class Cli:
     url = 'https://account_1.atlassian-host.net'
     personal_access_token = 'SECRET_1'
     no_verify_ssl = False
+    action = ''
+    issues = ['']
 
 @pytest.fixture
 def mock_post_request():

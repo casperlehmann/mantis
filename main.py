@@ -14,13 +14,21 @@ def log(*args):
     print(*args, file=sys.stderr)
 
 if __name__ == '__main__':
-    jira_option = JiraOptions(parse_args(), 'options.toml')
-    auth = JiraAuth(jira_option)
-    jira = JiraClient(jira_option, auth, requests)
+    jira_options = JiraOptions(parse_args(), 'options.toml')
+    auth = JiraAuth(jira_options)
+    jira = JiraClient(jira_options, auth, requests)
     jira.test_auth()
 
-    types_filter = lambda d: int(d['id']) < 100 and d['name'] in ('Bug', 'Task', 'Epic', 'Story', 'Incident', 'New Feature', 'Sub-Task')
-    mapping = {'id': 'id', 'description': 'description', 'untranslatedName': 'name'}
-    caster_functions = {'id': int}
-    issue_enums = fetch_enums(jira, endpoint = 'issuetype', filter = types_filter, mapping = mapping, caster_functions = caster_functions)
-    pprint(issue_enums)
+    if jira_options.action == 'fetch-issuetypes':
+        types_filter = lambda d: int(d['id']) < 100 and d['name'] in ('Bug', 'Task', 'Epic', 'Story', 'Incident', 'New Feature', 'Sub-Task')
+        mapping = {'id': 'id', 'description': 'description', 'untranslatedName': 'name'}
+        caster_functions = {'id': int}
+        issue_enums = fetch_enums(jira, endpoint = 'issuetype', filter = types_filter, mapping = mapping, caster_functions = caster_functions)
+        pprint(issue_enums)
+    elif jira_options.action == 'get-issue':
+        for issue_key in jira_options.issues:
+            issue = jira.issues.get(key=issue_key)
+            key = issue.get('key', 'N/A')
+            title = issue.get('fields', {}).get('summary')
+            print(f'[{key}] {title}')
+

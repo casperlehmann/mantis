@@ -23,6 +23,8 @@ class JiraOptions:
         self.personal_access_token = parser and parser.personal_access_token or options.get('jira', {}).get('personal-access-token')
         self.url = parser and parser.url or options.get('jira', {}).get('url')
         self.no_verify_ssl = bool(parser and parser.no_verify_ssl or options.get('jira', {}).get('no-verify-ssl'))
+        self.action = parser and parser.action or ''
+        self.issues: list[str] = parser and parser.issues or []
         assert self.user, 'JiraOptions.user not set'
         assert self.personal_access_token, 'JiraOptions.personal_access_token not set'
         assert self.url, 'JiraOptions.url not set'
@@ -37,6 +39,8 @@ def parse_args():
                         help='JIRA Tenant base URL (e.g. https://account.atlassian.net)')
     parser.add_argument('--no-verify-ssl', dest='no_verify_ssl', default=False,
                         action='store_true', help='Do not verify SSL certificates for requests')
+    parser.add_argument('--action', dest='action', default='get-issue', help='Get an issue from Jira')
+    parser.add_argument('issues', nargs='*', help='List of issues by key (e.g. TASK-1, TASK-2, TASK-3, etc.)')
     return parser.parse_args()
 
 if __name__ == '__main__':
