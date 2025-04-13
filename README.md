@@ -1,10 +1,11 @@
 # Mantis
 
-Quick actions for Jira.
+Command line interface for writing and maintaining your Jira tasks from the command line.
+Edit locally in your preferred editor and sync to Jira when ready.
 
 ## Getting started
 
-Setup environment with venv:
+### Setup environment with venv:
 
 ```sh
 $ python -m venv .venv
@@ -12,20 +13,46 @@ $ . .venv/bin/activate
 $ pip install -r requirements.txt
 ```
 
-Fill out the options toml:
+### Generate a Jira token:
+
+Head over to your Jira and under [manage-profile / security 
+/ api-tokens](https://id.atlassian.com/manage-profile/security/api-tokens),
+click on `Create API token`
+
+> [!WARNING]
+> Don't share this code with anyone, please read the official Jira docs on
+[API authentication](https://developer.atlassian.com/cloud/jira/platform/basic-auth-for-rest-apis/))
+and [API tokens](https://support.atlassian.com/atlassian-account/docs/manage-api-tokens-for-your-atlassian-account/)
+if you need more information.
+
+### Fill out the options toml:
 
 ```sh
 $ cp options-example.toml options.toml
 $ vi options.toml
 ```
 
-Then run the tests:
+Your `options.toml` needs to be filled out with your personal data,
+including the Jira token you just created.
+It should **not** be added to source control.
+You new file should look something like the following example:
+
+```toml
+[jira]
+user = "name@company.com"
+url = "https://company-account.atlassian.net"
+project = "TEAMNAME"
+personal-access-token = "qwerqwer-asdfasdf-zxcvzxcv"
+cache-dir = ".jira_cache"
+```
+
+### Then run the tests:
 
 ```sh
 $ pytest
 ```
 
-# Running the CLI
+## Running the CLI
 
 ```sh
 $ python main.py test-auth
@@ -43,13 +70,16 @@ Updated local cache for issuetypes:
 [...]
 ```
 
-Or to overwrite options on the command line:
+Or to overwrite options on the command line (remember to set the JIRA_TOKEN env var):
 
 ```sh
-$ python jira/jira_options.py --user user@domain.com --personal-access-token $JIRA_TOKEN --jira-url=https://account.atlassian.net
+$ python jira/jira_options.py \
+    --user user@domain.com \
+    --personal-access-token $JIRA_TOKEN \
+    --jira-url=https://account.atlassian.net
 ```
 
-# Extended testing
+## Extended testing
 
 ```sh
 $ pytest
