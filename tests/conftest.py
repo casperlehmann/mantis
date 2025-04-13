@@ -9,7 +9,7 @@ from dataclasses import dataclass
 @dataclass
 class Cli:
     user = 'user_1@domain.com'
-    url = 'https://account_1.atlassian.net'
+    url = 'https://account_1.atlassian-host.net'
     personal_access_token = 'SECRET_1'
     no_verify_ssl = False
 
@@ -38,7 +38,7 @@ def fake_toml(tmpdir):
     toml_contents = '\n'.join((
         '[jira]',
         'user = "user_2@domain.com"',
-        'url = "https://account_2.atlassian.net"',
+        'url = "https://account_2.atlassian-host.net"',
         'personal-access-token = "SECRET_2"',
         ''
     ))
