@@ -3,6 +3,16 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from jira_client import JiraClient
 
+def process_key(key: str):
+    split_key = key.split('-')
+    match split_key:
+        case (s,):
+            raise NotImplementedError(f'Key: {s}')
+        case (project, task_no):
+            return (project, task_no)
+        case _:
+            NotImplementedError(f'Key: {key}')
+
 class JiraIssues:
     allowed_types = {'Story', 'Sub-Task', 'Epic', 'Bug', 'Task'}
 
