@@ -55,7 +55,7 @@ $ pytest
 ## Running the CLI
 
 ```sh
-$ python main.py test-auth
+$ python main.py --action test-auth
 Connected as user: Admin9000
 
 $ python main.py TASK-1
