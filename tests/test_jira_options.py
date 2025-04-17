@@ -1,7 +1,7 @@
 import pytest
 import os
 
-from jira import JiraOptions
+from mantis.jira import JiraOptions
 
 def test_JiraOptions(fake_toml):
     opts = JiraOptions(toml_source = fake_toml)

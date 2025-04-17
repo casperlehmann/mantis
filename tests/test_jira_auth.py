@@ -1,14 +1,14 @@
 import pytest
 
-from jira import JiraOptions
-from jira import JiraAuth
+from mantis.jira import JiraOptions
+from mantis.jira import JiraAuth
 
 from requests.auth import HTTPBasicAuth
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from jira.jira_options import JiraOptions
+    from mantis.jira.jira_options import JiraOptions
 
 def test_CreatesJiraAuthSettings(fake_toml):
     opts = JiraOptions(toml_source = fake_toml)

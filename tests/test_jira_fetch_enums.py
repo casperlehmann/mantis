@@ -2,8 +2,8 @@ import pytest
 import inspect
 import os
 
-from jira import JiraAuth, JiraClient
-from jira import fetch_enums
+from mantis.jira import JiraAuth, JiraClient
+from mantis.jira import fetch_enums
 
 VAL = [
     {
