@@ -1,5 +1,7 @@
 from typing import TYPE_CHECKING
 
+from requests.models import HTTPError
+
 if TYPE_CHECKING:
     from jira_client import JiraClient
 
@@ -27,7 +29,23 @@ class JiraIssues:
         if issue_from_cache:
             return issue_from_cache
         response = self.client.get_issue(key)
-        response.raise_for_status()
+        try:
+            response.raise_for_status()
+        except HTTPError as e:
+            for _ in dir(e): print (_)
+            print (e.response.status_code)
+            print (e.response.reason)
+            match e.response.reason:
+                case "Not Found":
+                    (project_from_key, task_no_from_key) = process_key(key)
+                    assert project_from_key, "No project?"
+                    assert task_no_from_key , "No task number?"
+                    if self.client.options.project not in key:
+                        raise ValueError(f'The requested issue does not exists. Note that the provided key "{key}" does not appear to match your configured project "{self.client.options.project}".') from e
+                    else:
+                        raise e
+                case _:
+                    raise e
         data = response.json()
         assert data.get('key', 'NO_KEY_IN_RESPONSE_PAYLOAD') == key 
         self.client.write_issue_to_cache(key, data)
