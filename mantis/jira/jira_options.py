@@ -25,6 +25,7 @@ class JiraOptions:
         self.project = parser and parser.project or options.get('jira', {}).get('project')
         self.no_verify_ssl = bool(parser and parser.no_verify_ssl or options.get('jira', {}).get('no-verify-ssl'))
         self.cache_dir = parser and parser.cache_dir or options.get('jira', {}).get('cache-dir')
+        self.drafts_dir = parser and parser.drafts_dir or options.get('jira', {}).get('drafts-dir')
         self.action = parser and parser.action or ''
         self.issues: list[str] = parser and parser.issues or []
         assert self.user, 'JiraOptions.user not set'
@@ -32,6 +33,7 @@ class JiraOptions:
         assert self.url, 'JiraOptions.url not set'
         assert self.project, 'JiraOptions.project not set'
         assert self.cache_dir, 'JiraOptions.cache_dir not set'
+        assert self.drafts_dir, 'JiraOptions.drafts_dir not set'
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -46,6 +48,7 @@ def parse_args():
     parser.add_argument('--no-verify-ssl', dest='no_verify_ssl', default=False,
                         action='store_true', help='Do not verify SSL certificates for requests')
     parser.add_argument('--cache-dir', dest='cache_dir', default=None, help='Set the local cache for Jira data')
+    parser.add_argument('--drafts-dir', dest='drafts_dir', default=None, help='Set the local drafts directory for Jira issues')
     parser.add_argument('--action', dest='action', default='get-issue', help='Get an issue from Jira')
     parser.add_argument('issues', nargs='*', help='List of issues by key (e.g. TASK-1, TASK-2, TASK-3, etc.)')
     return parser.parse_args()

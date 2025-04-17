@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING
 from pathlib import Path
+import os
 import json
 import requests
 
@@ -26,11 +27,16 @@ class JiraClient:
         self.cache_dir = Path(self.options.cache_dir)
         self.cache_dir.mkdir(exist_ok=True)
         (self.cache_dir / 'issues').mkdir(exist_ok=True)
+        self.drafts_dir = Path(self.options.drafts_dir)
+        self.drafts_dir.mkdir(exist_ok=True)
         self.issues = JiraIssues(self)
 
     def write_to_cache(self, file_name: str, contents: str):
         with open(self.cache_dir / file_name, 'w') as f:
             return f.write(contents)
+
+    def remove_from_cache(self, file_name: str):
+        os.remove(self.cache_dir / file_name)
 
     def get_from_cache(self, file_name: str):
         if not (self.cache_dir / file_name).exists():
@@ -73,6 +79,9 @@ class JiraClient:
         issue_data = self.get_from_cache(f'issues/{key}.json')
         if issue_data:
             return json.loads(issue_data)
+
+    def remove_issue_from_cache(self, key: str):
+        self.remove_from_cache(f'issues/{key}.json')
 
     @property
     def api_url(self):
