@@ -6,7 +6,7 @@ import requests
 
 from pprint import pprint
 
-from jira import JiraClient, JiraOptions, JiraAuth, parse_args
+from mantis.jira import JiraClient, JiraOptions, JiraAuth, parse_args
 
 if __name__ == '__main__':
     jira_options = JiraOptions(parse_args(), 'options.toml')
