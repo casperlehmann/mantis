@@ -59,9 +59,17 @@ class JiraIssues:
         (project_from_key, task_no_from_key) = process_key(key, exception)
         match exception.response.reason:
             case "Not Found":
-                if self.client.options.project not in key:
+                if (' ' in key):
                     raise ValueError(
-                        f'The requested issue does not exists. Note that the '
+                        f'Whitespace in key is not allowed ("{key}")'
+                    ) from exception
+                elif (not task_no_from_key.isnumeric()):
+                    raise ValueError(
+                        f'Issue number "{task_no_from_key}" in key "{key}" must be numeric'
+                    ) from exception
+                elif self.client.options.project not in key:
+                    raise ValueError(
+                        f'The requested issue does not exist. Note that the '
                         f'provided key "{key}" does not appear to match '
                         f'your configured project "{self.client.options.project}"'
                     ) from exception

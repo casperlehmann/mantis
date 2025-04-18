@@ -1,5 +1,6 @@
 import pytest
 import os
+import re
 from mantis.jira import JiraClient, JiraAuth
 import requests
 from unittest.mock import patch
@@ -22,14 +23,27 @@ def test_JiraIssuesGetNonExistent(jira_client_from_fake_cli):
     _mock_response.status_code = 404
     _mock_response.reason = "Not Found"
     with patch("requests.get", return_value=_mock_response):
-        with pytest.raises(ValueError, match=('The issue "TEST-999" does not '
-                           'exists in the project "TEST"')):
+        with pytest.raises(ValueError,
+                           match=('The issue "TEST-999" does not exists in '
+                           'the project "TEST"')):
             jira_client_from_fake_cli.issues.get('TEST-999')
-        with pytest.raises(ValueError, match="The requested issue does not exists."):
+        with pytest.raises(ValueError,
+                           match='The requested issue does not exist. Note '
+                           'that the provided key "NONEXISTENT-1" does not '
+                           'appear to match your configured project "TEST"'):
             jira_client_from_fake_cli.issues.get('NONEXISTENT-1')
-        with pytest.raises(NotImplementedError, match=('Partial keys are not supported. '
-                           'Please provide the full key for your issue: "PROJ-11"')):
+        with pytest.raises(NotImplementedError,
+                           match=('Partial keys are not supported. Please '
+                           'provide the full key for your issue: "PROJ-11"')):
             jira_client_from_fake_cli.issues.get('11')
+        with pytest.raises(ValueError,
+                           match=('Issue number "PROJ" in key "1-PROJ" must '
+                           'be numeric')):
+            jira_client_from_fake_cli.issues.get('1-PROJ')
+        with pytest.raises(ValueError,
+                           match=re.escape('Whitespace in key is not allowed '
+                           '("PROJ-1 ")')):
+            jira_client_from_fake_cli.issues.get('PROJ-1 ')
 
 @pytest.mark.skipif(not os.path.exists("options.toml"), reason='File "options.toml" does not exist')
 @pytest.mark.skipif(not os.getenv('EXECUTE_SKIPPED'), reason="This is a live test against the Jira api")
