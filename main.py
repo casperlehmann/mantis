@@ -8,6 +8,8 @@ from pprint import pprint
 
 from mantis.jira import JiraClient, JiraOptions, JiraAuth, parse_args
 
+from mantis.drafts import Draft
+
 if __name__ == '__main__':
     jira_options = JiraOptions(parse_args(), 'options.toml')
     auth = JiraAuth(jira_options)
@@ -27,6 +29,7 @@ if __name__ == '__main__':
             key = issue.get('key', 'N/A')
             title = issue.get('fields', {}).get('summary')
             print(f'[{key}] {title}')
+            draft = Draft(issue)
     elif jira_options.action == 'get-project-keys':
         print('Dumped field values for:')
         pprint(jira.get_project_keys())

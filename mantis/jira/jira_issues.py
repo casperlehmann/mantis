@@ -29,16 +29,18 @@ class JiraIssues:
             self.allowed_types = {_.get('name') for _ in cached_issuetypes}
 
     def get(self, key: str) -> dict:
-        issue_from_cache = self.client.get_issue_from_cache(key)
-        if issue_from_cache:
-            return issue_from_cache
+        if not self.client._no_cache:
+            issue_from_cache = self.client.get_issue_from_cache(key)
+            if issue_from_cache:
+                return issue_from_cache
         response = self.client.get_issue(key)
         try:
             response.raise_for_status()
         except HTTPError as e:
             self.handle_http_error(e, key)
         data = response.json()
-        self.client.write_issue_to_cache(key, data)
+        if not self.client._no_cache:
+            self.client.write_issue_to_cache(key, data)
         return data
 
     def create(self, issue_type, title, data):
