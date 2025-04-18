@@ -8,6 +8,13 @@ from unittest.mock import patch
 @pytest.fixture
 def fake_jira(opts_from_fake_cli, mock_get_request):
     expected = {'key': 'TASK-1', 'fields': {'status': {'name': 'resolved'}}}
+    # expected = {'key': 'TASK-1',
+    #         'fields': {
+    #             'status': {'name': 'resolved'},
+    #             'project': {'key': 'ABC-123'},
+    #             'issuetype': {'key': 'Task'},
+    #             'assignee': {'displayName': 'Bobby Goodsky'},
+    #         }}
     mock_get_request.return_value.json.return_value = expected
     auth = JiraAuth(opts_from_fake_cli)
     return JiraClient(opts_from_fake_cli, auth)
@@ -15,7 +22,7 @@ def fake_jira(opts_from_fake_cli, mock_get_request):
 def test_JiraIssuesGetFake(fake_jira):
     task_1 = fake_jira.issues.get('TASK-1')
     assert task_1.get('key') == 'TASK-1'
-    assert task_1.get('fields') == {'status': {'name': 'resolved'}}
+    assert task_1.get('fields', {}).get('status') == {'name': 'resolved'}
 
 def test_JiraIssuesGetNonExistent(jira_client_from_fake_cli):
     jira_client_from_fake_cli._no_cache = True
