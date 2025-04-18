@@ -39,10 +39,11 @@ def test_JiraIssuesGetFake2(jira_client_from_fake_cli_no_cache):
 
 def test_JiraIssuesGetNonExistent(jira_client_from_fake_cli):
     jira_client_from_fake_cli._no_cache = True
-    _mock_response = requests.models.Response()
-    _mock_response.status_code = 404
-    _mock_response.reason = "Not Found"
-    with patch("requests.get", return_value=_mock_response):
+    mock_response = requests.models.Response()
+    # mock_response.ok = False
+    mock_response.status_code = 404
+    mock_response.reason = "Not Found"
+    with patch("requests.get", return_value=mock_response):
         with pytest.raises(ValueError,
                            match=('The issue "TEST-999" does not exists in '
                            'the project "TEST"')):
