@@ -5,15 +5,19 @@ from requests.models import HTTPError
 if TYPE_CHECKING:
     from jira_client import JiraClient
 
-def process_key(key: str):
-    split_key = key.split('-')
-    match split_key:
+def process_key(key: str, exception: Exception) -> (str, str):
+    match key.split('-'):
         case (s,):
-            raise NotImplementedError(f'Key: {s}')
+            raise NotImplementedError(
+                f'Partial keys are not supported. Please '
+                f'provide the full key for your issue: "PROJ-{s}"'
+            ) from exception
         case (project, task_no):
             return (project, task_no)
         case _:
-            NotImplementedError(f'Key: {key}')
+            raise NotImplementedError(
+                f'Key contains too many components: "{key}"'
+            ) from exception
 
 class JiraIssues:
     allowed_types = {'Story', 'Sub-Task', 'Epic', 'Bug', 'Task'}
@@ -32,22 +36,8 @@ class JiraIssues:
         try:
             response.raise_for_status()
         except HTTPError as e:
-            for _ in dir(e): print (_)
-            print (e.response.status_code)
-            print (e.response.reason)
-            match e.response.reason:
-                case "Not Found":
-                    (project_from_key, task_no_from_key) = process_key(key)
-                    assert project_from_key, "No project?"
-                    assert task_no_from_key , "No task number?"
-                    if self.client.options.project not in key:
-                        raise ValueError(f'The requested issue does not exists. Note that the provided key "{key}" does not appear to match your configured project "{self.client.options.project}".') from e
-                    else:
-                        raise e
-                case _:
-                    raise e
+            self.handle_http_error(e, key)
         data = response.json()
-        assert data.get('key', 'NO_KEY_IN_RESPONSE_PAYLOAD') == key 
         self.client.write_issue_to_cache(key, data)
         return data
 
@@ -64,4 +54,22 @@ class JiraIssues:
         response.raise_for_status()
         data = response.json()
         return data
+
+    def handle_http_error(self, exception, key):
+        (project_from_key, task_no_from_key) = process_key(key, exception)
+        match exception.response.reason:
+            case "Not Found":
+                if self.client.options.project not in key:
+                    raise ValueError(
+                        f'The requested issue does not exists. Note that the '
+                        f'provided key "{key}" does not appear to match '
+                        f'your configured project "{self.client.options.project}"'
+                    ) from exception
+                else:
+                    raise ValueError(
+                        f'The issue "{project_from_key}-{task_no_from_key}" does '
+                        f'not exists in the project "{project_from_key}"'
+                    ) from exception
+            case _:
+                raise exception
 

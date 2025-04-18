@@ -11,11 +11,13 @@ if TYPE_CHECKING:
     from .jira_options import JiraOptions
 
 class JiraClient:
-    def __init__(self, jira_option: 'JiraOptions', auth: 'JiraAuth'):
+    def __init__(self, jira_option: 'JiraOptions', auth: 'JiraAuth',
+                 no_cache: bool = False):
         self.options = jira_option
         self.auth = auth.auth
         self.no_verify_ssl = auth.no_verify_ssl
         self.project_name = jira_option.project
+        self._no_cache = no_cache
         self.requests_kwargs = {
             'auth': self.auth,
             'headers': {'Content-Type': 'application/json'},
@@ -66,6 +68,8 @@ class JiraClient:
         self.write_to_cache(f'issues/{key}.json', json.dumps(data))
 
     def get_issue_from_cache(self, key: str):
+        if self._no_cache:
+            return
         issue_data = self.get_from_cache(f'issues/{key}.json')
         if issue_data:
             return json.loads(issue_data)
