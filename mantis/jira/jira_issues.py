@@ -1,7 +1,23 @@
 from typing import TYPE_CHECKING
 
+from requests.models import HTTPError
+
 if TYPE_CHECKING:
     from jira_client import JiraClient
+
+def process_key(key: str, exception: Exception) -> (str, str):
+    match key.split('-'):
+        case (s,):
+            raise NotImplementedError(
+                f'Partial keys are not supported. Please '
+                f'provide the full key for your issue: "PROJ-{s}"'
+            ) from exception
+        case (project, task_no):
+            return (project, task_no)
+        case _:
+            raise NotImplementedError(
+                f'Key contains too many components: "{key}"'
+            ) from exception
 
 class JiraIssues:
     allowed_types = {'Story', 'Sub-Task', 'Epic', 'Bug', 'Task'}
@@ -17,9 +33,11 @@ class JiraIssues:
         if issue_from_cache:
             return issue_from_cache
         response = self.client.get_issue(key)
-        response.raise_for_status()
+        try:
+            response.raise_for_status()
+        except HTTPError as e:
+            self.handle_http_error(e, key)
         data = response.json()
-        assert data.get('key', 'NO_KEY_IN_RESPONSE_PAYLOAD') == key 
         self.client.write_issue_to_cache(key, data)
         return data
 
@@ -36,4 +54,30 @@ class JiraIssues:
         response.raise_for_status()
         data = response.json()
         return data
+
+    def handle_http_error(self, exception, key):
+        (project_from_key, task_no_from_key) = process_key(key, exception)
+        match exception.response.reason:
+            case "Not Found":
+                if (' ' in key):
+                    raise ValueError(
+                        f'Whitespace in key is not allowed ("{key}")'
+                    ) from exception
+                elif (not task_no_from_key.isnumeric()):
+                    raise ValueError(
+                        f'Issue number "{task_no_from_key}" in key "{key}" must be numeric'
+                    ) from exception
+                elif self.client.options.project not in key:
+                    raise ValueError(
+                        f'The requested issue does not exist. Note that the '
+                        f'provided key "{key}" does not appear to match '
+                        f'your configured project "{self.client.options.project}"'
+                    ) from exception
+                else:
+                    raise ValueError(
+                        f'The issue "{project_from_key}-{task_no_from_key}" does '
+                        f'not exists in the project "{project_from_key}"'
+                    ) from exception
+            case _:
+                raise exception
 
