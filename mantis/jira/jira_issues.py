@@ -38,7 +38,8 @@ class JiraIssues:
         except HTTPError as e:
             self.handle_http_error(e, key)
         data = response.json()
-        self.client.write_issue_to_cache(key, data)
+        if not self.client._no_cache:
+            self.client.write_issue_to_cache(key, data)
         return data
 
     def create(self, issue_type, title, data):
