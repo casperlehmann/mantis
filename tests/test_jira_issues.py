@@ -3,7 +3,7 @@ import os
 import re
 from mantis.jira import JiraClient, JiraAuth
 import requests
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 @pytest.fixture
 def fake_jira(opts_from_fake_cli, mock_get_request):
@@ -21,6 +21,19 @@ def fake_jira(opts_from_fake_cli, mock_get_request):
 
 def test_JiraIssuesGetFake(fake_jira):
     task_1 = fake_jira.issues.get('TASK-1')
+    assert task_1.get('key') == 'TASK-1'
+    assert task_1.get('fields', {}).get('status') == {'name': 'resolved'}
+
+def test_JiraIssuesGetFake2(jira_client_from_fake_cli_no_cache):
+    expected = {'key': 'TASK-1', 'fields': {'status': {'name': 'resolved'}}}
+    mock_response = MagicMock(spec=requests.models.Response)
+    mock_response.status_code = 200
+    mock_response.ok = True
+    mock_response.json = lambda: expected
+    mock_response.headers = {"Content-Type": "text/plain"}
+    mock_response.text = 'ULTI_JOKE'
+    with patch("requests.get", return_value=mock_response):
+        task_1 = jira_client_from_fake_cli_no_cache.issues.get('TASK-1')
     assert task_1.get('key') == 'TASK-1'
     assert task_1.get('fields', {}).get('status') == {'name': 'resolved'}
 
