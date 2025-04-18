@@ -17,7 +17,7 @@ def test_JiraIssuesGetFake(fake_jira):
     assert task_1.get('key') == 'TASK-1'
     assert task_1.get('fields', {}).get('status') == {'name': 'resolved'}
 
-def test_JiraIssuesGetFake2(jira_client_from_fake_cli_no_cache):
+def test_JiraIssuesGetMocked(jira_client_from_fake_cli_no_cache):
     expected = {'key': 'TASK-1', 'fields': {'status': {'name': 'resolved'}}}
     mock_response = Mock()
     mock_response.status_code = 200
