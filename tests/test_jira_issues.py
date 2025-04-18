@@ -1,6 +1,6 @@
 import pytest
 import os
-from jira import JiraClient, JiraAuth
+from mantis.jira import JiraClient, JiraAuth
 import requests
 
 @pytest.fixture

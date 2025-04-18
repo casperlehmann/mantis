@@ -1,7 +1,7 @@
 import pytest
 import os
 import requests
-from jira import JiraAuth, JiraClient
+from mantis.jira import JiraAuth, JiraClient
 
 @pytest.fixture
 def fake_jira_client_for_test_auth(opts_from_fake_cli, mock_get_request):

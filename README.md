@@ -55,7 +55,7 @@ $ pytest
 ## Running the CLI
 
 ```sh
-$ python main.py test-auth
+$ python main.py --action test-auth
 Connected as user: Admin9000
 
 $ python main.py TASK-1
@@ -73,10 +73,11 @@ Updated local cache for issuetypes:
 Or to overwrite options on the command line (remember to set the JIRA_TOKEN env var):
 
 ```sh
-$ python jira/jira_options.py \
+$ python mantis/jira/jira_options.py \
     --user user@domain.com \
     --personal-access-token $JIRA_TOKEN \
     --jira-url=https://account.atlassian.net
+JiraOptions successfully instantiated
 ```
 
 ## Extended testing

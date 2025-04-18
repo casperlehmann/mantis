@@ -4,7 +4,7 @@ from unittest.mock import patch
 from dataclasses import dataclass
 import requests
 
-from jira import JiraOptions, JiraAuth, JiraClient, JiraIssues
+from mantis.jira import JiraOptions, JiraAuth, JiraClient, JiraIssues
 
 @dataclass
 class Cli:
