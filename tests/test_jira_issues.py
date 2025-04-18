@@ -2,20 +2,12 @@ import pytest
 import os
 import re
 from mantis.jira import JiraClient, JiraAuth
-import requests
-from unittest.mock import patch, MagicMock , Mock
+from unittest.mock import patch, Mock
 from requests.models import HTTPError
 
 @pytest.fixture
 def fake_jira(opts_from_fake_cli, mock_get_request):
     expected = {'key': 'TASK-1', 'fields': {'status': {'name': 'resolved'}}}
-    # expected = {'key': 'TASK-1',
-    #         'fields': {
-    #             'status': {'name': 'resolved'},
-    #             'project': {'key': 'ABC-123'},
-    #             'issuetype': {'key': 'Task'},
-    #             'assignee': {'displayName': 'Bobby Goodsky'},
-    #         }}
     mock_get_request.return_value.json.return_value = expected
     auth = JiraAuth(opts_from_fake_cli)
     return JiraClient(opts_from_fake_cli, auth)
@@ -27,34 +19,23 @@ def test_JiraIssuesGetFake(fake_jira):
 
 def test_JiraIssuesGetFake2(jira_client_from_fake_cli_no_cache):
     expected = {'key': 'TASK-1', 'fields': {'status': {'name': 'resolved'}}}
-    mock_response = MagicMock(spec=requests.models.Response)
-    # mock_response.raise_for_status.side_effect = requests.HTTPError
+    mock_response = Mock()
     mock_response.status_code = 200
     mock_response.ok = True
     mock_response.json = lambda: expected
     mock_response.headers = {"Content-Type": "text/plain"}
-    mock_response.text = 'ULTI_JOKE'
+    mock_response.text = 'Description'
     with patch("requests.get", return_value=mock_response):
         task_1 = jira_client_from_fake_cli_no_cache.issues.get('TASK-1')
     assert task_1.get('key') == 'TASK-1'
     assert task_1.get('fields', {}).get('status') == {'name': 'resolved'}
 
-# @pytest.mark.skip
 def test_JiraIssuesGetNonExistent(jira_client_from_fake_cli_no_cache):
-    # jira_client_from_fake_cli_no_cache._no_cache = True
-    # _mock_response = MagicMock(spec=requests.models.Response, raise_for_status=HTTPError, side_effect=HTTPError)
-    # _mock_response.ok = False
-    # _mock_response.status_code = 404
-    # _mock_response.reason = "Not Found"
-    # _mock_response.raise_for_status.side_effect = MagicMock(spec=HTTPError)
-
     mock_response = Mock()
     mock_response.reason = "Not Found"
-    mock_request = Mock()
-    mock_request.raise_for_status.side_effect = HTTPError("Not Found")
-    mock_request.raise_for_status.side_effect.response = mock_response
-
-    with patch('requests.get', return_value=mock_request):
+    mock_response.raise_for_status.side_effect = HTTPError()
+    mock_response.raise_for_status.side_effect.response = mock_response # assigning itself, this is on purpose
+    with patch('requests.get', return_value=mock_response):
         with pytest.raises(ValueError,
                            match=('The issue "TEST-999" does not exists in '
                            'the project "TEST"')):
@@ -76,34 +57,6 @@ def test_JiraIssuesGetNonExistent(jira_client_from_fake_cli_no_cache):
                            match=re.escape('Whitespace in key is not allowed '
                            '("PROJ-1 ")')):
             jira_client_from_fake_cli_no_cache.issues.get('PROJ-1 ')
-
-@pytest.mark.skip
-def test_JiraIssuesGetNonExistent2(jira_client_from_fake_cli_no_cache):
-    # jira_client_from_fake_cli_no_cache._no_cache = True
-    mock_response = Mock()
-    mock_response.raise_for_status.side_effect = HTTPError("Not Found")
-    mock_response.raise_for_status.side_effect.response.reason = "Not Found"
-    # mock_response.reason = "Not Found"
-    # http_error = HTTPError('Bad response')
-    # http_error.response = mock_response
-    with patch('requests.get', return_value=mock_response):
-        with pytest.raises(ValueError,
-                           match=('The issue "TEST-999" does not exists in '
-                           'the project "TEST"')):
-            jira_client_from_fake_cli_no_cache.issues.get('TEST-999')
-
-def test_JiraIssuesGetNonExistent3(jira_client_from_fake_cli_no_cache):
-    # jira_client_from_fake_cli_no_cache._no_cache = True
-    mock_response = Mock()
-    mock_response.reason = "Not Found"
-    mock_request = Mock()
-    mock_request.raise_for_status.side_effect = HTTPError("Not Found")
-    mock_request.raise_for_status.side_effect.response = mock_response
-    with patch('requests.get', return_value=mock_request):
-        with pytest.raises(ValueError,
-                           match=('The issue "TEST-999" does not exists in '
-                           'the project "TEST"')):
-            jira_client_from_fake_cli_no_cache.issues.get('TEST-999')
 
 @pytest.mark.skipif(not os.path.exists("options.toml"), reason='File "options.toml" does not exist')
 @pytest.mark.skipif(not os.getenv('EXECUTE_SKIPPED'), reason="This is a live test against the Jira api")
