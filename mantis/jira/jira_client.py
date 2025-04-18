@@ -32,6 +32,8 @@ class JiraClient:
         self.issues = JiraIssues(self)
 
     def write_to_cache(self, file_name: str, contents: str):
+        if self._no_cache:
+            raise PermissionError('Cache dir not activated')
         with open(self.cache_dir / file_name, 'w') as f:
             return f.write(contents)
 
@@ -39,6 +41,8 @@ class JiraClient:
         os.remove(self.cache_dir / file_name)
 
     def get_from_cache(self, file_name: str):
+        if self._no_cache:
+            raise PermissionError('Cache dir not activated')
         if not (self.cache_dir / file_name).exists():
             return
         with open(self.cache_dir / file_name, 'r') as f:
