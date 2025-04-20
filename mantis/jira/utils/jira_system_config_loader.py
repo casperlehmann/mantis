@@ -4,6 +4,9 @@ from pprint import pprint
 from typing import TYPE_CHECKING, Mapping
 from mantis.jira.utils.jira_types import IssueTypeFields, ProjectFieldKeys
 
+from datamodel_code_generator import InputFileType, generate
+from datamodel_code_generator import DataModelType
+
 if TYPE_CHECKING:
     from jira_client import JiraClient
 
@@ -66,6 +69,10 @@ class JiraSystemConfigLoader:
     def get_from_system_cache_decoded(self, file_name: str) -> dict:
         return self.client.get_from_cache_decoded(f'system/{file_name}')
 
+    def loop_issue_type_fields(self):
+        for file in self.client.cache_issue_type_fields_dir.iterdir():
+            yield file
+
     def update_issuetypes_cache(self) -> None:
         types_filter = lambda d: int(d['id']) < 100 and d['name'] in (
             'Bug', 'Task', 'Epic', 'Story', 'Sub-Task',
@@ -101,6 +108,21 @@ class JiraSystemConfigLoader:
             self.write_to_system_cache(
                 f'issue_type_fields/{issue_type}.json', json.dumps(data))
         return self.client.issues.allowed_types
+
+    def compile_plugins(self):
+        for input_file in self.loop_issue_type_fields():
+            with open(input_file, 'r') as f:
+                content = f.read()
+            # Remove the .json extension
+            name = input_file.name[:-5].replace('-', '_').replace('_', '_').lower()
+            output_path = self.client.plugins_dir / f'{name}.py'
+            generate(
+                content,
+                input_file_type = InputFileType.Json,
+                input_filename = input_file,
+                output=output_path,
+                output_model_type=DataModelType.PydanticV2BaseModel,
+            )
 
     def get_all_keys_from_nested_dicts(
             self, data: Mapping[str, ProjectFieldKeys]) -> set[str]:

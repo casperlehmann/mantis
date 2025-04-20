@@ -5,3 +5,4 @@ requests.auth
 pytest-xdist
 pytest-cov
 pydantic
+datamodel-code-generator
