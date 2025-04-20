@@ -127,6 +127,7 @@ class JiraSystemConfigLoader:
             response = self.client._get(url)
             response.raise_for_status()
             data = response.json()
-            self.write_to_system_cache(f'issue_type_fields/{issue_type}.json', json.dumps(data))
+            self.write_to_system_cache(
+                f'issue_type_fields/{issue_type}.json', json.dumps(data))
         return self.client.issues.allowed_types
 
