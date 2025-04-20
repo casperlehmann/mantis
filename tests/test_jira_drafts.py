@@ -1,3 +1,4 @@
+from mantis.jira.jira_issues import JiraIssue
 import pytest
 
 from mantis.drafts import Draft
@@ -22,7 +23,7 @@ def test_JiraDraft(tmp_path, fake_jira: JiraClient):
     drafts_dir.mkdir()
     fake_jira._no_cache = True
     task_1 = fake_jira.issues.get('TASK-44')
-    assert type(task_1) == dict
+    assert type(task_1) == JiraIssue
     assert len(list(drafts_dir.iterdir())) == 0
     draft = Draft(task_1, drafts_dir)
     assert len([*drafts_dir.iterdir()]) == 1

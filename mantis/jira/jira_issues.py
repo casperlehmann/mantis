@@ -19,6 +19,15 @@ def process_key(key: str, exception: Exception) -> tuple[str, str]:
                 f'Key contains too many components: "{key}"'
             ) from exception
 
+class JiraIssue:
+    def __init__(self, client: 'JiraClient', raw_data: dict[str, dict]) -> None:
+        self.client = client
+        self.data = raw_data
+        # https://docs.pydantic.dev/1.10/datamodel_code_generator/
+
+    def get(self, key: str, *args):
+        return self.data.get(key, *args)
+
 class JiraIssues:
     allowed_types = ['Story', 'Sub-Task', 'Epic', 'Bug', 'Task']
 
@@ -32,11 +41,11 @@ class JiraIssues:
             sorted_cached_issuetypes = sorted(cached_issuetypes, key=lambda x: str(x.get('id')))
             self.allowed_types = [str(_.get('name')) for _ in sorted_cached_issuetypes]
 
-    def get(self, key: str) -> dict:
+    def get(self, key: str) -> JiraIssue:
         if not self.client._no_cache:
             issue_from_cache = self.client.get_issue_from_cache(key)
             if issue_from_cache:
-                return issue_from_cache
+                return JiraIssue(self.client, issue_from_cache)
         response = self.client.get_issue(key)
         try:
             response.raise_for_status()
@@ -45,7 +54,7 @@ class JiraIssues:
         data = response.json()
         if not self.client._no_cache:
             self.client.write_issue_to_cache(key, data)
-        return data
+        return JiraIssue(self.client, data)
 
     def create(self, issue_type, title, data):
         assert issue_type in self.allowed_types
