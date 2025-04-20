@@ -47,6 +47,10 @@ class JiraClient:
         with open(self.cache_dir / file_name, 'r') as f:
             return f.read()
 
+    def get_from_cache_decoded(self, file_name: str) -> dict:
+        with open(self.cache_dir / file_name, 'r') as f:
+            return json.load(f)
+
     def write_issue_to_cache(self, key: str, data):
         self.write_to_cache(f'issues/{key}.json', json.dumps(data))
 
