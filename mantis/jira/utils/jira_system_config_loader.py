@@ -2,7 +2,7 @@ import json
 from pprint import pprint
 
 from typing import TYPE_CHECKING, Mapping
-from mantis.jira.utils.jira_types import Project
+from mantis.jira.utils.jira_types import IssueTypeFields, ProjectFieldKeys
 
 if TYPE_CHECKING:
     from jira_client import JiraClient
@@ -52,31 +52,6 @@ def fetch_enums(jira: 'JiraClient',
         if not filter or filter(schema):
             schemas.append(schema)
     return schemas
-
-class ProjectFieldKeys:
-    def __init__(self, name: str, data: Mapping[str, list[Project]]) -> None:
-        assert data
-        self.name = name
-        self.data = data
-
-    @property
-    def fields(self) -> list[str]:
-        projects = self.data.get('projects')
-        assert projects, 'Data does not contain "projects" field'
-        assert len(projects) == 1, 'Expected exactly one project'
-        project = projects[0]
-        issue_types = project.get('issuetypes')
-        assert issue_types, 'Projects does not contain "issuetypes" field'
-        assert len(issue_types) == 1, 'Expected exactly one issue_type'
-        issue_type = issue_types[0]
-        fields = issue_type.get('fields')
-        assert fields, 'Issue_types does not contain "fields" field'
-        assert len(fields) > 0
-        return list(fields.keys())
-
-    def show(self) -> None:
-        pprint(', '.join(self.fields))
-        return self.fields
 
 class JiraSystemConfigLoader:
     def __init__(self, client: 'JiraClient') -> None:
@@ -160,10 +135,11 @@ class JiraSystemConfigLoader:
             try:
                 loaded_json = self.get_from_system_cache_decoded(
                     f'issue_type_fields/{issue_type}.json')
+                issue_type_fields = IssueTypeFields(loaded_json)
             except FileNotFoundError as e:
                 raise FileNotFoundError(
                     f'Cached values do not exist for {issue_type}') from e
-            d[issue_type] = ProjectFieldKeys(issue_type, loaded_json)
+            d[issue_type] = ProjectFieldKeys(issue_type, issue_type_fields)
         return d
 
     def inspect(self) -> None:
