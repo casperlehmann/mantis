@@ -29,6 +29,7 @@ class JiraClient:
         (self.cache_dir / 'issues').mkdir(exist_ok=True)
         self.drafts_dir = Path(self.options.drafts_dir)
         self.drafts_dir.mkdir(exist_ok=True)
+        self.system_config_loader = JiraSystemConfigLoader(self)
         self.issues = JiraIssues(self)
 
     def write_to_cache(self, file_name: str, contents: str):
