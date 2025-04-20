@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 j2m = lambda x: x
 
 if TYPE_CHECKING:
-    from mantis.jira import JiraIssues, JiraIssue
+    from mantis.jira import JiraIssue
 
 class Draft:
     def __init__(self, issue: 'JiraIssue', drafts_dir: Path = None) -> None:
