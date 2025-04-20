@@ -33,6 +33,8 @@ if __name__ == '__main__':
         pprint(resp)
     elif jira_options.action == 'inspect':
         jira.system_config_loader.inspect()
+    elif jira_options.action == 'compile-plugins':
+        jira.system_config_loader.compile_plugins()
     else:
         print(f'Action {jira_options.action} not recognized')
 
