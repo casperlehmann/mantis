@@ -56,6 +56,8 @@ def fetch_enums(jira: 'JiraClient',
 class ProjectFieldKeys:
     def __init__(self, name: str, data: Mapping[str, list[Project]]) -> None:
         assert data
+        # print (data['projects'][0].keys())
+        # dict_keys(['expand', 'self', 'id', 'key', 'name', 'avatarUrls', 'issuetypes'])
         self.name = name
         self.data = data
 
@@ -77,6 +79,8 @@ class ProjectFieldKeys:
     def show(self) -> None:
         pprint(', '.join(self.fields))
         return self.fields
+        # for field in self.fields:
+        #     print (field)
 
 class JiraSystemConfigLoader:
     def __init__(self, client: 'JiraClient') -> None:
