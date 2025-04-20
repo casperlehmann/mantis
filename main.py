@@ -35,6 +35,16 @@ if __name__ == '__main__':
         jira.system_config_loader.inspect()
     elif jira_options.action == 'compile-plugins':
         jira.system_config_loader.compile_plugins()
+    elif jira_options.action == 'load-plugins':
+        from plugins import Plugins
+        print(Plugins.all_plugins['plugins_test'].Schema(type='a', system='b'))
+        print(Plugins.plugins_test.Schema(type='a', system='b'))
+
+        import plugins
+        print(plugins.plugins_test.Schema(type='a', system='b'))
+
+        from plugins.plugins_test import Schema
+        print(Schema(type='a', system='b'))
     else:
         print(f'Action {jira_options.action} not recognized')
 
