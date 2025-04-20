@@ -20,13 +20,14 @@ def process_key(key: str, exception: Exception) -> tuple[str, str]:
             ) from exception
 
 class JiraIssues:
-    allowed_types = {'Story', 'Sub-Task', 'Epic', 'Bug', 'Task'}
+    allowed_types = ['Story', 'Sub-Task', 'Epic', 'Bug', 'Task']
 
     def __init__(self, client: 'JiraClient'):
         self.client = client
         cached_issuetypes = client.system_config_loader.get_issuetypes_names_from_cache()
         if cached_issuetypes:
-            self.allowed_types = {_.get('name') for _ in cached_issuetypes}
+            sorted_cached_issuetypes = sorted(cached_issuetypes, key=lambda x: str(x.get('id')))
+            self.allowed_types = [str(_.get('name')) for _ in sorted_cached_issuetypes]
 
     def get(self, key: str) -> dict:
         if not self.client._no_cache:
