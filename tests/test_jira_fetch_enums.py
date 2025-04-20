@@ -3,7 +3,7 @@ import inspect
 import os
 
 from mantis.jira import JiraAuth, JiraClient
-from mantis.jira import fetch_enums
+from mantis.jira.utils.jira_system_config_loader import fetch_enums
 
 VAL = [
     {

@@ -1,3 +1,5 @@
+import json
+
 def fetch_enums(jira, endpoint = 'issuetype', filter = None, mapping = {}, caster_functions = {}):
     """Get the enums of the fields in a jira tenant
 
@@ -38,3 +40,25 @@ def fetch_enums(jira, endpoint = 'issuetype', filter = None, mapping = {}, caste
         if not filter or filter(schema):
             schemas.append(schema)
     return schemas
+
+class JiraSystemConfigLoader:
+    def __init__(self, client: 'JiraClient') -> None:
+        self.client = client
+
+    def update_issuetypes_cache(self):
+        types_filter = lambda d: int(d['id']) < 100 and d['name'] in ('Bug', 'Task', 'Epic', 'Story', 'Incident', 'New Feature', 'Sub-Task')
+        mapping = {'id': 'id', 'description': 'description', 'untranslatedName': 'name'}
+        caster_functions = {'id': int}
+        issue_enums = fetch_enums(
+            self.client,
+            endpoint = 'issuetype',
+            filter = types_filter,
+            mapping = mapping,
+            caster_functions = caster_functions
+        )
+        self.client.write_to_cache('issue_types.json', json.dumps(issue_enums))
+
+    def get_issuetypes_names_from_cache(self):
+        issuetypes = self.client.get_from_cache('issue_types.json')
+        if issuetypes:
+            return json.loads(issuetypes)

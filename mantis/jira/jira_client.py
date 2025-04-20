@@ -5,7 +5,7 @@ import json
 import requests
 
 from .jira_issues import JiraIssues
-from .utils import fetch_enums
+from .utils import JiraSystemConfigLoader
 
 if TYPE_CHECKING:
     from .jira_auth import JiraAuth
@@ -43,18 +43,6 @@ class JiraClient:
             return
         with open(self.cache_dir / file_name, 'r') as f:
             return f.read()
-
-    def update_issuetypes_cache(self):
-        types_filter = lambda d: int(d['id']) < 100 and d['name'] in ('Bug', 'Task', 'Epic', 'Story', 'Incident', 'New Feature', 'Sub-Task')
-        mapping = {'id': 'id', 'description': 'description', 'untranslatedName': 'name'}
-        caster_functions = {'id': int}
-        issue_enums = fetch_enums(self, endpoint = 'issuetype', filter = types_filter, mapping = mapping, caster_functions = caster_functions)
-        self.write_to_cache('issue_types.json', json.dumps(issue_enums))
-
-    def get_issuetypes_names_from_cache(self):
-        issuetypes = self.get_from_cache('issue_types.json')
-        if issuetypes:
-            return json.loads(issuetypes)
 
     def get_project_keys(self):
         for issue_type in self.issues.allowed_types:
