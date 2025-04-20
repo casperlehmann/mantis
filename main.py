@@ -31,6 +31,8 @@ if __name__ == '__main__':
         resp = jira.system_config_loader.update_project_field_keys()
         print('Dumped field values for:')
         pprint(resp)
+    elif jira_options.action == 'get-project-keys-from-cache':
+        jira.system_config_loader.inspect()
     else:
         print(f'Action {jira_options.action} not recognized')
 

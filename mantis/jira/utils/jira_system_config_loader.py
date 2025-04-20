@@ -131,3 +131,47 @@ class JiraSystemConfigLoader:
                 f'issue_type_fields/{issue_type}.json', json.dumps(data))
         return self.client.issues.allowed_types
 
+    def get_all_keys_from_nested_dicts(
+            self, data: Mapping[str, ProjectFieldKeys]) -> set[str]:
+        d: dict[str, list[str]] = {}
+        all_field_keys: set[str] = set()
+        for issue_type, field_keys in data.items():
+            d[issue_type] = field_keys.fields
+            all_field_keys = all_field_keys.union(set(d[issue_type]))
+        return all_field_keys
+
+    def print_table(self, column_order: list[str], all_field_keys: set[str],
+                    issue_type_field_map: Mapping[str, ProjectFieldKeys]) -> None:
+        def print_header_footer():
+            print (f'{'':<20} - ', end='')
+            for issue_type_name in column_order:
+                if not issue_type_name in issue_type_field_map.keys():
+                    raise ValueError('column_order contains non-existent key')
+                print (f'{issue_type_name:<10}', end = '')
+            print()
+        print_header_footer()
+        for each in all_field_keys:
+            print (f'{each:<20} - ', end='')
+            for _, project_field_keys in issue_type_field_map.items():
+                print (f'{'1   ' if each in project_field_keys.fields
+                                 else '' :<10}', end = '')
+            print()
+        print_header_footer()
+
+    def get_project_field_keys_from_cache(self) -> Mapping[str, ProjectFieldKeys]:
+        d: Mapping[str, ProjectFieldKeys] = {}
+        for issue_type in self.client.issues.allowed_types:
+            try:
+                loaded_json = self.get_from_system_cache_decoded(
+                    f'issue_type_fields/{issue_type}.json')
+            except FileNotFoundError as e:
+                raise FileNotFoundError(
+                    f'Cached values do not exist for {issue_type}') from e
+            d[issue_type] = ProjectFieldKeys(issue_type, loaded_json)
+        return d
+
+    def inspect(self) -> None:
+        data = self.get_project_field_keys_from_cache()
+        all_keys = self.get_all_keys_from_nested_dicts(data)
+        self.print_table(self.client.issues.allowed_types, all_keys, data)
+
