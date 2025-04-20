@@ -62,7 +62,10 @@ class JiraSystemConfigLoader:
         return self.client.get_from_cache(f'system/{file_name}')
 
     def update_issuetypes_cache(self) -> None:
-        types_filter = lambda d: int(d['id']) < 100 and d['name'] in ('Bug', 'Task', 'Epic', 'Story', 'Incident', 'New Feature', 'Sub-Task')
+        types_filter = lambda d: int(d['id']) < 100 and d['name'] in (
+            'Bug', 'Task', 'Epic', 'Story', 'Sub-Task',
+            #'Incident', 'New Feature'
+        )
         mapping = {'id': 'id', 'description': 'description', 'untranslatedName': 'name'}
         caster_functions = {'id': int}
         issue_enums = fetch_enums(
