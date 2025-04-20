@@ -58,7 +58,7 @@ class JiraSystemConfigLoader:
     def write_to_system_cache(self, file_name: str, issue_enums) -> None:
         self.client.write_to_cache(f'system/{file_name}', issue_enums)
 
-    def get_from_system_cache(self, file_name: str) -> None:
+    def get_from_system_cache(self, file_name: str) -> str | None:
         return self.client.get_from_cache(f'system/{file_name}')
 
     def update_issuetypes_cache(self) -> None:
@@ -77,7 +77,7 @@ class JiraSystemConfigLoader:
         )
         self.write_to_system_cache('issue_types.json', json.dumps(issue_enums))
 
-    def get_issuetypes_names_from_cache(self) -> set[str]:
+    def get_issuetypes_names_from_cache(self) -> list[dict[str, int|str]] | None:
         issuetypes = self.get_from_system_cache('issue_types.json')
         if issuetypes:
             return json.loads(issuetypes)

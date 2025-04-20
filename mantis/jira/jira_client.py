@@ -41,7 +41,7 @@ class JiraClient:
     def remove_from_cache(self, file_name: str):
         os.remove(self.cache_dir / file_name)
 
-    def get_from_cache(self, file_name: str):
+    def get_from_cache(self, file_name: str) -> str | None:
         if not (self.cache_dir / file_name).exists():
             return
         with open(self.cache_dir / file_name, 'r') as f:
