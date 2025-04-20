@@ -5,7 +5,7 @@ import json
 import requests
 
 from .jira_issues import JiraIssues
-from .utils import fetch_enums
+from .utils import JiraSystemConfigLoader
 
 if TYPE_CHECKING:
     from .jira_auth import JiraAuth
@@ -27,8 +27,11 @@ class JiraClient:
         self.cache_dir = Path(self.options.cache_dir)
         self.cache_dir.mkdir(exist_ok=True)
         (self.cache_dir / 'issues').mkdir(exist_ok=True)
+        (self.cache_dir / 'system').mkdir(exist_ok=True)
+        (self.cache_dir / 'system' / 'issue_type_fields').mkdir(exist_ok=True)
         self.drafts_dir = Path(self.options.drafts_dir)
         self.drafts_dir.mkdir(exist_ok=True)
+        self.system_config_loader = JiraSystemConfigLoader(self)
         self.issues = JiraIssues(self)
 
     def write_to_cache(self, file_name: str, contents: str):
@@ -38,37 +41,11 @@ class JiraClient:
     def remove_from_cache(self, file_name: str):
         os.remove(self.cache_dir / file_name)
 
-    def get_from_cache(self, file_name: str):
+    def get_from_cache(self, file_name: str) -> str | None:
         if not (self.cache_dir / file_name).exists():
             return
         with open(self.cache_dir / file_name, 'r') as f:
             return f.read()
-
-    def update_issuetypes_cache(self):
-        types_filter = lambda d: int(d['id']) < 100 and d['name'] in ('Bug', 'Task', 'Epic', 'Story', 'Incident', 'New Feature', 'Sub-Task')
-        mapping = {'id': 'id', 'description': 'description', 'untranslatedName': 'name'}
-        caster_functions = {'id': int}
-        issue_enums = fetch_enums(self, endpoint = 'issuetype', filter = types_filter, mapping = mapping, caster_functions = caster_functions)
-        self.write_to_cache('issue_types.json', json.dumps(issue_enums))
-
-    def get_issuetypes_names_from_cache(self):
-        issuetypes = self.get_from_cache('issue_types.json')
-        if issuetypes:
-            return json.loads(issuetypes)
-
-    def get_project_keys(self):
-        for issue_type in self.issues.allowed_types:
-            url = (
-                f'issue/createmeta'
-                f'?projectKeys={self.project_name}'
-                f'&issuetypeNames={issue_type}'
-                '&expand=projects.issuetypes.fields'
-            )
-            response = self._get(url)
-            response.raise_for_status()
-            data = response.json()
-            self.write_to_cache(f'issue_type_fields_{issue_type}.json', json.dumps(data))
-        return self.issues.allowed_types
 
     def write_issue_to_cache(self, key: str, data):
         self.write_to_cache(f'issues/{key}.json', json.dumps(data))

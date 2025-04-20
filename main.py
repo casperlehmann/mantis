@@ -1,9 +1,5 @@
 #!/usr/bin/env python
 
-import requests
-import json
-import requests
-
 from pprint import pprint
 
 from mantis.jira import JiraClient, JiraOptions, JiraAuth, parse_args
@@ -20,9 +16,9 @@ if __name__ == '__main__':
     elif jira_options.action == 'me-as-assignee':
         print(jira.get_current_user_as_assignee())
     elif jira_options.action == 'fetch-issuetypes':
-        jira.update_issuetypes_cache()
+        jira.system_config_loader.update_issuetypes_cache()
         print('Updated local cache for issuetypes:')
-        pprint(jira.get_issuetypes_names_from_cache())
+        pprint(jira.system_config_loader.get_issuetypes_names_from_cache())
     elif jira_options.action == 'get-issue':
         for issue_key in jira_options.issues:
             issue = jira.issues.get(key=issue_key)
@@ -31,5 +27,10 @@ if __name__ == '__main__':
             print(f'[{key}] {title}')
             draft = Draft(issue)
     elif jira_options.action == 'get-project-keys':
+        print ('Fetching from Jira...')
+        resp = jira.system_config_loader.update_project_field_keys()
         print('Dumped field values for:')
-        pprint(jira.get_project_keys())
+        pprint(resp)
+    else:
+        print(f'Action {jira_options.action} not recognized')
+

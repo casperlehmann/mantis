@@ -5,7 +5,7 @@ from requests.models import HTTPError
 if TYPE_CHECKING:
     from jira_client import JiraClient
 
-def process_key(key: str, exception: Exception) -> (str, str):
+def process_key(key: str, exception: Exception) -> tuple[str, str]:
     match key.split('-'):
         case (s,):
             raise NotImplementedError(
@@ -20,13 +20,17 @@ def process_key(key: str, exception: Exception) -> (str, str):
             ) from exception
 
 class JiraIssues:
-    allowed_types = {'Story', 'Sub-Task', 'Epic', 'Bug', 'Task'}
+    allowed_types = ['Story', 'Sub-Task', 'Epic', 'Bug', 'Task']
 
     def __init__(self, client: 'JiraClient'):
         self.client = client
-        cached_issuetypes = client.get_issuetypes_names_from_cache()
+        cached_issuetypes = client.system_config_loader.get_issuetypes_names_from_cache()
         if cached_issuetypes:
-            self.allowed_types = {_.get('name') for _ in cached_issuetypes}
+            assert isinstance(cached_issuetypes, list)
+            assert isinstance(cached_issuetypes[0], dict)
+            assert isinstance(cached_issuetypes[0]['id'], int)
+            sorted_cached_issuetypes = sorted(cached_issuetypes, key=lambda x: str(x.get('id')))
+            self.allowed_types = [str(_.get('name')) for _ in sorted_cached_issuetypes]
 
     def get(self, key: str) -> dict:
         if not self.client._no_cache:
