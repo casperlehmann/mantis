@@ -102,3 +102,21 @@ An example of the coverage report:
 
 ![Markdown coverage report](docs/img/pytest-coverage-html-report.png)
 
+# Generate types
+
+```python
+from plugins import model
+for x in dir(model): print (x)
+... 
+Assignee
+Attachment
+AvatarUrls
+BaseModel
+Components
+Configuration
+Customfield10001
+Customfield10002
+Customfield10003
+[...]
+```
+
