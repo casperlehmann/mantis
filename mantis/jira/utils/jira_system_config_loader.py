@@ -92,6 +92,9 @@ class JiraSystemConfigLoader:
     def get_from_system_cache(self, file_name: str) -> str | None:
         return self.client.get_from_cache(f'system/{file_name}')
 
+    def get_from_system_cache_decoded(self, file_name: str) -> dict:
+        return self.client.get_from_cache_decoded(f'system/{file_name}')
+
     def update_issuetypes_cache(self) -> None:
         types_filter = lambda d: int(d['id']) < 100 and d['name'] in (
             'Bug', 'Task', 'Epic', 'Story', 'Sub-Task',
