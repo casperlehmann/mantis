@@ -1,6 +1,16 @@
 import json
 
-def fetch_enums(jira, endpoint = 'issuetype', filter = None, mapping = {}, caster_functions = {}):
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from jira_client import JiraClient
+
+def fetch_enums(jira: 'JiraClient',
+                endpoint = 'issuetype',
+                filter = None,
+                mapping = {},
+                caster_functions = {}
+                ) -> list:
     """Get the enums of the fields in a jira tenant
 
     Args:
@@ -12,13 +22,13 @@ def fetch_enums(jira, endpoint = 'issuetype', filter = None, mapping = {}, caste
 
     Returns:
         _type_: _description_
-    
+
     Example for /rest/api/2/issuetype:
         types_filter = lambda d: int(d['id']) < 100 and d['name'] in ('Bug', 'Task', 'Epic', 'Story', 'Incident', 'New Feature', 'Sub-Task')
         mapping = {'id': 'id', 'description': 'description', 'untranslatedName': 'name'}
         caster_functions = {'id': int}
         issue_enums = fetch_enums(jira, endpoint = 'issuetype', filter = types_filter, mapping = mapping, caster_functions = caster_functions)
-    
+
     See https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issue-types/#api-rest-api-2-issuetype-get
     """
     response = jira._get(f'/{endpoint}')
