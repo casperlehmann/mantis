@@ -26,6 +26,9 @@ class JiraIssues:
         self.client = client
         cached_issuetypes = client.system_config_loader.get_issuetypes_names_from_cache()
         if cached_issuetypes:
+            assert isinstance(cached_issuetypes, list)
+            assert isinstance(cached_issuetypes[0], dict)
+            assert isinstance(cached_issuetypes[0]['id'], int)
             sorted_cached_issuetypes = sorted(cached_issuetypes, key=lambda x: str(x.get('id')))
             self.allowed_types = [str(_.get('name')) for _ in sorted_cached_issuetypes]
 
