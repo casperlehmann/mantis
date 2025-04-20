@@ -27,6 +27,10 @@ if __name__ == '__main__':
             print(f'[{key}] {title}')
             draft = Draft(issue)
     elif jira_options.action == 'get-project-keys':
+        print ('Fetching from Jira...')
+        resp = jira.system_config_loader.update_project_field_keys()
         print('Dumped field values for:')
-        pprint(jira.system_config_loader.get_project_keys())
+        pprint(resp)
+    else:
+        print(f'Action {jira_options.action} not recognized')
 

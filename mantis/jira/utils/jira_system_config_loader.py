@@ -82,7 +82,7 @@ class JiraSystemConfigLoader:
         if issuetypes:
             return json.loads(issuetypes)
 
-    def get_project_keys(self) -> set[str]:
+    def update_project_field_keys(self) -> list[str]:
         for issue_type in self.client.issues.allowed_types:
             url = (
                 f'issue/createmeta'
