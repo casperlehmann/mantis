@@ -1,13 +1,30 @@
-from typing import Any, Mapping
+from pprint import pprint
+from typing import Any
 
-class IssueType(Mapping[str, dict[str, Any]]):
-    fields = dict[str, dict]
+from pydantic import BaseModel
 
-class Project(Mapping[str, list[IssueType]]):
-    issuetypes = list[IssueType]
+class IssueType(BaseModel):
+    id: str
+    description: str
+    iconUrl: str
+    name: str
+    untranslatedName: str
+    subtask: bool
+    hierarchyLevel: int
+    expand: str
+    fields: dict[str, Any]
 
-class IssueTypeFields(Mapping[str, list[Project]]):
-    projects = list[Project]
+class Project(BaseModel):
+    issuetypes: list[IssueType]
+    expand: str
+    id: str
+    key: str
+    name: str
+    avatarUrls: dict[str, str]
+
+class IssueTypeFields(BaseModel):
+    projects: list[Project]
+    expand: str
 
 class ProjectFieldKeys:
     def __init__(self, name: str, data: IssueTypeFields) -> None:

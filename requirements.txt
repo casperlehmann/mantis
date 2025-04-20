@@ -4,4 +4,4 @@ types-requests
 requests.auth
 pytest-xdist
 pytest-cov
-
+pydantic
