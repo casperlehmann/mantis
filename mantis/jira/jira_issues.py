@@ -5,7 +5,7 @@ from requests.models import HTTPError
 if TYPE_CHECKING:
     from jira_client import JiraClient
 
-def process_key(key: str, exception: Exception) -> (str, str):
+def process_key(key: str, exception: Exception) -> tuple[str, str]:
     match key.split('-'):
         case (s,):
             raise NotImplementedError(
