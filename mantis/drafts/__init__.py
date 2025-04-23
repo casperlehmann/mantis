@@ -1,4 +1,3 @@
-from pathlib import Path
 from typing import TYPE_CHECKING
 
 # To-do: Create converter for Jira syntax to markdown.
@@ -6,14 +5,13 @@ j2m = lambda x: x
 
 if TYPE_CHECKING:
     from mantis.jira import JiraIssue
+    from mantis.jira.jira_client import JiraClient
 
 
 class Draft:
-    def __init__(self, issue: "JiraIssue", drafts_dir: Path | None = None) -> None:
-        if not drafts_dir:
-            drafts_dir = Path("drafts")
-        self.dir = drafts_dir
-        self.dir.mkdir(exist_ok=True)
+    def __init__(self, jira: "JiraClient", issue: "JiraIssue") -> None:
+        assert jira.drafts_dir
+        self.jira = jira
         self.issue = issue
         self._materialize()
 
@@ -32,7 +30,7 @@ class Draft:
         assignee = assignee.get("displayName")
         description = self.issue.get_field("description")
 
-        with open(self.dir / (key + ".md"), "w") as f:
+        with open(self.jira.drafts_dir / f"{key}.md", "w") as f:
             f.write(f"---\n")
             f.write(f"header: [{key}] {summary}\n")
             f.write(f"ignore: True\n")
