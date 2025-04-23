@@ -1,12 +1,13 @@
-from requests.auth import HTTPBasicAuth
-
 from typing import TYPE_CHECKING
+
+from requests.auth import HTTPBasicAuth
 
 if TYPE_CHECKING:
     from jira.jira_options import JiraOptions
 
+
 class JiraAuth:
-    def __init__(self, options: 'JiraOptions') -> None:
+    def __init__(self, options: "JiraOptions") -> None:
         self.options = options
         assert self.options.url
 

@@ -3,6 +3,7 @@ from typing import Any
 
 from pydantic import BaseModel
 
+
 class IssueType(BaseModel):
     id: str
     description: str
@@ -14,6 +15,7 @@ class IssueType(BaseModel):
     expand: str
     fields: dict[str, Any]
 
+
 class Project(BaseModel):
     issuetypes: list[IssueType]
     expand: str
@@ -22,9 +24,11 @@ class Project(BaseModel):
     name: str
     avatarUrls: dict[str, str]
 
+
 class IssueTypeFields(BaseModel):
     projects: list[Project]
     expand: str
+
 
 class ProjectFieldKeys:
     def __init__(self, name: str, data: IssueTypeFields) -> None:
@@ -36,11 +40,11 @@ class ProjectFieldKeys:
     def fields(self) -> list[str]:
         projects = self.data.projects
         assert projects, 'Data does not contain "projects" field'
-        assert len(projects) == 1, 'Expected exactly one project'
+        assert len(projects) == 1, "Expected exactly one project"
         project = projects[0]
         issue_types = project.issuetypes
         assert issue_types, 'Projects does not contain "issuetypes" field'
-        assert len(issue_types) == 1, 'Expected exactly one issue_type'
+        assert len(issue_types) == 1, "Expected exactly one issue_type"
         issue_type = issue_types[0]
         fields = issue_type.fields
         assert fields, 'Issue_types does not contain "fields" field'
@@ -48,5 +52,4 @@ class ProjectFieldKeys:
         return list(fields.keys())
 
     def show(self) -> None:
-        pprint(', '.join(self.fields))
-
+        pprint(", ".join(self.fields))
