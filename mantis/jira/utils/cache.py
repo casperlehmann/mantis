@@ -1,3 +1,5 @@
+import json
+import os
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -22,3 +24,34 @@ class Cache:
     def write(self, file_name: str, contents: str):
         with open(self.root / file_name, "w") as f:
             return f.write(contents)
+
+    def remove(self, file_name: str):
+        os.remove(self.root / file_name)
+
+    def write_issue(self, key: str, data):
+        self.write(f"issues/{key}.json", json.dumps(data))
+
+    def get(self, file_name: str) -> str | None:
+        if not (self.root / file_name).exists():
+            return
+        with open(self.root / file_name, "r") as f:
+            return f.read()
+
+    def get_decoded(self, file_name: str) -> dict:
+        with open(self.root / file_name, "r") as f:
+            return json.load(f)
+
+    def get_issue(self, key: str):
+        if self.client._no_cache:
+            return
+        issue_data = self.get(f"issues/{key}.json")
+        if issue_data:
+            return json.loads(issue_data)
+
+    def remove_issue_from_cache(self, key: str):
+        self.remove(f"issues/{key}.json")
+
+    def iter_dir(self, identifier):
+        if identifier == "issue_type_fields":
+            for file in self.issue_type_fields.iterdir():
+                yield file

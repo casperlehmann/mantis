@@ -37,32 +37,6 @@ class JiraClient:
         self.system_config_loader = JiraSystemConfigLoader(self)
         self.issues = JiraIssues(self)
 
-    def remove_from_cache(self, file_name: str):
-        os.remove(self.cache.root / file_name)
-
-    def get_from_cache(self, file_name: str) -> str | None:
-        if not (self.cache.root / file_name).exists():
-            return
-        with open(self.cache.root / file_name, "r") as f:
-            return f.read()
-
-    def get_from_cache_decoded(self, file_name: str) -> dict:
-        with open(self.cache.root / file_name, "r") as f:
-            return json.load(f)
-
-    def write_issue_to_cache(self, key: str, data):
-        self.cache.write(f"issues/{key}.json", json.dumps(data))
-
-    def get_issue_from_cache(self, key: str):
-        if self._no_cache:
-            return
-        issue_data = self.get_from_cache(f"issues/{key}.json")
-        if issue_data:
-            return json.loads(issue_data)
-
-    def remove_issue_from_cache(self, key: str):
-        self.remove_from_cache(f"issues/{key}.json")
-
     @property
     def api_url(self):
         assert self.options.url
