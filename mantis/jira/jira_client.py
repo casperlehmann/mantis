@@ -79,7 +79,7 @@ class JiraClient:
             print("Connection error. Run it like this:")
             print("export JIRA_TOKEN=$(cat secret.txt)")
             print("python main.py")
-            exit()
+            exit(1)
         except Exception as e:
             print(e.with_traceback)
             print("\ntest_auth failed for unknown reasons.")
