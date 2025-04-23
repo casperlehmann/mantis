@@ -21,16 +21,6 @@ class Cache:
         self.issue_type_fields = self.system / "issue_type_fields"
         self.issue_type_fields.mkdir(exist_ok=True)
 
-    def write(self, file_name: str, contents: str):
-        with open(self.root / file_name, "w") as f:
-            return f.write(contents)
-
-    def remove(self, file_name: str):
-        os.remove(self.root / file_name)
-
-    def write_issue(self, key: str, data):
-        self.write(f"issues/{key}.json", json.dumps(data))
-
     def get(self, file_name: str) -> str | None:
         if not (self.root / file_name).exists():
             return
@@ -48,7 +38,17 @@ class Cache:
         if issue_data:
             return json.loads(issue_data)
 
-    def remove_issue_from_cache(self, key: str):
+    def write(self, file_name: str, contents: str):
+        with open(self.root / file_name, "w") as f:
+            return f.write(contents)
+
+    def write_issue(self, key: str, data):
+        self.write(f"issues/{key}.json", json.dumps(data))
+
+    def remove(self, file_name: str):
+        os.remove(self.root / file_name)
+
+    def remove_issue(self, key: str):
         self.remove(f"issues/{key}.json")
 
     def iter_dir(self, identifier):
