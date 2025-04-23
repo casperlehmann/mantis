@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 
 class Draft:
-    def __init__(self, issue: "JiraIssue", drafts_dir: Path = None) -> None:
+    def __init__(self, issue: "JiraIssue", drafts_dir: Path | None = None) -> None:
         if not drafts_dir:
             drafts_dir = Path("drafts")
         self.dir = drafts_dir
