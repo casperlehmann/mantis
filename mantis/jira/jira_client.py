@@ -74,6 +74,7 @@ class JiraClient:
             print(
                 f"Connected as user: {user.get('displayName', 'ERROR: No displayName')}"
             )
+            return True
         except requests.exceptions.ConnectionError as e:
             print("Connection error. Run it like this:")
             print("export JIRA_TOKEN=$(cat secret.txt)")
