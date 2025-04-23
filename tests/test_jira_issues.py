@@ -6,7 +6,7 @@ import pytest
 from requests.models import HTTPError
 
 from mantis.jira import JiraAuth, JiraClient
-from mantis.jira.jira_issues import process_key
+from mantis.jira.jira_issues import JiraIssues, process_key
 
 
 @pytest.fixture
@@ -128,3 +128,12 @@ def test_jira_no_issues_fields_raises(fake_jira, mock_post_request):
     with pytest.raises(KeyError):
         assert issue.fields
 
+
+def test_jira_issues_cached_issuetypes(fake_jira):
+    fake_jira._no_cache = False
+    cached_issuetypes = [{"id": 1, "name": "Bug"}, {"id": 2, "name": "Task"}]
+    fake_jira.system_config_loader.get_issuetypes_names_from_cache = (
+        lambda *args, **kwargs: cached_issuetypes
+    )
+    fake_jira.issues = JiraIssues(fake_jira)
+    assert fake_jira.issues.allowed_types == ["Bug", "Task"]
