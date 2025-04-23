@@ -82,7 +82,9 @@ class JiraSystemConfigLoader:
             "Epic",
             "Story",
             "Sub-Task",
-            #'Incident', 'New Feature'
+            "Subtask",
+            # "Incident",
+            # "New Feature",
         )
         mapping = {"id": "id", "description": "description", "untranslatedName": "name"}
         caster_functions = {"id": int}
