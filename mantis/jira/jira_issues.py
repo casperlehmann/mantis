@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from requests.models import HTTPError
 
@@ -29,6 +29,18 @@ class JiraIssue:
 
     def get(self, key: str, *args):
         return self.data.get(key, *args)
+
+    @property
+    def fields(self):
+        fields = self.data.get("fields")
+        if not fields:
+            raise KeyError("JiraIssue.data does not have any fields")
+        return fields
+
+    def get_field(self, key: str, default: Any = None):
+        # Note that the key can exist and the value can still be None
+        x = self.fields.get(key, default) or default
+        return x
 
 
 class JiraIssues:

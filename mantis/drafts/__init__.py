@@ -25,11 +25,12 @@ class Draft:
             len(key) < 20
         ), f'The length of the key is suspeciously long: "{key[:20]}..."'
         # project = self.issue.get('fields', {}).get('project', {}).get('key')
-        parent = self.issue.get("fields", {}).get("parent")
-        summary = self.issue.get("fields", {}).get("summary")
-        issuetype = self.issue.get("fields", {}).get("issuetype", {}).get("name")
-        assignee = self.issue.get("fields", {}).get("assignee", {}).get("displayName")
-        description = self.issue.get("fields", {}).get("description")
+        parent = self.issue.get_field("parent", "None")
+        summary = self.issue.get_field("summary")
+        issuetype = self.issue.get_field("issuetype").get("name")
+        assignee = self.issue.get_field("assignee", {})
+        assignee = assignee.get("displayName")
+        description = self.issue.get_field("description")
 
         with open(self.dir / (key + ".md"), "w") as f:
             f.write(f"---\n")

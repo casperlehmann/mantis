@@ -23,7 +23,7 @@ if __name__ == '__main__':
         for issue_key in jira_options.issues:
             issue = jira.issues.get(key=issue_key)
             key = issue.get('key', 'N/A')
-            title = issue.get('fields', {}).get('summary')
+            title = issue.get_field('summary')
             print(f'[{key}] {title}')
             draft = Draft(issue)
     elif jira_options.action == 'get-project-keys':
