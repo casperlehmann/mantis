@@ -30,3 +30,29 @@ def test_cache_exists(fake_jira):
     assert len(list(fake_jira.cache.system.iterdir())) == 1
     for item in fake_jira.cache.system.iterdir():
         assert item.name in ("issue_type_fields")
+
+
+@pytest.fixture
+def json_response_account_id(mock_get_request):
+    mock_get_request.return_value.json.return_value = {
+        "accountId": "492581:638245r0-3d02-ki30-kchs-3kjd92hafjmz"
+    }
+
+
+def test_get_current_user(fake_jira, json_response_account_id):
+    assert fake_jira.get_current_user() == {
+        "accountId": "492581:638245r0-3d02-ki30-kchs-3kjd92hafjmz"
+    }
+
+
+def test_get_current_user_account_id(fake_jira, json_response_account_id):
+    assert (
+        fake_jira.get_current_user_account_id()
+        == "492581:638245r0-3d02-ki30-kchs-3kjd92hafjmz"
+    )
+
+
+def test_get_current_user_as_assignee(fake_jira, json_response_account_id):
+    assert fake_jira.get_current_user_as_assignee() == {
+        "assignee": {"accountId": "492581:638245r0-3d02-ki30-kchs-3kjd92hafjmz"}
+    }
