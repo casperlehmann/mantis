@@ -17,6 +17,8 @@ class Cli:
     no_verify_ssl = False
     cache_dir = ".jira_cache_test"
     drafts_dir = "drafts_test"
+    plugins_dir = "plugins_test"
+    type_id_cutoff = "10100"
     action = ""
     issues = [""]
 
@@ -43,7 +45,9 @@ def fake_toml(tmpdir):
             'personal-access-token = "SECRET_2"',
             'project = "TEST"',
             'cache-dir = ".jira_cache_test"',
-            'drafts-dir = "drafts_test"' "",
+            'drafts-dir = "drafts_test"',
+            'plugins-dir = "plugins_test"',
+            'type-id-cutoff = "10100"' "",
         )
     )
     toml = tmpdir / "options.toml"

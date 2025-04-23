@@ -76,7 +76,9 @@ class JiraSystemConfigLoader:
             yield file
 
     def update_issuetypes_cache(self) -> None:
-        types_filter = lambda d: int(d["id"]) < 100 and d["name"] in (
+        types_filter = lambda d: int(d["id"]) <= self.client.options.type_id_cutoff and d[
+            "name"
+        ] in (
             "Bug",
             "Task",
             "Epic",
