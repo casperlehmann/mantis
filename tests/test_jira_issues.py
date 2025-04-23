@@ -6,6 +6,7 @@ import pytest
 from requests.models import HTTPError
 
 from mantis.jira import JiraAuth, JiraClient
+from mantis.jira.jira_issues import process_key
 
 
 @pytest.fixture
@@ -111,3 +112,12 @@ def test_jira_issues_create(fake_jira, mock_post_request):
     name = issuetype.get("name")
     assert name is not None, "Expected 'name' to be present in 'issuetype'"
     assert name == "Bug", "Expected issue type name to be 'Bug'"
+
+
+def test_process_key():
+    with pytest.raises(NotImplementedError):
+        try:
+            raise HTTPError("An excuse to raise an exception")
+        except HTTPError as e:
+            process_key(key="A-B-1", exception=e)
+
