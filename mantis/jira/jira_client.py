@@ -38,20 +38,20 @@ class JiraClient:
         self.issues = JiraIssues(self)
 
     def write_to_cache(self, file_name: str, contents: str):
-        with open(self.cache.cache_dir / file_name, "w") as f:
+        with open(self.cache.root / file_name, "w") as f:
             return f.write(contents)
 
     def remove_from_cache(self, file_name: str):
-        os.remove(self.cache.cache_dir / file_name)
+        os.remove(self.cache.root / file_name)
 
     def get_from_cache(self, file_name: str) -> str | None:
-        if not (self.cache.cache_dir / file_name).exists():
+        if not (self.cache.root / file_name).exists():
             return
-        with open(self.cache.cache_dir / file_name, "r") as f:
+        with open(self.cache.root / file_name, "r") as f:
             return f.read()
 
     def get_from_cache_decoded(self, file_name: str) -> dict:
-        with open(self.cache.cache_dir / file_name, "r") as f:
+        with open(self.cache.root / file_name, "r") as f:
             return json.load(f)
 
     def write_issue_to_cache(self, key: str, data):
