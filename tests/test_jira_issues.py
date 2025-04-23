@@ -3,6 +3,8 @@ import re
 from unittest.mock import Mock, patch
 
 import pytest
+import requests
+from requests import request
 from requests.models import HTTPError
 
 from mantis.jira import JiraAuth, JiraClient
@@ -121,6 +123,24 @@ def test_process_key():
         except HTTPError as e:
             process_key(key="A-B-1", exception=e)
 
+
+def test_handle_http_error_raises_generic_exception(
+    fake_jira: "JiraClient", mock_post_request
+):
+    mock_response = Mock()
+    mock_response.reason = "Unknown error"
+    mock_response.raise_for_status.side_effect = HTTPError()
+    mock_response.raise_for_status.side_effect.response = (
+        mock_response  # assigning itself, this is on purpose
+    )
+    with patch("requests.get", return_value=mock_response):
+        try:
+            response = fake_jira._get("Task-3")
+            response.raise_for_status()
+        except HTTPError as e:
+            assert e.response.reason == "Unknown error"
+            with pytest.raises(AttributeError):
+                fake_jira.issues.handle_http_error(exception=e, key="A-1")
 
 def test_jira_no_issues_fields_raises(fake_jira, mock_post_request):
     issue = fake_jira.issues.get("TASK-1")
