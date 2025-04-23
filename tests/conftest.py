@@ -5,6 +5,7 @@ import pytest
 import requests
 
 from mantis.jira import JiraAuth, JiraClient, JiraIssues, JiraOptions
+from mantis.jira.utils.cache import Cache
 
 
 @dataclass
@@ -86,3 +87,11 @@ def jira_issues_from_fake_cli(jira_client_from_fake_cli):
 def jira_client_from_fake_cli_no_cache(opts_from_fake_cli):
     auth = JiraAuth(opts_from_fake_cli)
     return JiraClient(opts_from_fake_cli, auth, no_cache=True)
+
+
+@pytest.fixture
+def jira_client_from_fake_cli_with_fake_cache(tmp_path, jira_client_from_fake_cli):
+    jira = jira_client_from_fake_cli
+    jira.options.cache_dir = tmp_path
+    jira.cache = Cache(jira)
+    return jira
