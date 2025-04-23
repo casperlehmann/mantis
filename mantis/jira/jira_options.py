@@ -46,6 +46,9 @@ class JiraOptions:
         self.drafts_dir = (
             parser and parser.drafts_dir or options.get("jira", {}).get("drafts-dir")
         )
+        self.plugins_dir = (
+            parser and parser.plugins_dir or options.get("jira", {}).get("plugins-dir")
+        )
         self.action = parser and parser.action or ""
         self.issues: list[str] = parser and parser.issues or []
         assert self.user, "JiraOptions.user not set"
@@ -98,6 +101,12 @@ def parse_args():
         dest="drafts_dir",
         default=None,
         help="Set the local drafts directory for Jira issues",
+    )
+    parser.add_argument(
+        "--plugins-dir",
+        dest="plugins_dir",
+        default=None,
+        help="Set the local plugins directory for models",
     )
     parser.add_argument(
         "--action", dest="action", default="get-issue", help="Get an issue from Jira"
