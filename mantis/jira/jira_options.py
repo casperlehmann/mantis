@@ -62,6 +62,7 @@ class JiraOptions:
         assert self.project, "JiraOptions.project not set"
         assert self.cache_dir, "JiraOptions.cache_dir not set"
         assert self.drafts_dir, "JiraOptions.drafts_dir not set"
+        assert self.plugins_dir, "JiraOptions.plugins_dir not set"
 
 
 def parse_args():
