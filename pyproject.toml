@@ -2,3 +2,9 @@
 
 [[requests.auth]]
 follow_untyped_imports = "True"
+
+[tool.pytest.ini_options]
+testpaths = [
+    "tests",
+]
+
