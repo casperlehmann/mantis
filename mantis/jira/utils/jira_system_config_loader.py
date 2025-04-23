@@ -126,7 +126,7 @@ class JiraSystemConfigLoader:
             generate(
                 content,
                 input_file_type=InputFileType.Json,
-                input_filename=input_file,
+                input_filename=str(input_file),
                 output=output_path,
                 output_model_type=DataModelType.PydanticV2BaseModel,
             )
