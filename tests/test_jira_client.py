@@ -25,7 +25,7 @@ def test_cache_exists(jira_client_from_fake_cli_with_fake_cache):
     assert len(list(jira.cache.root.iterdir())) == 2
     for item in jira.cache.root.iterdir():
         assert item.name in ("system", "issues")
-    assert len(list(jira.cache.cache_system.iterdir())) == 1
-    for item in jira.cache.cache_system.iterdir():
+    assert len(list(jira.cache.system.iterdir())) == 1
+    for item in jira.cache.system.iterdir():
         assert item.name in ("issue_type_fields")
 

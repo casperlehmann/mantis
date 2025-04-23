@@ -12,9 +12,9 @@ class Cache:
         self.root = Path(self.client.options.cache_dir)
         self.root.mkdir(exist_ok=True)
 
-        self.cache_issues = self.root / "issues"
-        self.cache_issues.mkdir(exist_ok=True)
-        self.cache_system = self.root / "system"
-        self.cache_system.mkdir(exist_ok=True)
-        self.cache_issue_type_fields = self.cache_system / "issue_type_fields"
-        self.cache_issue_type_fields.mkdir(exist_ok=True)
+        self.issues = self.root / "issues"
+        self.issues.mkdir(exist_ok=True)
+        self.system = self.root / "system"
+        self.system.mkdir(exist_ok=True)
+        self.issue_type_fields = self.system / "issue_type_fields"
+        self.issue_type_fields.mkdir(exist_ok=True)
