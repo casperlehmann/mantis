@@ -12,12 +12,12 @@ def fake_jira(opts_from_fake_cli, mock_get_request):
     auth = JiraAuth(opts_from_fake_cli)
     return JiraClient(opts_from_fake_cli, auth)
 
-def test_JiraIssuesGetFake(fake_jira):
+def test_jira_issues_get_fake(fake_jira):
     task_1 = fake_jira.issues.get('TASK-1')
     assert task_1.get('key') == 'TASK-1'
     assert task_1.get('fields', {}).get('status') == {'name': 'resolved'}
 
-def test_JiraIssuesGetMocked(jira_client_from_fake_cli_no_cache: JiraClient):
+def test_jira_issues_get_mocked(jira_client_from_fake_cli_no_cache: JiraClient):
     expected = {'key': 'TASK-1', 'fields': {'status': {'name': 'resolved'}}}
     mock_response = Mock()
     mock_response.status_code = 200
@@ -30,7 +30,7 @@ def test_JiraIssuesGetMocked(jira_client_from_fake_cli_no_cache: JiraClient):
     assert task_1.get('key') == 'TASK-1'
     assert task_1.get('fields', {}).get('status') == {'name': 'resolved'}
 
-def test_JiraIssuesGetNonExistent(jira_client_from_fake_cli_no_cache):
+def test_jira_issues_get_non_existent(jira_client_from_fake_cli_no_cache):
     mock_response = Mock()
     mock_response.reason = "Not Found"
     mock_response.raise_for_status.side_effect = HTTPError()
@@ -60,7 +60,7 @@ def test_JiraIssuesGetNonExistent(jira_client_from_fake_cli_no_cache):
 
 @pytest.mark.skipif(not os.path.exists("options.toml"), reason='File "options.toml" does not exist')
 @pytest.mark.skipif(not os.getenv('EXECUTE_SKIPPED'), reason="This is a live test against the Jira api")
-def test_JiraIssuesGetReal(jira_client_from_user_toml):
+def test_jira_issues_get_real(jira_client_from_user_toml):
     test_3 = jira_client_from_user_toml.issues.get('TEST-3')
     assert test_3.get('key') == 'TEST-3'
     test_3_fields = test_3.get('fields', {})
@@ -70,7 +70,7 @@ def test_JiraIssuesGetReal(jira_client_from_user_toml):
     test_3_status_name = test_3_status.get('name', {})
     assert test_3_status_name == 'In Progress'
 
-def test_JiraIssuesCreate(jira_issues_from_fake_cli, mock_post_request):
+def test_jira_issues_create(jira_issues_from_fake_cli, mock_post_request):
     with pytest.raises(ValueError):
         issue = jira_issues_from_fake_cli.create(issue_type='Bug', title='Tester', data={})
     expected = {'key': 'TASK-1', 'fields': {'status': {'name': 'In Progress'}, 'issuetype': {'name': 'Bug'}}}
