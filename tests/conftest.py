@@ -18,6 +18,7 @@ class Cli:
     cache_dir = ".jira_cache_test"
     drafts_dir = "drafts_test"
     plugins_dir = "plugins_test"
+    type_id_cutoff = "10100"
     action = ""
     issues = [""]
 
@@ -45,7 +46,8 @@ def fake_toml(tmpdir):
             'project = "TEST"',
             'cache-dir = ".jira_cache_test"',
             'drafts-dir = "drafts_test"',
-            'plugins-dir = "plugins_test"' "",
+            'plugins-dir = "plugins_test"',
+            'type-id-cutoff = "10100"' "",
         )
     )
     toml = tmpdir / "options.toml"

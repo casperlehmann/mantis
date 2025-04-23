@@ -6,4 +6,5 @@ personal-access-token = "zxcv_JIRA_TOKEN"
 cache-dir = ".jira_cache"
 drafts-dir = "drafts"
 plugins-dir = "plugins"
+type_id_cutoff = "10100"
 

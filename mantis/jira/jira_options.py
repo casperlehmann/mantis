@@ -49,6 +49,11 @@ class JiraOptions:
         self.plugins_dir = (
             parser and parser.plugins_dir or options.get("jira", {}).get("plugins-dir")
         )
+        self.type_id_cutoff = int(
+            parser
+            and parser.type_id_cutoff
+            or options.get("jira", {}).get("type-id-cutoff", 10100)
+        )
         self.action = parser and parser.action or ""
         self.issues: list[str] = parser and parser.issues or []
         assert self.user, "JiraOptions.user not set"
@@ -107,6 +112,12 @@ def parse_args():
         dest="plugins_dir",
         default=None,
         help="Set the local plugins directory for models",
+    )
+    parser.add_argument(
+        "--type-id-cutoff",
+        dest="type_id_cutoff",
+        default=None,
+        help="Set the cutoff for Jira types to fetch",
     )
     parser.add_argument(
         "--action", dest="action", default="get-issue", help="Get an issue from Jira"
