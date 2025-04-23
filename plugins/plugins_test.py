@@ -4,6 +4,7 @@
 
 from pydantic import BaseModel
 
+
 class Schema(BaseModel):
     type: str
     system: str
