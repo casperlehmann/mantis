@@ -50,7 +50,7 @@ class JiraIssues:
 
     def get(self, key: str) -> JiraIssue:
         if not self.client._no_cache:
-            issue_from_cache = self.client.get_issue_from_cache(key)
+            issue_from_cache = self.client.cache.get_issue(key)
             if issue_from_cache:
                 return JiraIssue(self.client, issue_from_cache)
         response = self.client.get_issue(key)
@@ -60,7 +60,7 @@ class JiraIssues:
             self.handle_http_error(e, key)
         data = response.json()
         if not self.client._no_cache:
-            self.client.write_issue_to_cache(key, data)
+            self.client.cache.write_issue(key, data)
         return JiraIssue(self.client, data)
 
     def create(self, issue_type, title, data):

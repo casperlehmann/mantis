@@ -5,6 +5,8 @@ from typing import TYPE_CHECKING
 
 import requests
 
+from mantis.jira.utils import Cache
+
 from .jira_issues import JiraIssues
 from .utils import JiraSystemConfigLoader
 
@@ -27,47 +29,13 @@ class JiraClient:
             "headers": {"Content-Type": "application/json"},
             "verify": (not self.no_verify_ssl),
         }
-        self.cache_dir = Path(self.options.cache_dir)
-        self.cache_dir.mkdir(exist_ok=True)
-        (self.cache_dir / "issues").mkdir(exist_ok=True)
-        (self.cache_dir / "system").mkdir(exist_ok=True)
-        (self.cache_dir / "system" / "issue_type_fields").mkdir(exist_ok=True)
+        self.cache = Cache(self)
         self.drafts_dir = Path(self.options.drafts_dir)
         self.drafts_dir.mkdir(exist_ok=True)
         self.plugins_dir = Path("plugins")
         self.plugins_dir.mkdir(exist_ok=True)
         self.system_config_loader = JiraSystemConfigLoader(self)
         self.issues = JiraIssues(self)
-
-    def write_to_cache(self, file_name: str, contents: str):
-        with open(self.cache_dir / file_name, "w") as f:
-            return f.write(contents)
-
-    def remove_from_cache(self, file_name: str):
-        os.remove(self.cache_dir / file_name)
-
-    def get_from_cache(self, file_name: str) -> str | None:
-        if not (self.cache_dir / file_name).exists():
-            return
-        with open(self.cache_dir / file_name, "r") as f:
-            return f.read()
-
-    def get_from_cache_decoded(self, file_name: str) -> dict:
-        with open(self.cache_dir / file_name, "r") as f:
-            return json.load(f)
-
-    def write_issue_to_cache(self, key: str, data):
-        self.write_to_cache(f"issues/{key}.json", json.dumps(data))
-
-    def get_issue_from_cache(self, key: str):
-        if self._no_cache:
-            return
-        issue_data = self.get_from_cache(f"issues/{key}.json")
-        if issue_data:
-            return json.loads(issue_data)
-
-    def remove_issue_from_cache(self, key: str):
-        self.remove_from_cache(f"issues/{key}.json")
 
     @property
     def api_url(self):

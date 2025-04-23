@@ -63,16 +63,16 @@ class JiraSystemConfigLoader:
         self.client = client
 
     def write_to_system_cache(self, file_name: str, issue_enums) -> None:
-        self.client.write_to_cache(f"system/{file_name}", issue_enums)
+        self.client.cache.write(f"system/{file_name}", issue_enums)
 
     def get_from_system_cache(self, file_name: str) -> str | None:
-        return self.client.get_from_cache(f"system/{file_name}")
+        return self.client.cache.get(f"system/{file_name}")
 
     def get_from_system_cache_decoded(self, file_name: str) -> dict:
-        return self.client.get_from_cache_decoded(f"system/{file_name}")
+        return self.client.cache.get_decoded(f"system/{file_name}")
 
     def loop_issue_type_fields(self):
-        for file in self.client.cache_issue_type_fields_dir.iterdir():
+        for file in self.client.cache.issue_type_fields_dir.iterdir():
             yield file
 
     def update_issuetypes_cache(self) -> None:
@@ -82,7 +82,9 @@ class JiraSystemConfigLoader:
             "Epic",
             "Story",
             "Sub-Task",
-            #'Incident', 'New Feature'
+            "Subtask",
+            # "Incident",
+            # "New Feature",
         )
         mapping = {"id": "id", "description": "description", "untranslatedName": "name"}
         caster_functions = {"id": int}
@@ -117,7 +119,7 @@ class JiraSystemConfigLoader:
         return self.client.issues.allowed_types
 
     def compile_plugins(self):
-        for input_file in self.loop_issue_type_fields():
+        for input_file in self.client.cache.iter_dir("issue_type_fields"):
             with open(input_file, "r") as f:
                 content = f.read()
             # Remove the .json extension
@@ -126,7 +128,7 @@ class JiraSystemConfigLoader:
             generate(
                 content,
                 input_file_type=InputFileType.Json,
-                input_filename=input_file,
+                input_filename=str(input_file),
                 output=output_path,
                 output_model_type=DataModelType.PydanticV2BaseModel,
             )
