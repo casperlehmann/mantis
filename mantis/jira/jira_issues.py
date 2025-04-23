@@ -58,7 +58,7 @@ class JiraIssues:
             response.raise_for_status()
         except HTTPError as e:
             self.handle_http_error(e, key)
-        data = response.json()
+        data: dict[str, dict] = response.json()
         if not self.client._no_cache:
             self.client.cache.write_issue(key, data)
         return JiraIssue(self.client, data)
