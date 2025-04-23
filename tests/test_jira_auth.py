@@ -10,12 +10,12 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from mantis.jira.jira_options import JiraOptions
 
-def test_CreatesJiraAuthSettings(fake_toml):
+def test_creates_jira_auth_settings(fake_toml):
     opts = JiraOptions(toml_source = fake_toml)
     auth = JiraAuth(opts)
     assert isinstance(auth.auth, HTTPBasicAuth)
 
-def test_FailedJiraAuthSettingsRaises(fake_cli):
+def test_failed_jira_auth_settings_raises(fake_cli):
     fake_cli.personal_access_token = None
     with pytest.raises(PermissionError):
         JiraAuth(fake_cli).auth

@@ -18,7 +18,7 @@ def fake_jira(opts_from_fake_cli, mock_get_request):
     auth = JiraAuth(opts_from_fake_cli)
     return JiraClient(opts_from_fake_cli, auth)
 
-def test_JiraDraft(tmp_path, fake_jira: JiraClient):
+def test_jira_draft(tmp_path, fake_jira: JiraClient):
     drafts_dir = tmp_path / 'drafts'
     drafts_dir.mkdir()
     fake_jira._no_cache = True
