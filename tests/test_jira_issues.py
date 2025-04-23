@@ -121,3 +121,10 @@ def test_process_key():
         except HTTPError as e:
             process_key(key="A-B-1", exception=e)
 
+
+def test_jira_no_issues_fields_raises(fake_jira, mock_post_request):
+    issue = fake_jira.issues.get("TASK-1")
+    issue.data["fields"] = None
+    with pytest.raises(KeyError):
+        assert issue.fields
+
