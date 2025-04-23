@@ -81,6 +81,5 @@ class JiraClient:
             print("python main.py")
             exit(1)
         except Exception as e:
-            print(e.with_traceback)
-            print("\ntest_auth failed for unknown reasons.")
+            print("test_auth failed for unknown reasons.")
             raise e
