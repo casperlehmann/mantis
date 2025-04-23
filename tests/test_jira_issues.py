@@ -129,7 +129,7 @@ def test_jira_no_issues_fields_raises(fake_jira, mock_post_request):
         assert issue.fields
 
 
-def test_jira_issues_cached_issuetypes(fake_jira):
+def test_jira_issues_cached_issuetypes_parses_allowed_types(fake_jira):
     fake_jira._no_cache = False
     cached_issuetypes = [{"id": 1, "name": "Bug"}, {"id": 2, "name": "Task"}]
     fake_jira.system_config_loader.get_issuetypes_names_from_cache = (
@@ -137,3 +137,11 @@ def test_jira_issues_cached_issuetypes(fake_jira):
     )
     fake_jira.issues = JiraIssues(fake_jira)
     assert fake_jira.issues.allowed_types == ["Bug", "Task"]
+
+
+def test_jira_issues_get_caches_jira_issue(with_fake_cache, fake_jira: JiraClient):
+    fake_jira._no_cache = False
+    assert fake_jira.cache.get_issue("TASK-1") is None
+    issue = fake_jira.issues.get("TASK-1")
+    assert fake_jira.cache.get_issue("TASK-1")
+    assert issue.get("key") == "TASK-1"
