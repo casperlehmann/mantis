@@ -18,3 +18,7 @@ class Cache:
         self.system.mkdir(exist_ok=True)
         self.issue_type_fields = self.system / "issue_type_fields"
         self.issue_type_fields.mkdir(exist_ok=True)
+
+    def write(self, file_name: str, contents: str):
+        with open(self.root / file_name, "w") as f:
+            return f.write(contents)

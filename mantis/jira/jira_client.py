@@ -37,10 +37,6 @@ class JiraClient:
         self.system_config_loader = JiraSystemConfigLoader(self)
         self.issues = JiraIssues(self)
 
-    def write_to_cache(self, file_name: str, contents: str):
-        with open(self.cache.root / file_name, "w") as f:
-            return f.write(contents)
-
     def remove_from_cache(self, file_name: str):
         os.remove(self.cache.root / file_name)
 
@@ -55,7 +51,7 @@ class JiraClient:
             return json.load(f)
 
     def write_issue_to_cache(self, key: str, data):
-        self.write_to_cache(f"issues/{key}.json", json.dumps(data))
+        self.cache.write(f"issues/{key}.json", json.dumps(data))
 
     def get_issue_from_cache(self, key: str):
         if self._no_cache:
