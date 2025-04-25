@@ -3,8 +3,6 @@ import re
 from unittest.mock import Mock, patch
 
 import pytest
-import requests
-from requests import request
 from requests.models import HTTPError
 
 from mantis.jira import JiraAuth, JiraClient
@@ -141,6 +139,7 @@ def test_handle_http_error_raises_generic_exception(
             assert e.response.reason == "Unknown error"
             with pytest.raises(AttributeError):
                 fake_jira.issues.handle_http_error(exception=e, key="A-1")
+
 
 def test_jira_no_issues_fields_raises(fake_jira, mock_post_request):
     issue = fake_jira.issues.get("TASK-1")
