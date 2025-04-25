@@ -100,7 +100,9 @@ def with_fake_drafts_dir(fake_jira, tmp_path: Path):
 
 
 @pytest.fixture
-def fake_jira(with_fake_cache, jira_client_from_fake_cli):
+def fake_jira(with_fake_cache, jira_client_from_fake_cli, mock_get_request):
     jira = jira_client_from_fake_cli
+    expected = {"key": "TASK-1", "fields": {"status": {"name": "resolved"}}}
+    mock_get_request.return_value.json.return_value = expected
     assert str(jira.cache.root) != ".jira_cache_test"
     return jira
