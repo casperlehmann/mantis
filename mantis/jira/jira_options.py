@@ -13,8 +13,8 @@ class JiraOptions:
 
     def __init__(
         self,
-        parser: Optional["argparse.Namespace"] = None,
-        toml_source: Optional[str] = None,
+        parser: "argparse.Namespace | None" = None,
+        toml_source: str | None = None,
     ):
         if not toml_source:
             toml_source = self.default_toml_source
@@ -130,4 +130,3 @@ def parse_args(args_overwrite: list[str] | None = None) -> argparse.Namespace:
         help="List of issues by key (e.g. TASK-1, TASK-2, TASK-3, etc.)",
     )
     return parser.parse_args(args_overwrite)
-
