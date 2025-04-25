@@ -73,11 +73,11 @@ Updated local cache for issuetypes:
 Or to overwrite options on the command line (remember to set the JIRA_TOKEN env var):
 
 ```sh
-$ python mantis/jira/jira_options.py \
+$ python main.py \
     --user user@domain.com \
     --personal-access-token $JIRA_TOKEN \
     --jira-url=https://account.atlassian.net
-JiraOptions successfully instantiated
+[...]
 ```
 
 ## Extended testing

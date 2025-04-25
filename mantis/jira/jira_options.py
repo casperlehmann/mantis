@@ -131,6 +131,3 @@ def parse_args(args_overwrite: list[str] | None = None) -> argparse.Namespace:
     )
     return parser.parse_args(args_overwrite)
 
-
-if __name__ == "__main__":
-    print(JiraOptions(parse_args()) and "JiraOptions successfully instantiated")
