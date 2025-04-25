@@ -200,6 +200,16 @@ def test_config_loader_update_issuetypes_writes_to_cache(
     ), f"Not empty: {fake_jira.cache.system}"
 
 
+def test_config_loader_get_issuetypes_names_from_cache(
+    with_fake_cache, fake_jira_client_for_issue_type: "JiraClient"
+):
+    fake_jira = fake_jira_client_for_issue_type
+    config_loader = fake_jira.system_config_loader
+    with open(fake_jira.cache.system / "issue_types.json", "w") as f:
+        f.write('{"a": "b"}')
+    retrieved = config_loader.get_issuetypes_names_from_cache()
+    assert retrieved == {"a": "b"}
+
 def test_config_loader_loop_yields_files(
     with_fake_cache, fake_jira_client_for_issue_type: "JiraClient"
 ):
