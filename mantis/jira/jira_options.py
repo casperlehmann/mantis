@@ -65,7 +65,8 @@ class JiraOptions:
         assert self.plugins_dir, "JiraOptions.plugins_dir not set"
 
 
-def parse_args():
+def parse_args(args_overwrite: list[str] | None = None) -> argparse.Namespace:
+    """Parse sys.argv (or optional list of strings) and return argparse Namespace"""
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-u", "--user", dest="user", default=None, help="Username to access JIRA"
@@ -128,7 +129,7 @@ def parse_args():
         nargs="*",
         help="List of issues by key (e.g. TASK-1, TASK-2, TASK-3, etc.)",
     )
-    return parser.parse_args()
+    return parser.parse_args(args_overwrite)
 
 
 if __name__ == "__main__":
