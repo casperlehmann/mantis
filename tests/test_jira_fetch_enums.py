@@ -5,7 +5,9 @@ import pytest
 
 from mantis.jira import JiraAuth, JiraClient
 from mantis.jira.utils.jira_system_config_loader import fetch_enums
+from mantis.jira.utils.jira_types import ProjectFieldKeys
 from tests.conftest import fake_jira
+from tests.test_jira_types import ISSUETYPEFIELDS
 
 VAL = [
     {
@@ -260,3 +262,15 @@ def test_compile_plugins(
     ), f"Not empty: {fake_jira.plugins_dir}"
     config_loader.compile_plugins()
     assert len(list(fake_jira.plugins_dir.iterdir())) == 1
+
+
+def test_get_all_keys_from_nested_dicts(
+    fake_jira: "JiraClient",
+):
+    config_loader = fake_jira.system_config_loader
+    data_in = {
+        "a": ProjectFieldKeys(name="test_a", data=ISSUETYPEFIELDS),
+        "b": ProjectFieldKeys(name="test_b", data=ISSUETYPEFIELDS),
+    }
+    data_out = config_loader.get_all_keys_from_nested_dicts(data_in)
+    assert data_out
