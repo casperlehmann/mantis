@@ -23,14 +23,16 @@ def test_jira_options_override(fake_toml, fake_cli):
 def test_jira_options_not_set(tmpdir, capfd):
     toml = tmpdir / "options.toml"
     with pytest.raises(AssertionError):
-        opts = JiraOptions(toml_source=toml)
+        JiraOptions(toml_source=toml)
     out, _ = capfd.readouterr()
     assert out == 'No toml_source provided and default "options.toml" does not exist\n'
     toml.write("")
-    with pytest.raises(AssertionError):
-        opts = JiraOptions(toml_source=toml)
-        out, _ = capfd.readouterr()
-    assert out == 'No toml_source provided and default "options.toml" does not exist\n'
+    with pytest.raises(AssertionError) as execution_error:
+        JiraOptions(toml_source=toml)
+    out, err = capfd.readouterr()
+    assert out == ""
+    assert err == ""
+    assert str(execution_error.value) == "JiraOptions.user not set"
 
 
 @pytest.mark.skipif(
