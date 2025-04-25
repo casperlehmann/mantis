@@ -292,3 +292,12 @@ def test_print_table(fake_jira: "JiraClient", capsys):
     )
     for actual_line, expected_line in zip(captured.out.split("\n"), expected):
         assert actual_line.strip() == expected_line.strip()
+
+def test_print_table_raises_on_non_existent_key(fake_jira: "JiraClient", capsys):
+    config_loader = fake_jira.system_config_loader
+    data_in = {
+        "a": ProjectFieldKeys(name="test_a", data=ISSUETYPEFIELDS),
+        "b": ProjectFieldKeys(name="test_b", data=ISSUETYPEFIELDS),
+    }
+    with pytest.raises(ValueError):
+        config_loader.print_table({"non-existent"}, ["placeholder"], data_in)
