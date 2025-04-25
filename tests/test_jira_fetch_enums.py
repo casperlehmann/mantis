@@ -293,6 +293,7 @@ def test_print_table(fake_jira: "JiraClient", capsys):
     for actual_line, expected_line in zip(captured.out.split("\n"), expected):
         assert actual_line.strip() == expected_line.strip()
 
+
 def test_print_table_raises_on_non_existent_key(fake_jira: "JiraClient", capsys):
     config_loader = fake_jira.system_config_loader
     data_in = {
@@ -302,15 +303,24 @@ def test_print_table_raises_on_non_existent_key(fake_jira: "JiraClient", capsys)
     with pytest.raises(ValueError):
         config_loader.print_table(["non-existent"], {"placeholder"}, data_in)
 
-def test_get_project_field_keys_from_cache(with_fake_cache, fake_jira: 'JiraClient'):
+
+def test_get_project_field_keys_from_cache(with_fake_cache, fake_jira: "JiraClient"):
     config_loader = fake_jira.system_config_loader
     with pytest.raises(FileNotFoundError):
         config_loader.get_project_field_keys_from_cache()
 
-    fake_jira.issues.allowed_types = ['test']
+    fake_jira.issues.allowed_types = ["test"]
     dummy = ProjectFieldKeys(name="test_b", data=ISSUETYPEFIELDS.model_dump())
-    with open(fake_jira.cache.issue_type_fields / 'test.json', 'w') as f:
-        f.write( dummy.data.model_dump_json())
+    with open(fake_jira.cache.issue_type_fields / "test.json", "w") as f:
+        f.write(dummy.data.model_dump_json())
     from_cache = config_loader.get_project_field_keys_from_cache()
     assert from_cache
 
+
+def test_inspect(with_fake_cache, fake_jira: "JiraClient"):
+    config_loader = fake_jira.system_config_loader
+    fake_jira.issues.allowed_types = ["test"]
+    dummy = ProjectFieldKeys(name="test_b", data=ISSUETYPEFIELDS.model_dump())
+    with open(fake_jira.cache.issue_type_fields / "test.json", "w") as f:
+        f.write(dummy.data.model_dump_json())
+    config_loader.inspect()
