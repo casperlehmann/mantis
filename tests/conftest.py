@@ -100,6 +100,12 @@ def with_fake_drafts_dir(fake_jira, tmp_path: Path):
 
 
 @pytest.fixture
+def with_fake_plugins_dir(fake_jira, tmp_path: Path):
+    (tmp_path / "plugins").mkdir(exist_ok=True)
+    fake_jira.plugins_dir = tmp_path / "plugins"
+
+
+@pytest.fixture
 def fake_jira(with_fake_cache, jira_client_from_fake_cli, mock_get_request):
     jira = jira_client_from_fake_cli
     expected = {"key": "TASK-1", "fields": {"status": {"name": "resolved"}}}
