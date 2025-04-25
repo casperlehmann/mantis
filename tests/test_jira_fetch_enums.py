@@ -99,6 +99,24 @@ def test_fetch_issuetype_enums_mock_no_casting(fake_jira_client_for_issue_type):
         issue_type_1_bug["description"] == "A problem or error."
     ), "Issue of id == '1' has wrong description"
 
+def test_fetch_issuetype_enums_mock_no_mapping(fake_jira_client_for_issue_type):
+    types_filter = lambda d: d["id"] == 1
+    mapping = {}
+    caster_functions = {}
+    issue_enums = fetch_enums(
+        fake_jira_client_for_issue_type,
+        endpoint="issuetype",
+        filter=types_filter,
+        mapping=mapping,
+        caster_functions=caster_functions,
+    )
+    assert (
+        len(issue_enums) == 1
+    ), f"Exactly one matches the filter: {str(inspect.getsource(types_filter)).strip()}"
+    issue_type_1_bug = issue_enums[0]
+    assert issue_type_1_bug["untranslatedName"] == "Bug", "Issue of id == '1' has wrong untranslatedName"
+
+
 
 @pytest.mark.skipif(
     not os.path.exists("options.toml"), reason='File "options.toml" does not exist'
