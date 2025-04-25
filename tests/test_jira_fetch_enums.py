@@ -269,8 +269,8 @@ def test_get_all_keys_from_nested_dicts(
 ):
     config_loader = fake_jira.system_config_loader
     data_in = {
-        "a": ProjectFieldKeys(name="test_a", data=ISSUETYPEFIELDS),
-        "b": ProjectFieldKeys(name="test_b", data=ISSUETYPEFIELDS),
+        "a": ProjectFieldKeys(name="test_a", data=ISSUETYPEFIELDS.model_dump()),
+        "b": ProjectFieldKeys(name="test_b", data=ISSUETYPEFIELDS.model_dump()),
     }
     data_out = config_loader.get_all_keys_from_nested_dicts(data_in)
     assert data_out
@@ -279,8 +279,8 @@ def test_get_all_keys_from_nested_dicts(
 def test_print_table(fake_jira: "JiraClient", capsys):
     config_loader = fake_jira.system_config_loader
     data_in = {
-        "a": ProjectFieldKeys(name="test_a", data=ISSUETYPEFIELDS),
-        "b": ProjectFieldKeys(name="test_b", data=ISSUETYPEFIELDS),
+        "a": ProjectFieldKeys(name="test_a", data=ISSUETYPEFIELDS.model_dump()),
+        "b": ProjectFieldKeys(name="test_b", data=ISSUETYPEFIELDS.model_dump()),
     }
     data_out = config_loader.print_table({"a"}, ["placeholder"], data_in)
     assert data_out is None
@@ -296,8 +296,21 @@ def test_print_table(fake_jira: "JiraClient", capsys):
 def test_print_table_raises_on_non_existent_key(fake_jira: "JiraClient", capsys):
     config_loader = fake_jira.system_config_loader
     data_in = {
-        "a": ProjectFieldKeys(name="test_a", data=ISSUETYPEFIELDS),
-        "b": ProjectFieldKeys(name="test_b", data=ISSUETYPEFIELDS),
+        "a": ProjectFieldKeys(name="test_a", data=ISSUETYPEFIELDS.model_dump()),
+        "b": ProjectFieldKeys(name="test_b", data=ISSUETYPEFIELDS.model_dump()),
     }
     with pytest.raises(ValueError):
         config_loader.print_table({"non-existent"}, ["placeholder"], data_in)
+
+def test_get_project_field_keys_from_cache(with_fake_cache, fake_jira: 'JiraClient'):
+    config_loader = fake_jira.system_config_loader
+    with pytest.raises(FileNotFoundError):
+        config_loader.get_project_field_keys_from_cache()
+
+    fake_jira.issues.allowed_types = ['test']
+    dummy = ProjectFieldKeys(name="test_b", data=ISSUETYPEFIELDS.model_dump())
+    with open(fake_jira.cache.issue_type_fields / 'test.json', 'w') as f:
+        f.write( dummy.data.model_dump_json())
+    from_cache = config_loader.get_project_field_keys_from_cache()
+    assert from_cache
+

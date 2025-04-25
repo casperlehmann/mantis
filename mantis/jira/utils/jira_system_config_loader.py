@@ -178,7 +178,7 @@ class JiraSystemConfigLoader:
                 loaded_json = self.get_from_system_cache_decoded(
                     f"issue_type_fields/{issue_type}.json"
                 )
-                issue_type_fields = IssueTypeFields(loaded_json)
+                issue_type_fields = IssueTypeFields.model_validate(loaded_json)
             except FileNotFoundError as e:
                 raise FileNotFoundError(
                     f"Cached values do not exist for {issue_type}"
