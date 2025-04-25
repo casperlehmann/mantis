@@ -5,6 +5,7 @@ import pytest
 
 from mantis.jira import JiraAuth, JiraClient
 from mantis.jira.utils.jira_system_config_loader import fetch_enums
+from tests.conftest import fake_jira
 
 VAL = [
     {
@@ -99,6 +100,7 @@ def test_fetch_issuetype_enums_mock_no_casting(fake_jira_client_for_issue_type):
         issue_type_1_bug["description"] == "A problem or error."
     ), "Issue of id == '1' has wrong description"
 
+
 def test_fetch_issuetype_enums_mock_no_mapping(fake_jira_client_for_issue_type):
     types_filter = lambda d: d["id"] == 1
     mapping = {}
@@ -114,8 +116,9 @@ def test_fetch_issuetype_enums_mock_no_mapping(fake_jira_client_for_issue_type):
         len(issue_enums) == 1
     ), f"Exactly one matches the filter: {str(inspect.getsource(types_filter)).strip()}"
     issue_type_1_bug = issue_enums[0]
-    assert issue_type_1_bug["untranslatedName"] == "Bug", "Issue of id == '1' has wrong untranslatedName"
-
+    assert (
+        issue_type_1_bug["untranslatedName"] == "Bug"
+    ), "Issue of id == '1' has wrong untranslatedName"
 
 
 @pytest.mark.skipif(
@@ -180,3 +183,19 @@ def test_fetch_issuetype_enums_real_no_casting(jira_client_from_user_toml):
     assert (
         issue_type_1_bug["description"] == "A problem or error."
     ), "Issue of id == '1' has wrong description"
+
+
+def test_config_loader_update_issuetypes_writes_to_cache(
+    with_fake_cache, fake_jira_client_for_issue_type: "JiraClient"
+):
+    fake_jira = fake_jira_client_for_issue_type
+    config_loader = fake_jira.system_config_loader
+    assert (
+        len(list(fake_jira.cache.system.iterdir())) == 1
+    ), f"Not empty: {fake_jira.cache.system}"
+
+    config_loader.update_issuetypes_cache()
+    assert (
+        len(list(fake_jira.cache.system.iterdir())) == 2
+    ), f"Not empty: {fake_jira.cache.system}"
+
