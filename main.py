@@ -2,9 +2,8 @@
 
 from pprint import pprint
 
-from mantis.jira import JiraClient, JiraOptions, JiraAuth, parse_args
-
 from mantis.drafts import Draft
+from mantis.jira import JiraAuth, JiraClient, JiraOptions, parse_args
 
 if __name__ == '__main__':
     jira_options = JiraOptions(parse_args(), 'options.toml')
