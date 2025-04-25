@@ -199,3 +199,17 @@ def test_config_loader_update_issuetypes_writes_to_cache(
         len(list(fake_jira.cache.system.iterdir())) == 2
     ), f"Not empty: {fake_jira.cache.system}"
 
+
+def test_config_loader_loop_yields_files(
+    with_fake_cache, fake_jira_client_for_issue_type: "JiraClient"
+):
+    fake_jira = fake_jira_client_for_issue_type
+    config_loader = fake_jira.system_config_loader
+    assert len(list(config_loader.loop_issue_type_fields())) == 0
+    # cache something
+    with open(
+        fake_jira.cache.system / f"issue_type_fields/some_file.json",
+        "w",
+    ) as f:
+        f.write("{}")
+    assert len(list(config_loader.loop_issue_type_fields())) == 1
