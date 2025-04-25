@@ -210,6 +210,7 @@ def test_config_loader_get_issuetypes_names_from_cache(
     retrieved = config_loader.get_issuetypes_names_from_cache()
     assert retrieved == {"a": "b"}
 
+
 def test_config_loader_loop_yields_files(
     with_fake_cache, fake_jira_client_for_issue_type: "JiraClient"
 ):
@@ -223,3 +224,17 @@ def test_config_loader_loop_yields_files(
     ) as f:
         f.write("{}")
     assert len(list(config_loader.loop_issue_type_fields())) == 1
+
+
+def test_update_project_field_keys(
+    with_fake_cache, fake_jira_client_for_issue_type: "JiraClient", mock_get_request
+):
+    mock_get_request.return_value.json.return_value = {"name": "test_type"}
+
+    fake_jira = fake_jira_client_for_issue_type
+    config_loader = fake_jira.system_config_loader
+    config_loader.client.issues.allowed_types = ["test_type"]
+    allowed_types = config_loader.update_project_field_keys()
+    assert allowed_types == ["test_type"]
+    with open(fake_jira.cache.issue_type_fields / "test_type.json", "r") as f:
+        assert f.read() == '{"name": "test_type"}'
