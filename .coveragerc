@@ -1,4 +1,5 @@
 [report]
 exclude_also =
     if TYPE_CHECKING:
+    .*user_toml.*
 
