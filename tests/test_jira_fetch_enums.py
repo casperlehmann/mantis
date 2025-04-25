@@ -274,3 +274,21 @@ def test_get_all_keys_from_nested_dicts(
     }
     data_out = config_loader.get_all_keys_from_nested_dicts(data_in)
     assert data_out
+
+
+def test_print_table(fake_jira: "JiraClient", capsys):
+    config_loader = fake_jira.system_config_loader
+    data_in = {
+        "a": ProjectFieldKeys(name="test_a", data=ISSUETYPEFIELDS),
+        "b": ProjectFieldKeys(name="test_b", data=ISSUETYPEFIELDS),
+    }
+    data_out = config_loader.print_table({"a"}, ["placeholder"], data_in)
+    assert data_out is None
+    captured = capsys.readouterr()
+    expected = (
+        "                     - a         ",
+        "placeholder          - 1         1",
+        "                     - a         ",
+    )
+    for actual_line, expected_line in zip(captured.out.split("\n"), expected):
+        assert actual_line.strip() == expected_line.strip()
