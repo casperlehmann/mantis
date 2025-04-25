@@ -238,3 +238,25 @@ def test_update_project_field_keys(
     assert allowed_types == ["test_type"]
     with open(fake_jira.cache.issue_type_fields / "test_type.json", "r") as f:
         assert f.read() == '{"name": "test_type"}'
+
+
+def test_compile_plugins(
+    with_fake_cache,
+    fake_jira: "JiraClient",
+    with_fake_plugins_dir,
+    mock_get_request,
+):
+    mock_get_request.return_value.json.return_value = {"name": "test_type"}
+    assert str(fake_jira.plugins_dir) != ".jira_cache_test"
+
+    # fake_jira = fake_jira_client_for_issue_type
+    config_loader = fake_jira.system_config_loader
+
+    with open(fake_jira.cache.issue_type_fields / "test_type.json", "w") as f:
+        f.write('{"name": "test_type"}')
+
+    assert (
+        len(list(fake_jira.plugins_dir.iterdir())) == 0
+    ), f"Not empty: {fake_jira.plugins_dir}"
+    config_loader.compile_plugins()
+    assert len(list(fake_jira.plugins_dir.iterdir())) == 1
