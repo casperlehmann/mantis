@@ -9,7 +9,7 @@ from mantis.jira import JiraAuth, JiraClient
 
 
 @pytest.fixture
-def fake_jira_client_for_test_auth(opts_from_fake_cli, mock_get_request):
+def fake_jira_client_for_test_auth(opts_from_fake_cli, mock_get_request): # pragma: no cover
     mock_get_request.return_value.json.return_value = {}
     auth = JiraAuth(opts_from_fake_cli)
     return JiraClient(opts_from_fake_cli, auth)
@@ -21,7 +21,7 @@ def fake_jira_client_for_test_auth(opts_from_fake_cli, mock_get_request):
 @pytest.mark.skipif(
     not os.getenv("EXECUTE_SKIPPED"), reason="This is a live test against the Jira api"
 )
-def test_jira_options_override(fake_jira_client_for_test_auth):
+def test_jira_options_override(fake_jira_client_for_test_auth): # pragma: no cover
     fake_jira_client_for_test_auth.test_auth()
 
 
