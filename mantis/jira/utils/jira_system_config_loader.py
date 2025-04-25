@@ -72,7 +72,7 @@ class JiraSystemConfigLoader:
         return self.client.cache.get_decoded(f"system/{file_name}")
 
     def loop_issue_type_fields(self):
-        for file in self.client.cache.issue_type_fields_dir.iterdir():
+        for file in self.client.cache.issue_type_fields.iterdir():
             yield file
 
     def update_issuetypes_cache(self) -> None:
