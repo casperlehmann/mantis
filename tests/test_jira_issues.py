@@ -87,14 +87,16 @@ def test_jira_issues_get_real(jira_client_from_user_toml):
     assert test_3_status_name == "In Progress"
 
 
-def test_jira_issues_create(fake_jira, mock_post_request):
+@patch("mantis.jira.jira_client.requests.post")
+def test_jira_issues_create(mock_post, fake_jira):
+    mock_post.return_value.json.return_value = {}
     with pytest.raises(ValueError):
         issue = fake_jira.issues.create(issue_type="Bug", title="Tester", data={})
     expected = {
         "key": "TASK-1",
         "fields": {"status": {"name": "In Progress"}, "issuetype": {"name": "Bug"}},
     }
-    mock_post_request.return_value.json.return_value = expected
+    mock_post.return_value.json.return_value = expected
     issue = fake_jira.issues.create(
         issue_type="Bug", title="Tester", data={"Summary": "a"}
     )
