@@ -83,7 +83,7 @@ def jira_client_from_fake_cli(opts_from_fake_cli):
 
 
 @pytest.fixture
-def with_no_cache(fake_jira):
+def with_no_cache(fake_jira: JiraClient):
     fake_jira._no_cache = True
 
 
@@ -94,13 +94,13 @@ def with_fake_cache(opts_from_fake_cli, tmp_path: Path):
 
 
 @pytest.fixture
-def with_fake_drafts_dir(fake_jira, tmp_path: Path):
+def with_fake_drafts_dir(fake_jira: JiraClient, tmp_path: Path):
     (tmp_path / "drafts").mkdir(exist_ok=True)
     fake_jira.drafts_dir = tmp_path / "drafts"
 
 
 @pytest.fixture
-def with_fake_plugins_dir(fake_jira, tmp_path: Path):
+def with_fake_plugins_dir(fake_jira: JiraClient, tmp_path: Path):
     (tmp_path / "plugins").mkdir(exist_ok=True)
     fake_jira.plugins_dir = tmp_path / "plugins"
 
