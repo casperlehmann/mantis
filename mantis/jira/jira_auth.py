@@ -12,10 +12,6 @@ class JiraAuth:
         assert self.options.url
 
     @property
-    def url(self):
-        return self.options.url
-
-    @property
     def no_verify_ssl(self):
         return self.options.no_verify_ssl
 

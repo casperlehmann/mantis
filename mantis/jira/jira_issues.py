@@ -114,4 +114,4 @@ class JiraIssues:
                         f'not exists in the project "{project_from_key}"'
                     ) from exception
             case _:
-                raise exception
+                raise AttributeError("Unknown reason") from exception

@@ -13,8 +13,8 @@ class JiraOptions:
 
     def __init__(
         self,
-        parser: Optional["argparse.Namespace"] = None,
-        toml_source: Optional[str] = None,
+        parser: "argparse.Namespace | None" = None,
+        toml_source: str | None = None,
     ):
         if not toml_source:
             toml_source = self.default_toml_source
@@ -65,7 +65,8 @@ class JiraOptions:
         assert self.plugins_dir, "JiraOptions.plugins_dir not set"
 
 
-def parse_args():
+def parse_args(args_overwrite: list[str] | None = None) -> argparse.Namespace:
+    """Parse sys.argv (or optional list of strings) and return argparse Namespace"""
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-u", "--user", dest="user", default=None, help="Username to access JIRA"
@@ -128,8 +129,4 @@ def parse_args():
         nargs="*",
         help="List of issues by key (e.g. TASK-1, TASK-2, TASK-3, etc.)",
     )
-    return parser.parse_args()
-
-
-if __name__ == "__main__":
-    print(JiraOptions(parse_args()) and "JiraOptions successfully instantiated")
+    return parser.parse_args(args_overwrite)

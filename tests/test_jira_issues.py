@@ -1,3 +1,4 @@
+import json
 import os
 import re
 from unittest.mock import Mock, patch
@@ -6,14 +7,7 @@ import pytest
 from requests.models import HTTPError
 
 from mantis.jira import JiraAuth, JiraClient
-
-
-@pytest.fixture
-def fake_jira(opts_from_fake_cli, mock_get_request):
-    expected = {"key": "TASK-1", "fields": {"status": {"name": "resolved"}}}
-    mock_get_request.return_value.json.return_value = expected
-    auth = JiraAuth(opts_from_fake_cli)
-    return JiraClient(opts_from_fake_cli, auth)
+from mantis.jira.jira_issues import JiraIssues, process_key
 
 
 def test_jira_issues_get_fake(fake_jira):
@@ -93,14 +87,16 @@ def test_jira_issues_get_real(jira_client_from_user_toml):
     assert test_3_status_name == "In Progress"
 
 
-def test_jira_issues_create(fake_jira, mock_post_request):
+@patch("mantis.jira.jira_client.requests.post")
+def test_jira_issues_create(mock_post, fake_jira):
+    mock_post.return_value.json.return_value = {}
     with pytest.raises(ValueError):
         issue = fake_jira.issues.create(issue_type="Bug", title="Tester", data={})
     expected = {
         "key": "TASK-1",
         "fields": {"status": {"name": "In Progress"}, "issuetype": {"name": "Bug"}},
     }
-    mock_post_request.return_value.json.return_value = expected
+    mock_post.return_value.json.return_value = expected
     issue = fake_jira.issues.create(
         issue_type="Bug", title="Tester", data={"Summary": "a"}
     )
@@ -111,3 +107,70 @@ def test_jira_issues_create(fake_jira, mock_post_request):
     name = issuetype.get("name")
     assert name is not None, "Expected 'name' to be present in 'issuetype'"
     assert name == "Bug", "Expected issue type name to be 'Bug'"
+
+
+def test_process_key():
+    with pytest.raises(NotImplementedError):
+        try:
+            raise HTTPError("An excuse to raise an exception")
+        except HTTPError as e:
+            process_key(key="A-B-1", exception=e)
+
+
+def test_handle_http_error_raises_generic_exception(
+    fake_jira: "JiraClient", mock_post_request
+):
+    mock_response = Mock()
+    mock_response.reason = "Unknown error"
+    mock_response.raise_for_status.side_effect = HTTPError()
+    mock_response.raise_for_status.side_effect.response = (
+        mock_response  # assigning itself, this is on purpose
+    )
+    with patch("requests.get", return_value=mock_response):
+        try:
+            response = fake_jira._get("Task-3")
+            response.raise_for_status()
+        except HTTPError as e:
+            assert e.response.reason == "Unknown error"
+            with pytest.raises(AttributeError):
+                fake_jira.issues.handle_http_error(exception=e, key="A-1")
+
+
+def test_jira_no_issues_fields_raises(fake_jira, mock_post_request):
+    issue = fake_jira.issues.get("TASK-1")
+    issue.data["fields"] = None
+    with pytest.raises(KeyError):
+        assert issue.fields
+
+
+def test_jira_issues_cached_issuetypes_parses_allowed_types(fake_jira):
+    fake_jira._no_cache = False
+    cached_issuetypes = [{"id": 1, "name": "Bug"}, {"id": 2, "name": "Task"}]
+    fake_jira.system_config_loader.get_issuetypes_names_from_cache = (
+        lambda *args, **kwargs: cached_issuetypes
+    )
+    fake_jira.issues = JiraIssues(fake_jira)
+    assert fake_jira.issues.allowed_types == ["Bug", "Task"]
+
+
+def test_jira_issues_get_does_write_to_cache(with_fake_cache, fake_jira: JiraClient):
+    fake_jira._no_cache = False
+    assert fake_jira.cache.get_issue("TASK-1") is None
+    assert len([file for file in fake_jira.cache.issues.iterdir()]) == 0
+    issue = fake_jira.issues.get("TASK-1")
+    assert fake_jira.cache.get_issue("TASK-1")
+    assert len([file for file in fake_jira.cache.issues.iterdir()]) == 1
+    with open(fake_jira.cache.issues / "TASK-1.json", "r") as f:
+        data = json.load(f)
+    assert data == {"fields": {"status": {"name": "resolved"}}, "key": "TASK-1"}
+
+
+def test_jira_issues_get_does_retrieve_from_cache(
+    with_fake_cache, fake_jira: JiraClient
+):
+    fake_jira._no_cache = False
+    data = {"redacted": "True"}
+    with open(fake_jira.cache.issues / "TASK-1.json", "w") as f:
+        json.dump(data, f)
+    issue = fake_jira.issues.get("TASK-1")
+    assert issue.get("redacted") == "True"
