@@ -51,7 +51,7 @@ def fake_jira_client_for_issue_type(opts_from_fake_cli, mock_get_request):
     return JiraClient(opts_from_fake_cli, auth)
 
 
-def test_fetch_issuetype_enums_mock(fake_jira_client_for_issue_type):
+def test_fetch_issuetype_enums_mock(fake_jira_client_for_issue_type: JiraClient):
     types_filter = lambda d: int(d["id"]) < 100 and d["name"] in (
         "Bug",
         "Task",
@@ -82,7 +82,7 @@ def test_fetch_issuetype_enums_mock(fake_jira_client_for_issue_type):
     ), "Issue of id == 1 has wrong description"
 
 
-def test_fetch_issuetype_enums_mock_no_casting(fake_jira_client_for_issue_type):
+def test_fetch_issuetype_enums_mock_no_casting(fake_jira_client_for_issue_type: JiraClient):
     types_filter = lambda d: d["id"] == 1
     mapping = {"id": "id", "description": "description", "untranslatedName": "name"}
     caster_functions = {}
@@ -103,7 +103,7 @@ def test_fetch_issuetype_enums_mock_no_casting(fake_jira_client_for_issue_type):
     ), "Issue of id == '1' has wrong description"
 
 
-def test_fetch_issuetype_enums_mock_no_mapping(fake_jira_client_for_issue_type):
+def test_fetch_issuetype_enums_mock_no_mapping(fake_jira_client_for_issue_type: JiraClient):
     types_filter = lambda d: d["id"] == 1
     mapping = {}
     caster_functions = {}

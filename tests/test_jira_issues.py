@@ -10,7 +10,7 @@ from mantis.jira import JiraAuth, JiraClient
 from mantis.jira.jira_issues import JiraIssues, process_key
 
 
-def test_jira_issues_get_fake(fake_jira):
+def test_jira_issues_get_fake(fake_jira: JiraClient):
     task_1 = fake_jira.issues.get("TASK-1")
     assert task_1.get("key") == "TASK-1"
     assert task_1.get("fields", {}).get("status") == {"name": "resolved"}
@@ -88,7 +88,7 @@ def test_jira_issues_get_real(jira_client_from_user_toml):
 
 
 @patch("mantis.jira.jira_client.requests.post")
-def test_jira_issues_create(mock_post, fake_jira):
+def test_jira_issues_create(mock_post, fake_jira: JiraClient):
     mock_post.return_value.json.return_value = {}
     with pytest.raises(ValueError):
         issue = fake_jira.issues.create(issue_type="Bug", title="Tester", data={})
@@ -136,14 +136,14 @@ def test_handle_http_error_raises_generic_exception(
                 fake_jira.issues.handle_http_error(exception=e, key="A-1")
 
 
-def test_jira_no_issues_fields_raises(fake_jira, mock_post_request):
+def test_jira_no_issues_fields_raises(fake_jira: JiraClient, mock_post_request):
     issue = fake_jira.issues.get("TASK-1")
     issue.data["fields"] = None
     with pytest.raises(KeyError):
         assert issue.fields
 
 
-def test_jira_issues_cached_issuetypes_parses_allowed_types(fake_jira):
+def test_jira_issues_cached_issuetypes_parses_allowed_types(fake_jira: JiraClient):
     fake_jira._no_cache = False
     cached_issuetypes = [{"id": 1, "name": "Bug"}, {"id": 2, "name": "Task"}]
     fake_jira.system_config_loader.get_issuetypes_names_from_cache = (
