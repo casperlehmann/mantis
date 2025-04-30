@@ -3,7 +3,7 @@ import pytest
 from mantis.jira import JiraClient
 
 
-def test_cache_get_caches_jira_issue(with_fake_cache, fake_jira: JiraClient):
+def test_cache_get_caches_jira_issue(fake_jira: JiraClient):
     assert not fake_jira._no_cache
     with pytest.raises(FileNotFoundError) as exec_info:
         fake_jira.cache.get_decoded("issues/TASK-1.json")
@@ -16,9 +16,7 @@ def test_cache_get_caches_jira_issue(with_fake_cache, fake_jira: JiraClient):
     assert decoded == {"fields": {"status": {"name": "resolved"}}, "key": "TASK-1"}
 
 
-def test_cache_get_issue_returns_none_when_no_cache_is_set(
-    with_fake_cache, fake_jira: JiraClient
-):
+def test_cache_get_issue_returns_none_when_no_cache_is_set(fake_jira: JiraClient):
     # Make sure nothing is cached
     assert not fake_jira._no_cache
     nothing_1 = fake_jira.cache.get_issue("TASK-1")
@@ -36,7 +34,7 @@ def test_cache_get_issue_returns_none_when_no_cache_is_set(
     assert nothing_2 is None
 
 
-def test_cache_remove_does_removals(with_fake_cache, fake_jira: JiraClient):
+def test_cache_remove_does_removals(fake_jira: JiraClient):
     # cache something
     with open(fake_jira.cache.root / "issues/task-1.json", "w") as f:
         f.write('{"fields": {"status": {"name": "resolved"}}, "key": "task-1"}')
@@ -49,7 +47,7 @@ def test_cache_remove_does_removals(with_fake_cache, fake_jira: JiraClient):
     assert nothing_1 is None
 
 
-def test_cache_remove_issue_does_removals(with_fake_cache, fake_jira: JiraClient):
+def test_cache_remove_issue_does_removals(fake_jira: JiraClient):
     # cache something
     with open(fake_jira.cache.root / "issues/task-1.json", "w") as f:
         f.write('{"fields": {"status": {"name": "resolved"}}, "key": "task-1"}')
@@ -68,9 +66,7 @@ def test_cache_remove_issue_does_removals(with_fake_cache, fake_jira: JiraClient
         ("issue_type_fields"),
     ],
 )
-def test_cache_iter_dir_yields_files(
-    with_fake_cache, fake_jira: JiraClient, identifier: str
-):
+def test_cache_iter_dir_yields_files(fake_jira: JiraClient, identifier: str):
     assert len(list(fake_jira.cache.iter_dir(identifier))) == 0
     # cache something
     with open(fake_jira.cache.system / f"{identifier}/some_file.json", "w") as f:
