@@ -153,7 +153,7 @@ def test_jira_issues_cached_issuetypes_parses_allowed_types(fake_jira: JiraClien
     assert fake_jira.issues.allowed_types == ["Bug", "Task"]
 
 
-def test_jira_issues_get_does_write_to_cache(with_fake_cache, fake_jira: JiraClient):
+def test_jira_issues_get_does_write_to_cache(fake_jira: JiraClient):
     fake_jira._no_cache = False
     assert fake_jira.cache.get_issue("TASK-1") is None
     assert len([file for file in fake_jira.cache.issues.iterdir()]) == 0
@@ -165,9 +165,7 @@ def test_jira_issues_get_does_write_to_cache(with_fake_cache, fake_jira: JiraCli
     assert data == {"fields": {"status": {"name": "resolved"}}, "key": "TASK-1"}
 
 
-def test_jira_issues_get_does_retrieve_from_cache(
-    with_fake_cache, fake_jira: JiraClient
-):
+def test_jira_issues_get_does_retrieve_from_cache(fake_jira: JiraClient):
     fake_jira._no_cache = False
     data = {"redacted": "True"}
     with open(fake_jira.cache.issues / "TASK-1.json", "w") as f:

@@ -1,12 +1,12 @@
 import inspect
 import os
+from unittest.mock import patch
 
 import pytest
 
 from mantis.jira import JiraAuth, JiraClient
 from mantis.jira.utils.jira_system_config_loader import fetch_enums
 from mantis.jira.utils.jira_types import ProjectFieldKeys
-from tests.conftest import fake_jira
 from tests.test_jira_types import ISSUETYPEFIELDS
 
 VAL = [
@@ -44,14 +44,9 @@ VAL = [
 ]
 
 
-@pytest.fixture
-def fake_jira_client_for_issue_type(opts_from_fake_cli, mock_get_request):
-    mock_get_request.return_value.json.return_value = VAL
-    auth = JiraAuth(opts_from_fake_cli)
-    return JiraClient(opts_from_fake_cli, auth)
-
-
-def test_fetch_issuetype_enums_mock(fake_jira_client_for_issue_type: JiraClient):
+@patch("mantis.jira.jira_client.requests.get")
+def test_fetch_issuetype_enums_mock(mock_get, fake_jira: JiraClient):
+    mock_get.return_value.json.return_value = VAL
     types_filter = lambda d: int(d["id"]) < 100 and d["name"] in (
         "Bug",
         "Task",
@@ -64,7 +59,7 @@ def test_fetch_issuetype_enums_mock(fake_jira_client_for_issue_type: JiraClient)
     mapping = {"id": "id", "description": "description", "untranslatedName": "name"}
     caster_functions = {"id": int}
     issue_enums = fetch_enums(
-        fake_jira_client_for_issue_type,
+        fake_jira,
         endpoint="issuetype",
         filter=types_filter,
         mapping=mapping,
@@ -82,12 +77,14 @@ def test_fetch_issuetype_enums_mock(fake_jira_client_for_issue_type: JiraClient)
     ), "Issue of id == 1 has wrong description"
 
 
-def test_fetch_issuetype_enums_mock_no_casting(fake_jira_client_for_issue_type: JiraClient):
+@patch("mantis.jira.jira_client.requests.get")
+def test_fetch_issuetype_enums_mock_no_casting(mock_get, fake_jira: JiraClient):
+    mock_get.return_value.json.return_value = VAL
     types_filter = lambda d: d["id"] == 1
     mapping = {"id": "id", "description": "description", "untranslatedName": "name"}
     caster_functions = {}
     issue_enums = fetch_enums(
-        fake_jira_client_for_issue_type,
+        fake_jira,
         endpoint="issuetype",
         filter=types_filter,
         mapping=mapping,
@@ -103,12 +100,14 @@ def test_fetch_issuetype_enums_mock_no_casting(fake_jira_client_for_issue_type: 
     ), "Issue of id == '1' has wrong description"
 
 
-def test_fetch_issuetype_enums_mock_no_mapping(fake_jira_client_for_issue_type: JiraClient):
+@patch("mantis.jira.jira_client.requests.get")
+def test_fetch_issuetype_enums_mock_no_mapping(mock_get, fake_jira: JiraClient):
+    mock_get.return_value.json.return_value = VAL
     types_filter = lambda d: d["id"] == 1
     mapping = {}
     caster_functions = {}
     issue_enums = fetch_enums(
-        fake_jira_client_for_issue_type,
+        fake_jira,
         endpoint="issuetype",
         filter=types_filter,
         mapping=mapping,
@@ -187,10 +186,9 @@ def test_fetch_issuetype_enums_real_no_casting(jira_client_from_user_toml):
     ), "Issue of id == '1' has wrong description"
 
 
-def test_config_loader_update_issuetypes_writes_to_cache(
-    with_fake_cache, fake_jira_client_for_issue_type: "JiraClient"
-):
-    fake_jira = fake_jira_client_for_issue_type
+@patch("mantis.jira.jira_client.requests.get")
+def test_config_loader_update_issuetypes_writes_to_cache(mock_get, fake_jira: JiraClient):
+    mock_get.return_value.json.return_value = VAL
     config_loader = fake_jira.system_config_loader
     assert (
         len(list(fake_jira.cache.system.iterdir())) == 1
@@ -202,10 +200,9 @@ def test_config_loader_update_issuetypes_writes_to_cache(
     ), f"Not empty: {fake_jira.cache.system}"
 
 
-def test_config_loader_get_issuetypes_names_from_cache(
-    with_fake_cache, fake_jira_client_for_issue_type: "JiraClient"
-):
-    fake_jira = fake_jira_client_for_issue_type
+@patch("mantis.jira.jira_client.requests.get")
+def test_config_loader_get_issuetypes_names_from_cache(mock_get, fake_jira: JiraClient):
+    mock_get.return_value.json.return_value = VAL
     config_loader = fake_jira.system_config_loader
     with open(fake_jira.cache.system / "issue_types.json", "w") as f:
         f.write('{"a": "b"}')
@@ -213,10 +210,9 @@ def test_config_loader_get_issuetypes_names_from_cache(
     assert retrieved == {"a": "b"}
 
 
-def test_config_loader_loop_yields_files(
-    with_fake_cache, fake_jira_client_for_issue_type: "JiraClient"
-):
-    fake_jira = fake_jira_client_for_issue_type
+@patch("mantis.jira.jira_client.requests.get")
+def test_config_loader_loop_yields_files(mock_get, fake_jira: JiraClient):
+    mock_get.return_value.json.return_value = VAL
     config_loader = fake_jira.system_config_loader
     assert len(list(config_loader.loop_issue_type_fields())) == 0
     # cache something
@@ -228,12 +224,9 @@ def test_config_loader_loop_yields_files(
     assert len(list(config_loader.loop_issue_type_fields())) == 1
 
 
-def test_update_project_field_keys(
-    with_fake_cache, fake_jira_client_for_issue_type: "JiraClient", mock_get_request
-):
-    mock_get_request.return_value.json.return_value = {"name": "test_type"}
-
-    fake_jira = fake_jira_client_for_issue_type
+@patch("mantis.jira.jira_client.requests.get")
+def test_update_project_field_keys(mock_get, fake_jira: JiraClient):
+    mock_get.return_value.json.return_value = {"name": "test_type"}
     config_loader = fake_jira.system_config_loader
     config_loader.client.issues.allowed_types = ["test_type"]
     allowed_types = config_loader.update_project_field_keys()
@@ -242,16 +235,11 @@ def test_update_project_field_keys(
         assert f.read() == '{"name": "test_type"}'
 
 
-def test_compile_plugins(
-    with_fake_cache,
-    fake_jira: "JiraClient",
-    with_fake_plugins_dir,
-    mock_get_request,
-):
-    mock_get_request.return_value.json.return_value = {"name": "test_type"}
+@patch("mantis.jira.jira_client.requests.get")
+def test_compile_plugins(mock_get, fake_jira: JiraClient):
+    mock_get.return_value.json.return_value = {"name": "test_type"}
     assert str(fake_jira.plugins_dir) != ".jira_cache_test"
 
-    # fake_jira = fake_jira_client_for_issue_type
     config_loader = fake_jira.system_config_loader
 
     with open(fake_jira.cache.issue_type_fields / "test_type.json", "w") as f:
@@ -304,7 +292,7 @@ def test_print_table_raises_on_non_existent_key(fake_jira: "JiraClient", capsys)
         config_loader.print_table(["non-existent"], {"placeholder"}, data_in)
 
 
-def test_get_project_field_keys_from_cache(with_fake_cache, fake_jira: "JiraClient"):
+def test_get_project_field_keys_from_cache(fake_jira: "JiraClient"):
     config_loader = fake_jira.system_config_loader
     with pytest.raises(FileNotFoundError):
         config_loader.get_project_field_keys_from_cache()
@@ -317,7 +305,7 @@ def test_get_project_field_keys_from_cache(with_fake_cache, fake_jira: "JiraClie
     assert from_cache
 
 
-def test_inspect(with_fake_cache, fake_jira: "JiraClient"):
+def test_inspect(fake_jira: "JiraClient"):
     config_loader = fake_jira.system_config_loader
     fake_jira.issues.allowed_types = ["test"]
     dummy = ProjectFieldKeys(name="test_b", data=ISSUETYPEFIELDS.model_dump())

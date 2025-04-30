@@ -1,28 +1,15 @@
-import os
 from unittest.mock import patch
 
 import pytest
 import requests
-from requests.exceptions import RequestException
 
-from mantis.jira import JiraAuth, JiraClient
-
-
-@pytest.fixture
-def fake_jira_client_for_test_auth(opts_from_fake_cli, mock_get_request): # pragma: no cover
-    mock_get_request.return_value.json.return_value = {}
-    auth = JiraAuth(opts_from_fake_cli)
-    return JiraClient(opts_from_fake_cli, auth)
+from mantis.jira import JiraClient
 
 
-@pytest.mark.skipif(
-    not os.path.exists("options.toml"), reason='File "options.toml" does not exist'
-)
-@pytest.mark.skipif(
-    not os.getenv("EXECUTE_SKIPPED"), reason="This is a live test against the Jira api"
-)
-def test_jira_options_override(fake_jira_client_for_test_auth: JiraClient): # pragma: no cover
-    fake_jira_client_for_test_auth.test_auth()
+@patch("mantis.jira.jira_client.requests.get")
+def test_jira_options_override(mock_get, fake_jira: JiraClient):
+    mock_get.return_value.json.return_value = {}
+    fake_jira.test_auth()
 
 
 def test_cache_exists(fake_jira: JiraClient):
@@ -95,7 +82,7 @@ def test_get_test_auth_generic_exception(fake_jira: JiraClient, json_response_ac
         "mantis.jira.jira_client.requests.get",
         side_effect=requests.exceptions.RequestException,
     ):
-        with pytest.raises(RequestException):
+        with pytest.raises(requests.exceptions.RequestException):
             fake_jira.test_auth()
     captured = capsys.readouterr()
     assert captured.out == ("test_auth failed for unknown reasons.\n")

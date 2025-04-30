@@ -94,21 +94,29 @@ def with_fake_cache(opts_from_fake_cli, tmp_path: Path):
 
 
 @pytest.fixture
-def with_fake_drafts_dir(fake_jira: JiraClient, tmp_path: Path):
+def with_fake_drafts_dir(opts_from_fake_cli, tmp_path: Path):
     (tmp_path / "drafts").mkdir(exist_ok=True)
-    fake_jira.drafts_dir = tmp_path / "drafts"
+    opts_from_fake_cli.drafts_dir = tmp_path / "drafts"
 
 
 @pytest.fixture
-def with_fake_plugins_dir(fake_jira: JiraClient, tmp_path: Path):
+def with_fake_plugins_dir(opts_from_fake_cli, tmp_path: Path):
     (tmp_path / "plugins").mkdir(exist_ok=True)
-    fake_jira.plugins_dir = tmp_path / "plugins"
+    opts_from_fake_cli.plugins_dir = tmp_path / "plugins"
 
 
 @pytest.fixture
-def fake_jira(with_fake_cache, jira_client_from_fake_cli, mock_get_request):
+def fake_jira(
+    with_fake_cache,
+    with_fake_drafts_dir,
+    with_fake_plugins_dir,
+    jira_client_from_fake_cli,
+    mock_get_request,
+):
     jira = jira_client_from_fake_cli
     expected = {"key": "TASK-1", "fields": {"status": {"name": "resolved"}}}
     mock_get_request.return_value.json.return_value = expected
     assert str(jira.cache.root) != ".jira_cache_test"
+    assert str(jira.drafts_dir) != "drafts_test"
+    assert str(jira.plugins_dir) != "plugins_test"
     return jira
