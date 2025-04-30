@@ -1,27 +1,15 @@
-import os
 from unittest.mock import patch
 
 import pytest
 import requests
 
-from mantis.jira import JiraAuth, JiraClient
+from mantis.jira import JiraClient
 
 
-@pytest.fixture
-def fake_jira_client_for_test_auth(opts_from_fake_cli, mock_get_request): # pragma: no cover
-    mock_get_request.return_value.json.return_value = {}
-    auth = JiraAuth(opts_from_fake_cli)
-    return JiraClient(opts_from_fake_cli, auth)
-
-
-@pytest.mark.skipif(
-    not os.path.exists("options.toml"), reason='File "options.toml" does not exist'
-)
-@pytest.mark.skipif(
-    not os.getenv("EXECUTE_SKIPPED"), reason="This is a live test against the Jira api"
-)
-def test_jira_options_override(fake_jira_client_for_test_auth: JiraClient): # pragma: no cover
-    fake_jira_client_for_test_auth.test_auth()
+@patch("mantis.jira.jira_client.requests.get")
+def test_jira_options_override(mock_get, fake_jira: JiraClient):
+    mock_get.return_value.json.return_value = {}
+    fake_jira.test_auth()
 
 
 def test_cache_exists(fake_jira: JiraClient):
