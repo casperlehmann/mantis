@@ -3,7 +3,6 @@ from unittest.mock import patch
 
 import pytest
 import requests
-from requests.exceptions import RequestException
 
 from mantis.jira import JiraAuth, JiraClient
 
@@ -95,7 +94,7 @@ def test_get_test_auth_generic_exception(fake_jira: JiraClient, json_response_ac
         "mantis.jira.jira_client.requests.get",
         side_effect=requests.exceptions.RequestException,
     ):
-        with pytest.raises(RequestException):
+        with pytest.raises(requests.exceptions.RequestException):
             fake_jira.test_auth()
     captured = capsys.readouterr()
     assert captured.out == ("test_auth failed for unknown reasons.\n")
