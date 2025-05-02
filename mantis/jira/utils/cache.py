@@ -31,24 +31,24 @@ class Cache:
         with open(self.root / file_name, "r") as f:
             return json.load(f)
 
-    def get_issue(self, key: str):
+    def get_issue(self, key: str) -> dict | None:
         if self.client._no_cache:
             return
         issue_data = self.get(f"issues/{key}.json")
         if issue_data:
             return json.loads(issue_data)
 
-    def write(self, file_name: str, contents: str):
+    def write(self, file_name: str, contents: str) -> int:
         with open(self.root / file_name, "w") as f:
             return f.write(contents)
 
-    def write_issue(self, key: str, data):
+    def write_issue(self, key: str, data) -> None:
         self.write(f"issues/{key}.json", json.dumps(data))
 
-    def remove(self, file_name: str):
+    def remove(self, file_name: str) -> None:
         os.remove(self.root / file_name)
 
-    def remove_issue(self, key: str):
+    def remove_issue(self, key: str) -> None:
         self.remove(f"issues/{key}.json")
 
     def iter_dir(self, identifier) -> Generator[Path, None, None]:
