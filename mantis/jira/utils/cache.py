@@ -1,7 +1,7 @@
 import json
 import os
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Generator
 
 if TYPE_CHECKING:
     from mantis.jira.jira_client import JiraClient
@@ -51,7 +51,7 @@ class Cache:
     def remove_issue(self, key: str):
         self.remove(f"issues/{key}.json")
 
-    def iter_dir(self, identifier):
+    def iter_dir(self, identifier) -> Generator[Path, None, None]:
         if identifier == "issue_type_fields":
             for file in self.issue_type_fields.iterdir():
                 yield file
