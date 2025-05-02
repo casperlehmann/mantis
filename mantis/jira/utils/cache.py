@@ -27,7 +27,9 @@ class Cache:
         with open(self.root / file_name, "r") as f:
             return f.read()
 
-    def get_decoded(self, file_name: str) -> dict:
+    def get_decoded(self, file_name: str) -> dict | None:
+        if not (self.root / file_name).exists():
+            return
         with open(self.root / file_name, "r") as f:
             return json.load(f)
 
@@ -42,14 +44,17 @@ class Cache:
         with open(self.root / file_name, "w") as f:
             return f.write(contents)
 
-    def write_issue(self, key: str, data) -> None:
-        self.write(f"issues/{key}.json", json.dumps(data))
+    def write_issue(self, key: str, data) -> int:
+        return self.write(f"issues/{key}.json", json.dumps(data))
 
-    def remove(self, file_name: str) -> None:
+    def remove(self, file_name: str) -> bool:
+        if not (self.root / file_name).exists():
+            return False
         os.remove(self.root / file_name)
+        return True
 
-    def remove_issue(self, key: str) -> None:
-        self.remove(f"issues/{key}.json")
+    def remove_issue(self, key: str) -> bool:
+        return self.remove(f"issues/{key}.json")
 
     def iter_dir(self, identifier) -> Generator[Path, None, None]:
         if identifier == "issue_type_fields":
