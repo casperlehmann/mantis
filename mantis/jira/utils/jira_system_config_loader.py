@@ -12,10 +12,10 @@ if TYPE_CHECKING:
 
 def fetch_enums(
     jira: "JiraClient",
-    endpoint: str="issuetype",
-    filter: Callable | None=None,
-    mapping: dict={},
-    caster_functions: dict={},
+    endpoint: str = "issuetype",
+    filter: Callable[[dict], bool] | None = None,
+    mapping: dict = {},
+    caster_functions: dict = {},
 ) -> list:
     """Get the enums of the fields in a jira tenant
 
