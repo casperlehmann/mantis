@@ -37,10 +37,10 @@ if __name__ == '__main__':
     elif jira_options.action == 'load-plugins':
         from plugins import Plugins
         print(Plugins.all_plugins['plugins_test'].Schema(type='a', system='b'))
-        print(Plugins.plugins_test.Schema(type='a', system='b'))
+        print(Plugins.plugins_test.Schema(type='a', system='b')) # type: ignore
 
         import plugins
-        print(plugins.plugins_test.Schema(type='a', system='b'))
+        print(plugins.plugins_test.Schema(type='a', system='b')) # type: ignore
 
         from plugins.plugins_test import Schema
         print(Schema(type='a', system='b'))

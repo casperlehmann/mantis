@@ -1,12 +1,12 @@
 import argparse
 import tomllib
-from typing import Optional
 
 
 class JiraOptions:
     """Collects options from toml file, allowing for command line overrides
 
-    python jira/jira_options.py --user user@domain.com --personal-access-token $JIRA_TOKEN --jira-url=https://account.atlassian.net
+    python jira/jira_options.py --user user@domain.com --personal-access-token $JIRA_TOKEN \
+        --jira-url=https://account.atlassian.net
     """
 
     default_toml_source = "options.toml"

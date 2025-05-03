@@ -6,3 +6,5 @@ pytest-xdist
 pytest-cov
 pydantic
 datamodel-code-generator
+mypy
+flake8

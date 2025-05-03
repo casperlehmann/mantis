@@ -44,4 +44,6 @@ jobs:
       with:
         name: coverage-report
         path: htmlcov
-
+    - name: MyPy
+      run: |
+        mypy --disallow-untyped-calls --disallow-untyped-defs --disallow-incomplete-defs --explicit-package-bases mantis

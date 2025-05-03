@@ -1,21 +1,23 @@
 import json
-from pprint import pprint
-from typing import TYPE_CHECKING, Mapping
+from pathlib import Path
+from typing import TYPE_CHECKING, Any, Callable, Dict, Generator, Mapping
 
 from datamodel_code_generator import DataModelType, InputFileType, generate
+from pydantic import ValidationError
 
+from mantis.jira.utils.cache import CacheMissException
 from mantis.jira.utils.jira_types import IssueTypeFields, ProjectFieldKeys
 
 if TYPE_CHECKING:
-    from jira_client import JiraClient
+    from mantis.jira.jira_client import JiraClient
 
 
 def fetch_enums(
     jira: "JiraClient",
-    endpoint="issuetype",
-    filter=None,
-    mapping={},
-    caster_functions={},
+    endpoint: str = "issuetype",
+    filter: Callable[[dict], bool] | None = None,
+    mapping: dict = {},
+    caster_functions: dict = {},
 ) -> list:
     """Get the enums of the fields in a jira tenant
 
@@ -30,10 +32,12 @@ def fetch_enums(
         _type_: _description_
 
     Example for /rest/api/2/issuetype:
-        types_filter = lambda d: int(d['id']) < 100 and d['name'] in ('Bug', 'Task', 'Epic', 'Story', 'Incident', 'New Feature', 'Sub-Task')
+        types_filter = lambda d: int(d['id']) < 100 and d['name'] in ('Bug', 'Task', 'Epic',
+                                 'Story', 'Incident', 'New Feature', 'Sub-Task')
         mapping = {'id': 'id', 'description': 'description', 'untranslatedName': 'name'}
         caster_functions = {'id': int}
-        issue_enums = fetch_enums(jira, endpoint = 'issuetype', filter = types_filter, mapping = mapping, caster_functions = caster_functions)
+        issue_enums = fetch_enums(jira, endpoint = 'issuetype', filter = types_filter,
+                                  mapping = mapping, caster_functions = caster_functions)
 
     See https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issue-types/#api-rest-api-2-issuetype-get
     """
@@ -62,23 +66,22 @@ class JiraSystemConfigLoader:
     def __init__(self, client: "JiraClient") -> None:
         self.client = client
 
-    def write_to_system_cache(self, file_name: str, issue_enums) -> None:
+    def write_to_system_cache(self, file_name: str, issue_enums: str) -> None:
         self.client.cache.write(f"system/{file_name}", issue_enums)
 
     def get_from_system_cache(self, file_name: str) -> str | None:
         return self.client.cache.get(f"system/{file_name}")
 
-    def get_from_system_cache_decoded(self, file_name: str) -> dict:
+    def get_from_system_cache_decoded(self, file_name: str) -> dict | None:
         return self.client.cache.get_decoded(f"system/{file_name}")
 
-    def loop_issue_type_fields(self):
+    def loop_issue_type_fields(self) -> Generator[Path, Any, None]:
         for file in self.client.cache.issue_type_fields.iterdir():
             yield file
 
     def update_issuetypes_cache(self) -> None:
-        types_filter = lambda d: int(d["id"]) <= self.client.options.type_id_cutoff and d[
-            "name"
-        ] in (
+        types_filter: Callable[[dict], bool] = lambda d: int(d["id"]) <= self.client.options.type_id_cutoff \
+                and d["name"] in (
             "Bug",
             "Task",
             "Epic",
@@ -103,6 +106,7 @@ class JiraSystemConfigLoader:
         issuetypes = self.get_from_system_cache("issue_types.json")
         if issuetypes:
             return json.loads(issuetypes)
+        return None
 
     def update_project_field_keys(self) -> list[str]:
         for issue_type in self.client.issues.allowed_types:
@@ -120,7 +124,7 @@ class JiraSystemConfigLoader:
             )
         return self.client.issues.allowed_types
 
-    def compile_plugins(self):
+    def compile_plugins(self) -> None:
         for input_file in self.client.cache.iter_dir("issue_type_fields"):
             with open(input_file, "r") as f:
                 content = f.read()
@@ -151,10 +155,10 @@ class JiraSystemConfigLoader:
         all_field_keys: set[str],
         issue_type_field_map: Mapping[str, ProjectFieldKeys],
     ) -> None:
-        def print_header_footer():
+        def print_header_footer() -> None:
             print(f"{'':<20} - ", end="")
             for issue_type_name in column_order:
-                if not issue_type_name in issue_type_field_map.keys():
+                if issue_type_name not in issue_type_field_map.keys():
                     raise ValueError("column_order contains non-existent key")
                 print(f"{issue_type_name:<10}", end="")
             print()
@@ -164,24 +168,23 @@ class JiraSystemConfigLoader:
             print(f"{each:<20} - ", end="")
             for _, project_field_keys in issue_type_field_map.items():
                 print(
-                    f"{'1   ' if each in project_field_keys.fields
-                                 else '' :<10}",
+                    f"{'1   ' if each in project_field_keys.fields else '':<10}",
                     end="",
                 )
             print()
         print_header_footer()
 
-    def get_project_field_keys_from_cache(self) -> Mapping[str, ProjectFieldKeys]:
-        d: Mapping[str, ProjectFieldKeys] = {}
+    def get_project_field_keys_from_cache(self) -> Dict[str, ProjectFieldKeys]:
+        d: Dict[str, ProjectFieldKeys] = {}
         for issue_type in self.client.issues.allowed_types:
             try:
                 loaded_json = self.get_from_system_cache_decoded(
                     f"issue_type_fields/{issue_type}.json"
                 )
                 issue_type_fields = IssueTypeFields.model_validate(loaded_json)
-            except FileNotFoundError as e:
-                raise FileNotFoundError(
-                    f"Cached values do not exist for {issue_type}"
+            except ValidationError as e:
+                raise CacheMissException(
+                    f"issue_type {issue_type} does not exist. Did you remember to download types?"
                 ) from e
             d[issue_type] = ProjectFieldKeys(issue_type, issue_type_fields)
         return d

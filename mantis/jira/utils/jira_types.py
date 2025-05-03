@@ -31,10 +31,9 @@ class IssueTypeFields(BaseModel):
 
 
 class ProjectFieldKeys:
-    def __init__(self, name: str, data: dict) -> None:
+    def __init__(self, name: str, issue_type_fields: IssueTypeFields) -> None:
         self.name = name
-        self.raw_data = data
-        self.data = IssueTypeFields.model_validate(data)
+        self.data = issue_type_fields
 
     @property
     def fields(self) -> list[str]:

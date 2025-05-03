@@ -1,10 +1,14 @@
 import json
 import os
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Generator
 
 if TYPE_CHECKING:
     from mantis.jira.jira_client import JiraClient
+
+
+class CacheMissException(Exception):
+    pass
 
 
 class Cache:
@@ -23,35 +27,41 @@ class Cache:
 
     def get(self, file_name: str) -> str | None:
         if not (self.root / file_name).exists():
-            return
+            return None
         with open(self.root / file_name, "r") as f:
             return f.read()
 
-    def get_decoded(self, file_name: str) -> dict:
+    def get_decoded(self, file_name: str) -> dict | None:
+        if not (self.root / file_name).exists():
+            return None
         with open(self.root / file_name, "r") as f:
             return json.load(f)
 
-    def get_issue(self, key: str):
+    def get_issue(self, key: str) -> dict | None:
         if self.client._no_cache:
-            return
+            return None
         issue_data = self.get(f"issues/{key}.json")
         if issue_data:
             return json.loads(issue_data)
+        return None
 
-    def write(self, file_name: str, contents: str):
+    def write(self, file_name: str, contents: str) -> int:
         with open(self.root / file_name, "w") as f:
             return f.write(contents)
 
-    def write_issue(self, key: str, data):
-        self.write(f"issues/{key}.json", json.dumps(data))
+    def write_issue(self, key: str, data: dict) -> int:
+        return self.write(f"issues/{key}.json", json.dumps(data))
 
-    def remove(self, file_name: str):
+    def remove(self, file_name: str) -> bool:
+        if not (self.root / file_name).exists():
+            return False
         os.remove(self.root / file_name)
+        return True
 
-    def remove_issue(self, key: str):
-        self.remove(f"issues/{key}.json")
+    def remove_issue(self, key: str) -> bool:
+        return self.remove(f"issues/{key}.json")
 
-    def iter_dir(self, identifier):
+    def iter_dir(self, identifier: str) -> Generator[Path, None, None]:
         if identifier == "issue_type_fields":
             for file in self.issue_type_fields.iterdir():
                 yield file

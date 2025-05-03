@@ -5,9 +5,7 @@ from mantis.jira import JiraClient
 
 def test_cache_get_caches_jira_issue(fake_jira: JiraClient):
     assert not fake_jira._no_cache
-    with pytest.raises(FileNotFoundError) as exec_info:
-        fake_jira.cache.get_decoded("issues/TASK-1.json")
-    assert "No such file or directory" in str(exec_info.value)
+    assert fake_jira.cache.get_decoded("issues/TASK-1.json") is None
 
     with open(fake_jira.cache.root / "issues/TASK-1.json", "w") as f:
         f.write('{"fields": {"status": {"name": "resolved"}}, "key": "TASK-1"}')
@@ -42,7 +40,8 @@ def test_cache_remove_does_removals(fake_jira: JiraClient):
     assert something_1 is not None
 
     # remove with cache.remove
-    fake_jira.cache.remove("issues/task-1.json")
+    assert fake_jira.cache.remove("issues/task-1.json")
+    assert not fake_jira.cache.remove("issues/task-1.json")
     nothing_1 = fake_jira.cache.get_issue("task-1")
     assert nothing_1 is None
 

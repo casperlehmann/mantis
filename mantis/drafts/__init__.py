@@ -1,7 +1,7 @@
-from typing import TYPE_CHECKING
+from typing import Callable, TYPE_CHECKING
 
 # To-do: Create converter for Jira syntax to markdown.
-j2m = lambda x: x
+j2m: Callable[[str], str] = lambda x: x
 
 if TYPE_CHECKING:
     from mantis.jira import JiraIssue
@@ -15,7 +15,7 @@ class Draft:
         self.issue = issue
         self._materialize()
 
-    def _materialize(self):
+    def _materialize(self) -> None:
         key = self.issue.get("key")
         # key = json_payload.get('key')
         assert key, "No key in issue"
@@ -31,18 +31,18 @@ class Draft:
         description = self.issue.get_field("description")
 
         with open(self.jira.drafts_dir / f"{key}.md", "w") as f:
-            f.write(f"---\n")
+            f.write("---\n")
             f.write(f"header: [{key}] {summary}\n")
-            f.write(f"ignore: True\n")
+            f.write("ignore: True\n")
             # f.write(f'project: {project}\n')
             f.write(f"parent: {parent}\n")
             f.write(f"summary: {summary}\n")
             f.write(f"issuetype: {issuetype}\n")
             f.write(f"assignee: {assignee}\n")
-            f.write(f"---\n")
+            f.write("---\n")
             f.write(f"# {summary}\n")
-            f.write(f"\n")
+            f.write("\n")
             f.write(f"{j2m(description)}\n")
-            f.write(f"\n")
+            f.write("\n")
             # f.write(f'\n')
             # f.write(f'{description}\n')
