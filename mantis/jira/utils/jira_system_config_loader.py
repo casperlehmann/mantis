@@ -12,10 +12,10 @@ if TYPE_CHECKING:
 
 def fetch_enums(
     jira: "JiraClient",
-    endpoint="issuetype",
-    filter=None,
-    mapping={},
-    caster_functions={},
+    endpoint: str="issuetype",
+    filter: Callable | None=None,
+    mapping: dict={},
+    caster_functions: dict={},
 ) -> list:
     """Get the enums of the fields in a jira tenant
 
@@ -62,16 +62,16 @@ class JiraSystemConfigLoader:
     def __init__(self, client: "JiraClient") -> None:
         self.client = client
 
-    def write_to_system_cache(self, file_name: str, issue_enums) -> None:
+    def write_to_system_cache(self, file_name: str, issue_enums: str) -> None:
         self.client.cache.write(f"system/{file_name}", issue_enums)
 
     def get_from_system_cache(self, file_name: str) -> str | None:
         return self.client.cache.get(f"system/{file_name}")
 
-    def get_from_system_cache_decoded(self, file_name: str) -> dict:
+    def get_from_system_cache_decoded(self, file_name: str) -> dict | None:
         return self.client.cache.get_decoded(f"system/{file_name}")
 
-    def loop_issue_type_fields(self):
+    def loop_issue_type_fields(self) -> Generator[Path, Any, None]:
         for file in self.client.cache.issue_type_fields.iterdir():
             yield file
 
@@ -102,6 +102,7 @@ class JiraSystemConfigLoader:
         issuetypes = self.get_from_system_cache("issue_types.json")
         if issuetypes:
             return json.loads(issuetypes)
+        return None
 
     def update_project_field_keys(self) -> list[str]:
         for issue_type in self.client.issues.allowed_types:
@@ -119,7 +120,7 @@ class JiraSystemConfigLoader:
             )
         return self.client.issues.allowed_types
 
-    def compile_plugins(self):
+    def compile_plugins(self) -> None:
         for input_file in self.client.cache.iter_dir("issue_type_fields"):
             with open(input_file, "r") as f:
                 content = f.read()
@@ -150,7 +151,7 @@ class JiraSystemConfigLoader:
         all_field_keys: set[str],
         issue_type_field_map: Mapping[str, ProjectFieldKeys],
     ) -> None:
-        def print_header_footer():
+        def print_header_footer() -> None:
             print(f"{'':<20} - ", end="")
             for issue_type_name in column_order:
                 if not issue_type_name in issue_type_field_map.keys():

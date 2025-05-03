@@ -12,15 +12,15 @@ class JiraAuth:
         assert self.options.url
 
     @property
-    def no_verify_ssl(self):
+    def no_verify_ssl(self) -> bool:
         return self.options.no_verify_ssl
 
     @property
-    def user(self):
+    def user(self) -> str:
         return self.options.user
 
     @property
-    def personal_access_token(self):
+    def personal_access_token(self) -> str:
         return self.options.personal_access_token
 
     @property

@@ -44,7 +44,7 @@ class Cache:
         with open(self.root / file_name, "w") as f:
             return f.write(contents)
 
-    def write_issue(self, key: str, data) -> int:
+    def write_issue(self, key: str, data: dict) -> int:
         return self.write(f"issues/{key}.json", json.dumps(data))
 
     def remove(self, file_name: str) -> bool:
@@ -56,7 +56,7 @@ class Cache:
     def remove_issue(self, key: str) -> bool:
         return self.remove(f"issues/{key}.json")
 
-    def iter_dir(self, identifier) -> Generator[Path, None, None]:
+    def iter_dir(self, identifier: str) -> Generator[Path, None, None]:
         if identifier == "issue_type_fields":
             for file in self.issue_type_fields.iterdir():
                 yield file

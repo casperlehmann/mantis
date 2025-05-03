@@ -15,7 +15,7 @@ class Draft:
         self.issue = issue
         self._materialize()
 
-    def _materialize(self):
+    def _materialize(self) -> None:
         key = self.issue.get("key")
         # key = json_payload.get('key')
         assert key, "No key in issue"

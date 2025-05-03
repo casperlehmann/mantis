@@ -31,16 +31,18 @@ class JiraIssue:
         return self.data.get(key, *args)
 
     @property
-    def fields(self):
+    def fields(self) -> dict | None:
         fields = self.data.get("fields")
         if not fields:
             raise KeyError("JiraIssue.data does not have any fields")
         return fields
 
-    def get_field(self, key: str, default: Any = None):
+    def get_field(self, key: str, default: Any = None) -> Any:
         # Note that the key can exist and the value can still be None
-        x = self.fields.get(key, default) or default
-        return x
+        if isinstance(self.fields, dict):
+            return self.fields.get(key, default)
+        else:
+            return default
 
 
 class JiraIssues:
@@ -75,9 +77,12 @@ class JiraIssues:
             self.client.cache.write_issue(key, data)
         return JiraIssue(self.client, data)
 
-    def create(self, issue_type, title, data):
+    def create(self, issue_type: str | None, title: str, data: dict) -> dict:
         assert issue_type in self.allowed_types
-        issue_type = issue_type or data.get("issuetype")
+        if not issue_type:
+            if 'issuetype' not in data:
+                raise ValueError('No issuetype in payload')
+            issue_type = data.get("issuetype")
         if len(data.keys()) == 0:
             raise ValueError("The data object is an empty payload")
         print(f"Create issue ({issue_type}): {title}")
@@ -87,10 +92,10 @@ class JiraIssues:
 
         pprint(response.json())
         response.raise_for_status()
-        data = response.json()
-        return data
+        response_data: dict = response.json()
+        return response_data
 
-    def handle_http_error(self, exception, key):
+    def handle_http_error(self, exception: HTTPError, key: str) -> None:
         (project_from_key, task_no_from_key) = process_key(key, exception)
         match exception.response.reason:
             case "Not Found":
