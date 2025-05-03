@@ -23,22 +23,23 @@ class Cache:
 
     def get(self, file_name: str) -> str | None:
         if not (self.root / file_name).exists():
-            return
+            return None
         with open(self.root / file_name, "r") as f:
             return f.read()
 
     def get_decoded(self, file_name: str) -> dict | None:
         if not (self.root / file_name).exists():
-            return
+            return None
         with open(self.root / file_name, "r") as f:
             return json.load(f)
 
     def get_issue(self, key: str) -> dict | None:
         if self.client._no_cache:
-            return
+            return None
         issue_data = self.get(f"issues/{key}.json")
         if issue_data:
             return json.loads(issue_data)
+        return None
 
     def write(self, file_name: str, contents: str) -> int:
         with open(self.root / file_name, "w") as f:
