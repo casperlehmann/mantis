@@ -7,6 +7,10 @@ if TYPE_CHECKING:
     from mantis.jira.jira_client import JiraClient
 
 
+class CacheMissException(Exception):
+    pass
+
+
 class Cache:
     def __init__(self, jira_client: "JiraClient") -> None:
         self.client = jira_client
