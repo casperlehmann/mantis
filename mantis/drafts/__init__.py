@@ -1,7 +1,7 @@
-from typing import TYPE_CHECKING
+from typing import Callable, TYPE_CHECKING
 
 # To-do: Create converter for Jira syntax to markdown.
-j2m = lambda x: x
+j2m: Callable[[str], str] = lambda x: x
 
 if TYPE_CHECKING:
     from mantis.jira import JiraIssue
