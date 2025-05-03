@@ -187,7 +187,9 @@ def test_fetch_issuetype_enums_real_no_casting(jira_client_from_user_toml):
 
 
 @patch("mantis.jira.jira_client.requests.get")
-def test_config_loader_update_issuetypes_writes_to_cache(mock_get, fake_jira: JiraClient):
+def test_config_loader_update_issuetypes_writes_to_cache(
+    mock_get, fake_jira: JiraClient
+):
     mock_get.return_value.json.return_value = VAL
     config_loader = fake_jira.system_config_loader
     assert (
