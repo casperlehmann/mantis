@@ -41,11 +41,11 @@ class JiraClient:
 
     def _get(self, uri: str, params: dict={}) -> requests.Response:
         url = f"{self.api_url}/{uri}"
-        return requests.get(url, params=params, **self.requests_kwargs)
+        return requests.get(url, params=params, **self.requests_kwargs)  # type: ignore
 
     def _post(self, uri: str, data: dict) -> requests.Response:
         url = f"{self.api_url}/{uri}"
-        return requests.post(url, json=data, **self.requests_kwargs)
+        return requests.post(url, json=data, **self.requests_kwargs)  # type: ignore
 
     def get_issue(self, key: str) -> requests.Response:
         return self._get(f"issue/{key}")
