@@ -1,18 +1,15 @@
-import json
-import os
-from pathlib import Path
-from typing import TYPE_CHECKING
-
 import requests
 
-from mantis.jira.utils import Cache
+from pathlib import Path
+from typing import TYPE_CHECKING, Any
 
-from .jira_issues import JiraIssues
-from .utils import JiraSystemConfigLoader
+from mantis.jira.jira_issues import JiraIssues
+from mantis.jira.utils import Cache, JiraSystemConfigLoader
 
 if TYPE_CHECKING:
-    from .jira_auth import JiraAuth
-    from .jira_options import JiraOptions
+    from requests.auth import HTTPBasicAuth
+    from mantis.jira.jira_auth import JiraAuth
+    from mantis.jira.jira_options import JiraOptions
 
 
 class JiraClient:

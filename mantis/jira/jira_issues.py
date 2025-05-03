@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Any
 from requests.models import HTTPError
 
 if TYPE_CHECKING:
-    from jira_client import JiraClient
+    from .jira_client import JiraClient
 
 
 def process_key(key: str, exception: Exception) -> tuple[str, str]:

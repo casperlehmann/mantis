@@ -1,6 +1,5 @@
 import argparse
 import tomllib
-from typing import Optional
 
 
 class JiraOptions:

@@ -1,9 +1,9 @@
-from typing import TYPE_CHECKING
-
 from requests.auth import HTTPBasicAuth
 
+from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
-    from jira.jira_options import JiraOptions
+    from .jira_options import JiraOptions
 
 
 class JiraAuth:

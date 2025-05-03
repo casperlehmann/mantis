@@ -1,13 +1,13 @@
 import json
-from pprint import pprint
-from typing import TYPE_CHECKING, Mapping
+from pathlib import Path
+from typing import TYPE_CHECKING, Any, Callable, Dict, Generator, Mapping
 
 from datamodel_code_generator import DataModelType, InputFileType, generate
 
 from mantis.jira.utils.jira_types import IssueTypeFields, ProjectFieldKeys
 
 if TYPE_CHECKING:
-    from jira_client import JiraClient
+    from mantis.jira.jira_client import JiraClient
 
 
 def fetch_enums(
