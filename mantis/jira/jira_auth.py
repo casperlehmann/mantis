@@ -24,7 +24,7 @@ class JiraAuth:
         return self.options.personal_access_token
 
     @property
-    def auth(self):
+    def auth(self) -> HTTPBasicAuth:
         if self.personal_access_token:
             assert self.options.user
             return HTTPBasicAuth(self.user, self.personal_access_token)
