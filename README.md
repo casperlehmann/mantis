@@ -102,6 +102,37 @@ An example of the coverage report:
 
 ![Markdown coverage report](docs/img/pytest-coverage-html-report.png)
 
+## Running MyPy
+
+Ensuring typehint coverage (this is also run during [GitHub Actions](.github/workflows/python-app-ci.yml)).
+
+```
+$ mypy --disallow-untyped-calls --disallow-untyped-defs --disallow-incomplete-defs mantis
+Success: no issues found in 10 source files
+```
+
+## Running Flake8
+
+```sh
+$ flake8 mantis --count --select=E9,F63,F7,F82 --show-source --statistics                 
+0
+$ $flake8 mantis --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+mantis/jira/__init__.py:1:1: F401 '.jira_auth.JiraAuth' imported but unused
+mantis/jira/__init__.py:2:1: F401 '.jira_client.JiraClient' imported but unused
+mantis/jira/__init__.py:3:1: F401 '.jira_issues.JiraIssue' imported but unused
+mantis/jira/__init__.py:3:1: F401 '.jira_issues.JiraIssues' imported but unused
+mantis/jira/__init__.py:4:1: F401 '.jira_options.JiraOptions' imported but unused
+mantis/jira/__init__.py:4:1: F401 '.jira_options.parse_args' imported but unused
+mantis/jira/__init__.py:5:1: F401 '.utils.JiraSystemConfigLoader' imported but unused
+mantis/jira/utils/__init__.py:1:1: F401 '.cache.Cache' imported but unused
+mantis/jira/utils/__init__.py:2:1: F401 '.jira_system_config_loader.JiraSystemConfigLoader' imported but unused
+mantis/jira/utils/__init__.py:3:1: F401 '.jira_types.IssueType' imported but unused
+mantis/jira/utils/__init__.py:3:1: F401 '.jira_types.IssueTypeFields' imported but unused
+mantis/jira/utils/__init__.py:3:1: F401 '.jira_types.Project' imported but unused
+12    F401 '.jira_auth.JiraAuth' imported but unused
+12
+```
+
 # Generate types
 
 ```python
@@ -118,12 +149,4 @@ Customfield10001
 Customfield10002
 Customfield10003
 [...]
-```
-
-# Running MyPy
-
-Ensuring typehint coverage (this is also run during [GitHub Actions](.github/workflows/python-app-ci.yml)).
-
-```
-$ mypy --disallow-untyped-calls --disallow-untyped-defs --disallow-incomplete-defs mantis
 ```
