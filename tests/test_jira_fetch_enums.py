@@ -5,6 +5,7 @@ from unittest.mock import patch
 import pytest
 
 from mantis.jira import JiraAuth, JiraClient
+from mantis.jira.utils.cache import CacheMissException
 from mantis.jira.utils.jira_system_config_loader import fetch_enums
 from mantis.jira.utils.jira_types import ProjectFieldKeys
 from tests.test_jira_types import ISSUETYPEFIELDS
@@ -296,7 +297,7 @@ def test_print_table_raises_on_non_existent_key(fake_jira: "JiraClient", capsys)
 
 def test_get_project_field_keys_from_cache(fake_jira: "JiraClient"):
     config_loader = fake_jira.system_config_loader
-    with pytest.raises(FileNotFoundError):
+    with pytest.raises(CacheMissException):
         config_loader.get_project_field_keys_from_cache()
 
     fake_jira.issues.allowed_types = ["test"]

@@ -3,7 +3,9 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Dict, Generator, Mapping
 
 from datamodel_code_generator import DataModelType, InputFileType, generate
+from pydantic import ValidationError
 
+from mantis.jira.utils.cache import CacheMissException
 from mantis.jira.utils.jira_types import IssueTypeFields, ProjectFieldKeys
 
 if TYPE_CHECKING:
@@ -183,6 +185,10 @@ class JiraSystemConfigLoader:
             except FileNotFoundError as e:
                 raise FileNotFoundError(
                     f"Cached values do not exist for {issue_type}"
+                ) from e
+            except ValidationError as e:
+                raise CacheMissException(
+                    f"issue_type {issue_type} does not exist. Did you dump them?"
                 ) from e
             d[issue_type] = ProjectFieldKeys(issue_type, issue_type_fields)
         return d
