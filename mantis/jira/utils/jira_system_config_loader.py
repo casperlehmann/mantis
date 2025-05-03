@@ -182,13 +182,9 @@ class JiraSystemConfigLoader:
                     f"issue_type_fields/{issue_type}.json"
                 )
                 issue_type_fields = IssueTypeFields.model_validate(loaded_json)
-            except FileNotFoundError as e:
-                raise FileNotFoundError(
-                    f"Cached values do not exist for {issue_type}"
-                ) from e
             except ValidationError as e:
                 raise CacheMissException(
-                    f"issue_type {issue_type} does not exist. Did you dump them?"
+                    f"issue_type {issue_type} does not exist. Did you remember to download types?"
                 ) from e
             d[issue_type] = ProjectFieldKeys(issue_type, issue_type_fields)
         return d
