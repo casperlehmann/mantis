@@ -74,12 +74,8 @@ class JiraIssues:
             self.client.cache.write_issue(key, data)
         return JiraIssue(self.client, data)
 
-    def create(self, issue_type: str | None, title: str, data: dict) -> dict:
+    def create(self, issue_type: str, title: str, data: dict) -> dict:
         assert issue_type in self.allowed_types
-        if not issue_type:
-            if 'issuetype' not in data:
-                raise ValueError('No issuetype in payload')
-            issue_type = data.get("issuetype")
         if len(data.keys()) == 0:
             raise ValueError("The data object is an empty payload")
         print(f"Create issue ({issue_type}): {title}")
