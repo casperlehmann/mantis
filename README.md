@@ -120,3 +120,10 @@ Customfield10003
 [...]
 ```
 
+# Running MyPy
+
+Ensuring typehint coverage (this is also run during [GitHub Actions](.github/workflows/python-app-ci.yml)).
+
+```
+$ mypy --disallow-untyped-calls --disallow-untyped-defs --disallow-incomplete-defs mantis
+```
