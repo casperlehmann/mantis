@@ -21,7 +21,7 @@ class JiraClient:
         self.no_verify_ssl = auth.no_verify_ssl
         self.project_name = jira_option.project
         self._no_cache = no_cache
-        self.requests_kwargs = {
+        self.requests_kwargs: dict[str, 'HTTPBasicAuth | bool | dict[str, Any]'] = {
             "auth": self.auth,
             "headers": {"Content-Type": "application/json"},
             "verify": (not self.no_verify_ssl),
