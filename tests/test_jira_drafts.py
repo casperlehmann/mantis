@@ -56,4 +56,3 @@ def test_jira_draft(fake_jira: JiraClient, json_response):
     with open(fake_jira.drafts_dir / "TASK-1.md", "r") as f:
         for content, expected in zip(f.readlines(), expectations):
             assert content.strip() == expected
-
