@@ -39,7 +39,7 @@ class JiraClient:
         assert self.options.url
         return self.options.url + "/rest/api/latest"
 
-    def _get(self, uri: str, params: dict={}) -> requests.Response:
+    def _get(self, uri: str, params: dict = {}) -> requests.Response:
         url = f"{self.api_url}/{uri}"
         return requests.get(url, params=params, **self.requests_kwargs)  # type: ignore
 
@@ -72,7 +72,7 @@ class JiraClient:
                 f"Connected as user: {user.get('displayName', 'ERROR: No displayName')}"
             )
             return True
-        except requests.exceptions.ConnectionError as e:
+        except requests.exceptions.ConnectionError:
             print("Connection error. Run it like this:")
             print("export JIRA_TOKEN=$(cat secret.txt)")
             print("python main.py")

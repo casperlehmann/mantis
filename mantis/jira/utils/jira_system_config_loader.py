@@ -30,10 +30,12 @@ def fetch_enums(
         _type_: _description_
 
     Example for /rest/api/2/issuetype:
-        types_filter = lambda d: int(d['id']) < 100 and d['name'] in ('Bug', 'Task', 'Epic', 'Story', 'Incident', 'New Feature', 'Sub-Task')
+        types_filter = lambda d: int(d['id']) < 100 and d['name'] in ('Bug', 'Task', 'Epic',
+                                 'Story', 'Incident', 'New Feature', 'Sub-Task')
         mapping = {'id': 'id', 'description': 'description', 'untranslatedName': 'name'}
         caster_functions = {'id': int}
-        issue_enums = fetch_enums(jira, endpoint = 'issuetype', filter = types_filter, mapping = mapping, caster_functions = caster_functions)
+        issue_enums = fetch_enums(jira, endpoint = 'issuetype', filter = types_filter,
+                                  mapping = mapping, caster_functions = caster_functions)
 
     See https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issue-types/#api-rest-api-2-issuetype-get
     """
@@ -76,8 +78,8 @@ class JiraSystemConfigLoader:
             yield file
 
     def update_issuetypes_cache(self) -> None:
-        types_filter = lambda d: int(d["id"]) <= self.client.options.type_id_cutoff \
-        and d["name"] in (
+        types_filter: Callable[[dict], bool] = lambda d: int(d["id"]) <= self.client.options.type_id_cutoff \
+                and d["name"] in (
             "Bug",
             "Task",
             "Epic",
@@ -154,7 +156,7 @@ class JiraSystemConfigLoader:
         def print_header_footer() -> None:
             print(f"{'':<20} - ", end="")
             for issue_type_name in column_order:
-                if not issue_type_name in issue_type_field_map.keys():
+                if issue_type_name not in issue_type_field_map.keys():
                     raise ValueError("column_order contains non-existent key")
                 print(f"{issue_type_name:<10}", end="")
             print()
@@ -164,8 +166,7 @@ class JiraSystemConfigLoader:
             print(f"{each:<20} - ", end="")
             for _, project_field_keys in issue_type_field_map.items():
                 print(
-                    f"{'1   ' if each in project_field_keys.fields
-                                 else '' :<10}",
+                    f"{'1   ' if each in project_field_keys.fields else '':<10}",
                     end="",
                 )
             print()
