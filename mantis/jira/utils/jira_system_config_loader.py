@@ -172,8 +172,8 @@ class JiraSystemConfigLoader:
             print()
         print_header_footer()
 
-    def get_project_field_keys_from_cache(self) -> Mapping[str, ProjectFieldKeys]:
-        d: Mapping[str, ProjectFieldKeys] = {}
+    def get_project_field_keys_from_cache(self) -> Dict[str, ProjectFieldKeys]:
+        d: Dict[str, ProjectFieldKeys] = {}
         for issue_type in self.client.issues.allowed_types:
             try:
                 loaded_json = self.get_from_system_cache_decoded(
