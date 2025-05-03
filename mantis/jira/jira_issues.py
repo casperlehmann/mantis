@@ -31,7 +31,7 @@ class JiraIssue:
         return self.data.get(key, default)
 
     @property
-    def fields(self) -> dict | None:
+    def fields(self) -> dict:
         fields = self.data.get("fields")
         if not fields:
             raise KeyError("JiraIssue.data does not have any fields")
@@ -39,10 +39,7 @@ class JiraIssue:
 
     def get_field(self, key: str, default: Any = None) -> Any:
         # Note that the key can exist and the value can still be None
-        if isinstance(self.fields, dict):
-            return self.fields.get(key, default)
-        else:
-            return default
+        return self.fields.get(key, default)
 
 
 class JiraIssues:
