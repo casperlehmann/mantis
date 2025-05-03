@@ -5,7 +5,7 @@ import tomllib
 class JiraOptions:
     """Collects options from toml file, allowing for command line overrides
 
-    python jira/jira_options.py --user user@domain.com --personal-access-token $JIRA_TOKEN
+    python jira/jira_options.py --user user@domain.com --personal-access-token $JIRA_TOKEN \
         --jira-url=https://account.atlassian.net
     """
 
