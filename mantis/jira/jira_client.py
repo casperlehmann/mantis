@@ -19,7 +19,6 @@ class JiraClient:
         self.options = jira_option
         self.auth = auth.auth
         self.no_verify_ssl = auth.no_verify_ssl
-        self.project_name = jira_option.project
         self._no_cache = no_cache
         self.requests_kwargs: dict[str, 'HTTPBasicAuth | bool | dict[str, Any]'] = {
             "auth": self.auth,
@@ -27,13 +26,23 @@ class JiraClient:
             "verify": (not self.no_verify_ssl),
         }
         self.cache = Cache(self)
-        self.drafts_dir = Path(self.options.drafts_dir)
         self.drafts_dir.mkdir(exist_ok=True)
-        self.plugins_dir = Path(self.options.plugins_dir)
         self.plugins_dir.mkdir(exist_ok=True)
         self.system_config_loader = JiraSystemConfigLoader(self)
         self.issues = JiraIssues(self)
 
+    @property
+    def drafts_dir(self) -> Path:
+        return Path(self.options.drafts_dir)
+
+    @property
+    def plugins_dir(self) -> Path:
+        return Path(self.options.plugins_dir)
+
+    @property
+    def project_name(self) -> str:
+        return self.options.project
+    
     @property
     def api_url(self) -> str:
         assert self.options.url
