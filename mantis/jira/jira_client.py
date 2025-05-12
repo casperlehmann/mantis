@@ -1,3 +1,4 @@
+import re
 import requests
 
 from pathlib import Path
@@ -13,6 +14,9 @@ if TYPE_CHECKING:
 
 
 class JiraClient:
+
+    _project_id: None | str = None
+
     def __init__(
         self, jira_option: "JiraOptions", auth: "JiraAuth", no_cache: bool = False
     ):
@@ -42,6 +46,24 @@ class JiraClient:
     @property
     def project_name(self) -> str:
         return self.options.project
+    
+    @property
+    def project_id(self) -> str:
+        if self._project_id:
+            # Will be loaded when downloading issuetypes
+            return self._project_id
+        projects = self.system_config_loader.get_projects()
+        assert isinstance(projects, list), f"To satisfy the type checker. Got: {projects}"
+        for project in projects:
+            if project.get('key') == self.project_name:
+                project_id = project.get('id')
+                break
+        else:
+            raise RuntimeError('Could not find matching project id')
+        assert isinstance(project_id, str), f'project_id should be a str. Got: {project_id} ({type(project_id)})'
+        assert re.match(r'^[0-9]*$', project_id), f'project_id must be numeric. Got: {project_id}'
+        self._project_id = project_id
+        return self._project_id
     
     @property
     def api_url(self) -> str:
