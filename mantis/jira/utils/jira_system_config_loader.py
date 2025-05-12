@@ -123,6 +123,25 @@ class JiraSystemConfigLoader:
                 f"issue_type_fields/{issue_type}.json", json.dumps(data)
             )
         return self.client.issues.allowed_types
+            
+    def update_projects_cache(self) -> list[dict[str, Any]]:
+        url = 'project'
+        response = self.client._get(url)
+        try:
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            print(e.response.reason)
+            print(e.response.content)
+            exit()
+        payload: list[dict[str, Any]] = response.json()
+        self.cache.write_to_system_cache("projects.json", json.dumps(payload))
+        return payload
+        data = [{'id': _['id'], 'key': _['key']} for _ in response.json() if _.get('key') == self.client.options.project][0]
+        projects = [_ for _ in response.json() if _.get('key') == self.client.options.project][0]
+        self.cache.write_to_system_cache(
+            f"issue_type_fields/project.json", json.dumps(data)
+        )
+        return data
 
     def compile_plugins(self) -> None:
         for input_file in self.client.cache.iter_dir("issue_type_fields"):
