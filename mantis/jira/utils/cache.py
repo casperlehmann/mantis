@@ -14,17 +14,26 @@ class CacheMissException(Exception):
 class Cache:
     def __init__(self, jira_client: "JiraClient") -> None:
         self.client = jira_client
-
-        self.root = Path(self.client.options.cache_dir)
         self.root.mkdir(exist_ok=True)
-
-        self.issues = self.root / "issues"
         self.issues.mkdir(exist_ok=True)
-        self.system = self.root / "system"
         self.system.mkdir(exist_ok=True)
-        self.issue_type_fields = self.system / "issue_type_fields"
         self.issue_type_fields.mkdir(exist_ok=True)
 
+    @property
+    def root(self):
+        return Path(self.client.options.cache_dir)
+
+    @property
+    def issues(self):
+        return self.root / "issues"
+
+    @property
+    def system(self):
+        return self.root / "system"
+
+    @property
+    def issue_type_fields(self):
+        return self.system / "issue_type_fields"
     def get(self, file_name: str) -> str | None:
         if not (self.root / file_name).exists():
             return None
