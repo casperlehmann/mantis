@@ -142,6 +142,14 @@ class JiraSystemConfigLoader:
             f"issue_type_fields/project.json", json.dumps(data)
         )
         return data
+    
+    def get_projects(self) -> list[dict[str, Any]]:
+        if not self.client._no_read_cache:
+            projects = self.cache.get_projects_from_system_cache()
+            if projects:
+                assert isinstance(projects, list), f"To satisfy the type checker. Got: {projects}"
+                return projects
+        return self.update_projects_cache()
 
     def compile_plugins(self) -> None:
         for input_file in self.client.cache.iter_dir("issue_type_fields"):
