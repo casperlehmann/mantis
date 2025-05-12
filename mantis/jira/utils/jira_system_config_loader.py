@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Any, Callable, Dict, Generator, Mapping
 
 from datamodel_code_generator import DataModelType, InputFileType, generate
 from pydantic import ValidationError
+import requests
 
 from mantis.jira.utils.cache import CacheMissException
 from mantis.jira.utils.jira_types import IssueTypeFields, ProjectFieldKeys
