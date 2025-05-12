@@ -20,20 +20,21 @@ class Cache:
         self.issue_type_fields.mkdir(exist_ok=True)
 
     @property
-    def root(self):
+    def root(self) -> Path:
         return Path(self.client.options.cache_dir)
 
     @property
-    def issues(self):
+    def issues(self) -> Path:
         return self.root / "issues"
 
     @property
-    def system(self):
+    def system(self) -> Path:
         return self.root / "system"
 
     @property
-    def issue_type_fields(self):
+    def issue_type_fields(self) -> Path:
         return self.system / "issue_type_fields"
+
     def get(self, file_name: str) -> str | None:
         if not (self.root / file_name).exists():
             return None
