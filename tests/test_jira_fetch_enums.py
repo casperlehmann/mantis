@@ -1,11 +1,8 @@
-import inspect
-import json
-import os
 from unittest.mock import patch
 
 import pytest
 
-from mantis.jira import JiraAuth, JiraClient
+from mantis.jira import JiraClient
 from mantis.jira.utils.cache import CacheMissException
 from mantis.jira.utils.jira_types import ProjectFieldKeys
 from tests.data import get_issuetypes_response, update_projects_cache_response
@@ -112,10 +109,8 @@ def test_update_project_field_keys(mock_get, fake_jira: JiraClient):
     if not (fake_jira.cache.issuetype_fields / 'createmeta_testtype.json').exists():
         raise FileNotFoundError('File "createmeta_testtype.json" should have been created')
     assert 'Testtype' in (allowed_types or []), f"Testtype not in allowed_types: {allowed_types}"
-    # fake_jira._no_read_cache = False
     with open(fake_jira.cache.issuetype_fields / "createmeta_testtype.json", "r") as f:
         assert f.read() == '{"name": "Testtype"}'
-    # fake_jira._no_read_cache = True
 
 
 @patch("mantis.jira.jira_client.requests.get")
