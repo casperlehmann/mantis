@@ -1,37 +1,16 @@
-import pytest
-
 from mantis.jira.utils.jira_types import (
-    IssueType,
     IssueTypeFields,
-    Project,
     ProjectFieldKeys,
 )
 
-ISSUETYPE = IssueType.model_validate(
-    {
-        "id": "1",
-        "description": "placeholder",
-        "iconUrl": "placeholder",
-        "name": "placeholder",
-        "untranslatedName": "placeholder",
-        "subtask": "False",
-        "hierarchyLevel": 1,
-        "expand": "placeholder",
-        "fields": {"placeholder": "placeholder"},
-    }
-)
-PROJECT = Project.model_validate(
-    {
-        "issuetypes": [ISSUETYPE],
-        "expand": "placeholder",
-        "id": "placeholder",
-        "key": "placeholder",
-        "name": "placeholder",
-        "avatarUrls": {"placeholder": "placeholder"},
-    }
-)
+
 ISSUETYPEFIELDS = IssueTypeFields.model_validate(
-    {"projects": [PROJECT], "expand": "placeholder"}
+    {
+        'startAt': 1,
+        'maxResults': 4,
+        'total': 3,
+        "fields": [{"key": "placeholder"}]
+    }
 )
 
 

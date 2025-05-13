@@ -145,13 +145,15 @@ def test_jira_no_issues_fields_raises(fake_jira: JiraClient, mock_post_request):
 
 def test_jira_issues_cached_issuetypes_parses_allowed_types(fake_jira: JiraClient):
     fake_jira._no_read_cache = False
-    cached_issuetypes = [{"id": 1, "name": "Bug"}, {"id": 2, "name": "Task"}]
-    fake_jira.system_config_loader.get_issuetypes_names_from_cache = (
+    cached_issuetypes = [{"id": '1', "name": "Bug", 'scope': {'project': {'id': '10000'}}},
+                         {"id": '2', "name": "Task", 'scope': {'project': {'id': '10000'}}}]
+    fake_jira.system_config_loader.get_issuetypes_for_project = (
         lambda *args, **kwargs: cached_issuetypes
     )
     fake_jira.issues = JiraIssues(fake_jira)
-    assert fake_jira.issues.allowed_types == ["Bug", "Task"]
-
+    assert fake_jira.issues._allowed_types is None
+    assert fake_jira.issues.allowed_types == ["Bug", "Task"], f'Unexpected allowed types: {fake_jira.issues._allowed_types}'
+    assert fake_jira.issues._allowed_types
 
 def test_jira_issues_get_does_write_to_cache(fake_jira: JiraClient):
     fake_jira._no_read_cache = False

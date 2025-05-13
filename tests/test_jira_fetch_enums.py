@@ -1,4 +1,5 @@
 import inspect
+import json
 import os
 from unittest.mock import patch
 
@@ -6,7 +7,6 @@ import pytest
 
 from mantis.jira import JiraAuth, JiraClient
 from mantis.jira.utils.cache import CacheMissException
-from mantis.jira.utils.jira_system_config_loader import fetch_enums
 from mantis.jira.utils.jira_types import ProjectFieldKeys
 from tests.data import get_issuetypes_response, update_projects_cache_response
 from tests.test_jira_types import ISSUETYPEFIELDS
@@ -45,149 +45,6 @@ VAL = [
     },
 ]
 
-
-@patch("mantis.jira.jira_client.requests.get")
-def test_fetch_issuetype_enums_mock(mock_get, fake_jira: JiraClient):
-    mock_get.return_value.json.return_value = VAL
-    types_filter = lambda d: int(d["id"]) < 100 and d["name"] in (
-        "Bug",
-        "Task",
-        "Epic",
-        "Story",
-        "Incident",
-        "New Feature",
-        "Sub-Task",
-    )
-    mapping = {"id": "id", "description": "description", "untranslatedName": "name"}
-    caster_functions = {"id": int}
-    issue_enums = fetch_enums(
-        fake_jira,
-        endpoint="issuetype",
-        filter=types_filter,
-        mapping=mapping,
-        caster_functions=caster_functions,
-    )
-    assert (
-        len(issue_enums) == 7
-    ), f"Exactly seven matches the filter: {str(inspect.getsource(types_filter)).strip()}"
-    issuetype_1_bugs = [_ for _ in issue_enums if _["id"] == 1]
-    assert len(issuetype_1_bugs) == 1, f"Exactly one with id == 1"
-    issuetype_1_bug = issuetype_1_bugs[0]
-    assert issuetype_1_bug["name"] == "Bug", "Issue of id == 1 has wrong name"
-    assert (
-        issuetype_1_bug["description"] == "A problem or error."
-    ), "Issue of id == 1 has wrong description"
-
-
-@patch("mantis.jira.jira_client.requests.get")
-def test_fetch_issuetype_enums_mock_no_casting(mock_get, fake_jira: JiraClient):
-    mock_get.return_value.json.return_value = VAL
-    types_filter = lambda d: d["id"] == 1
-    mapping = {"id": "id", "description": "description", "untranslatedName": "name"}
-    caster_functions = {}
-    issue_enums = fetch_enums(
-        fake_jira,
-        endpoint="issuetype",
-        filter=types_filter,
-        mapping=mapping,
-        caster_functions=caster_functions,
-    )
-    assert (
-        len(issue_enums) == 1
-    ), f"Exactly one matches the filter: {str(inspect.getsource(types_filter)).strip()}"
-    issuetype_1_bug = issue_enums[0]
-    assert issuetype_1_bug["name"] == "Bug", "Issue of id == '1' has wrong name"
-    assert (
-        issuetype_1_bug["description"] == "A problem or error."
-    ), "Issue of id == '1' has wrong description"
-
-
-@patch("mantis.jira.jira_client.requests.get")
-def test_fetch_issuetype_enums_mock_no_mapping(mock_get, fake_jira: JiraClient):
-    mock_get.return_value.json.return_value = VAL
-    types_filter = lambda d: d["id"] == 1
-    mapping = {}
-    caster_functions = {}
-    issue_enums = fetch_enums(
-        fake_jira,
-        endpoint="issuetype",
-        filter=types_filter,
-        mapping=mapping,
-        caster_functions=caster_functions,
-    )
-    assert (
-        len(issue_enums) == 1
-    ), f"Exactly one matches the filter: {str(inspect.getsource(types_filter)).strip()}"
-    issuetype_1_bug = issue_enums[0]
-    assert (
-        issuetype_1_bug["untranslatedName"] == "Bug"
-    ), "Issue of id == '1' has wrong untranslatedName"
-
-
-@pytest.mark.skipif(
-    not os.path.exists("options.toml"), reason='File "options.toml" does not exist'
-)
-@pytest.mark.skipif(
-    not os.getenv("EXECUTE_SKIPPED"), reason="This is a live test against the Jira api"
-)
-def test_fetch_issuetype_enums_real(jira_client_from_user_toml):
-    types_filter = lambda d: int(d["id"]) < 100 and d["name"] in (
-        "Bug",
-        "Task",
-        "Epic",
-        "Story",
-        "Incident",
-        "New Feature",
-        "Sub-Task",
-    )
-    mapping = {"id": "id", "description": "description", "untranslatedName": "name"}
-    caster_functions = {"id": int}
-    issue_enums = fetch_enums(
-        jira_client_from_user_toml,
-        endpoint="issuetype",
-        filter=types_filter,
-        mapping=mapping,
-        caster_functions=caster_functions,
-    )
-    assert (
-        len(issue_enums) == 7
-    ), f"Exactly seven matches the filter: {str(inspect.getsource(types_filter)).strip()}"
-    issuetype_1_bugs = [_ for _ in issue_enums if _["id"] == 1]
-    assert len(issuetype_1_bugs) == 1, f"Exactly one with id == 1"
-    issuetype_1_bug = issuetype_1_bugs[0]
-    assert issuetype_1_bug["name"] == "Bug", "Issue of id == 1 has wrong name"
-    assert (
-        issuetype_1_bug["description"] == "A problem or error."
-    ), "Issue of id == 1 has wrong description"
-
-
-@pytest.mark.skipif(
-    not os.path.exists("options.toml"), reason='File "options.toml" does not exist'
-)
-@pytest.mark.skipif(
-    not os.getenv("EXECUTE_SKIPPED"), reason="This is a live test against the Jira api"
-)
-def test_fetch_issuetype_enums_real_no_casting(jira_client_from_user_toml):
-    types_filter = lambda d: d["id"] == "1"
-    mapping = {"id": "id", "description": "description", "untranslatedName": "name"}
-    caster_functions = {}
-    issue_enums = fetch_enums(
-        jira_client_from_user_toml,
-        endpoint="issuetype",
-        filter=types_filter,
-        mapping=mapping,
-        caster_functions=caster_functions,
-    )
-    assert (
-        len(issue_enums) == 1
-    ), f"Exactly one matches the filter: {str(inspect.getsource(types_filter)).strip()}"
-    issuetype_1_bug = issue_enums[0]
-    assert issuetype_1_bug["name"] == "Bug", "Issue of id == '1' has wrong name"
-    assert (
-        issuetype_1_bug["description"] == "A problem or error."
-    ), "Issue of id == '1' has wrong description"
-
-
 @patch("mantis.jira.jira_client.requests.get")
 def test_config_loader_update_issuetypes_writes_to_cache(
     mock_get, fake_jira: JiraClient
@@ -205,13 +62,13 @@ def test_config_loader_update_issuetypes_writes_to_cache(
 
 
 @patch("mantis.jira.jira_client.requests.get")
-def test_config_loader_get_issuetypes_names_from_cache(mock_get, fake_jira: JiraClient):
+def test_cache_get_issuetypes_from_system_cache(mock_get, fake_jira: JiraClient):
     mock_get.return_value.json.return_value = get_issuetypes_response
-    config_loader = fake_jira.system_config_loader
+    cache = fake_jira.cache
     with open(fake_jira.cache.system / "issuetypes.json", "w") as f:
-        f.write('{"a": "b"}')
-    retrieved = config_loader.get_issuetypes_names_from_cache()
-    assert retrieved == {"a": "b"}
+        f.write('[{"a": "b"}]')
+    retrieved = cache.get_issuetypes_from_system_cache()
+    assert retrieved == [{"a": "b"}]
 
 
 @patch("mantis.jira.jira_client.requests.get")
@@ -230,13 +87,35 @@ def test_config_loader_loop_yields_files(mock_get, fake_jira: JiraClient):
 
 @patch("mantis.jira.jira_client.requests.get")
 def test_update_project_field_keys(mock_get, fake_jira: JiraClient):
-    mock_get.return_value.json.return_value = {"name": "test_type"}
     config_loader = fake_jira.system_config_loader
-    config_loader.client.issues.allowed_types = ["test_type"]
+    if (fake_jira.cache.system / 'projects.json').exists():
+        raise FileExistsError('File "projects.json" should not exist yet')
+    mock_get.return_value.json.return_value = update_projects_cache_response
+    got_projects = config_loader.update_projects_cache()
+    assert all({int(_['id']) in list(range(10000, 10010)) + [99999] for _ in got_projects}), f'We expect two projects in len(update_projects_cache_response): {len(update_projects_cache_response)} Got {[_['id'] for _ in got_projects]}'
+    if not (fake_jira.cache.system / 'projects.json').exists():
+        raise FileNotFoundError('File "projects.json" should have been created')
+
+    if (fake_jira.cache.system / 'issuetypes.json').exists():
+        raise FileExistsError('File "issuetypes.json" should not exist yet')
+    mock_get.return_value.json.return_value = get_issuetypes_response
+    got_issue_types = config_loader.get_issuetypes()
+    assert all({int(_['id']) in list(range(10000, 10010)) + [99999] for _ in got_issue_types}), f'Issue types: {[_['id'] for _ in got_issue_types]}'
+    if not (fake_jira.cache.system / 'issuetypes.json').exists():
+        raise FileNotFoundError('File "issuetypes.json" should have been created')
+
+    mock_get.return_value.json.return_value = {"name": "Testtype"}
+
+    if (fake_jira.cache.issuetype_fields / 'createmeta_testtype.json').exists():
+        raise FileExistsError('File "createmeta_testtype.json" should not exist yet')
     allowed_types = config_loader.update_project_field_keys()
-    assert allowed_types == ["test_type"]
-    with open(fake_jira.cache.issuetype_fields / "test_type.json", "r") as f:
-        assert f.read() == '{"name": "test_type"}'
+    if not (fake_jira.cache.issuetype_fields / 'createmeta_testtype.json').exists():
+        raise FileNotFoundError('File "createmeta_testtype.json" should have been created')
+    assert 'Testtype' in (allowed_types or []), f"Testtype not in allowed_types: {allowed_types}"
+    fake_jira._no_read_cache = False
+    with open(fake_jira.cache.issuetype_fields / "createmeta_testtype.json", "r") as f:
+        assert f.read() == '{"name": "Testtype"}'
+    fake_jira._no_read_cache = True
 
 
 @patch("mantis.jira.jira_client.requests.get")
@@ -301,9 +180,9 @@ def test_get_project_field_keys_from_cache(fake_jira: "JiraClient"):
     with pytest.raises(CacheMissException):
         config_loader.get_project_field_keys_from_cache()
 
-    fake_jira.issues.allowed_types = ["test"]
+    fake_jira.issues._allowed_types = ["test"]
     dummy = ProjectFieldKeys(name="test_b", issuetype_fields=ISSUETYPEFIELDS)
-    with open(fake_jira.cache.issuetype_fields / "test.json", "w") as f:
+    with open(fake_jira.cache.issuetype_fields / "createmeta_test.json", "w") as f:
         f.write(dummy.data.model_dump_json())
     from_cache = config_loader.get_project_field_keys_from_cache()
     assert from_cache
@@ -311,8 +190,8 @@ def test_get_project_field_keys_from_cache(fake_jira: "JiraClient"):
 
 def test_inspect(fake_jira: "JiraClient"):
     config_loader = fake_jira.system_config_loader
-    fake_jira.issues.allowed_types = ["test"]
+    fake_jira.issues._allowed_types = ["test"]
     dummy = ProjectFieldKeys(name="test_b", issuetype_fields=ISSUETYPEFIELDS)
-    with open(fake_jira.cache.issuetype_fields / "test.json", "w") as f:
+    with open(fake_jira.cache.issuetype_fields / "createmeta_test.json", "w") as f:
         f.write(dummy.data.model_dump_json())
     config_loader.inspect()

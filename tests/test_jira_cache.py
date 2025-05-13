@@ -5,20 +5,19 @@ from mantis.jira import JiraClient
 
 def test_cache_get_caches_jira_issue(fake_jira: JiraClient):
     assert not fake_jira._no_read_cache
-    assert fake_jira.cache.get_decoded("issues/TASK-1.json") is None
+    assert fake_jira.cache._get(fake_jira.cache.issues, "TASK-1.json") is None
 
     with open(fake_jira.cache.root / "issues/TASK-1.json", "w") as f:
         f.write('{"fields": {"status": {"name": "resolved"}}, "key": "TASK-1"}')
 
-    decoded = fake_jira.cache.get_decoded("issues/TASK-1.json")
+    decoded = fake_jira.cache._get(fake_jira.cache.issues, "TASK-1.json")
     assert decoded == {"fields": {"status": {"name": "resolved"}}, "key": "TASK-1"}
 
 
 def test_cache_get_issue_returns_none_when_no_read_cache_is_set(fake_jira: JiraClient):
     # Make sure nothing is cached
     assert not fake_jira._no_read_cache
-    nothing_1 = fake_jira.cache.get_issue("TASK-1")
-    assert nothing_1 is None
+    assert fake_jira.cache.get_issue("TASK-1") is None
 
     # cache something
     with open(fake_jira.cache.root / "issues/task-1.json", "w") as f:
@@ -28,8 +27,9 @@ def test_cache_get_issue_returns_none_when_no_read_cache_is_set(fake_jira: JiraC
 
     # Deactivate the cache and make sure nothing is retrieved
     fake_jira._no_read_cache = True
-    nothing_2 = fake_jira.cache.get_issue("TASK-1")
-    assert nothing_2 is None
+    with pytest.raises(LookupError):
+        nothing_2 = fake_jira.cache.get_issue("TASK-1")
+        assert nothing_2 is None
 
 
 def test_cache_remove_does_removals(fake_jira: JiraClient):

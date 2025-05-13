@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Any, Callable, Dict, Generator, Mapping
 
 from datamodel_code_generator import DataModelType, InputFileType, generate
 from pydantic import ValidationError
+import requests
 
 from mantis.jira.utils.cache import CacheMissException
 from mantis.jira.utils.jira_types import IssueTypeFields, ProjectFieldKeys
@@ -12,120 +13,101 @@ if TYPE_CHECKING:
     from mantis.jira.jira_client import JiraClient
 
 
-def fetch_enums(
-    jira: "JiraClient",
-    endpoint: str = "issuetype",
-    filter: Callable[[dict], bool] | None = None,
-    mapping: dict = {},
-    caster_functions: dict = {},
-) -> list:
-    """Get the enums of the fields in a jira tenant
-
-    Args:
-        jira (_type_): Client for connecting to the endpoint.
-        endpoint (str, optional): The endpoint for the specific field. Defaults to 'issuetype'.
-        filter (_type_, optional): Filters the return value if set. Defaults to None.
-        mapping (dict, optional): Renames an internal field name in the Jira api to something custom. Defaults to {}.
-        caster_functions (dict, optional): Casts fields using custom conversion functions. Defaults to {}.
-
-    Returns:
-        _type_: _description_
-
-    Example for /rest/api/2/issuetype:
-        types_filter = lambda d: int(d['id']) < 100 and d['name'] in ('Bug', 'Task', 'Epic',
-                                 'Story', 'Incident', 'New Feature', 'Sub-Task')
-        mapping = {'id': 'id', 'description': 'description', 'untranslatedName': 'name'}
-        caster_functions = {'id': int}
-        issue_enums = fetch_enums(jira, endpoint = 'issuetype', filter = types_filter,
-                                  mapping = mapping, caster_functions = caster_functions)
-
-    See https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issue-types/#api-rest-api-2-issuetype-get
-    """
-    response = jira._get(f"/{endpoint}")
-    response.raise_for_status()
-    data = response.json()
-    schemas = []
-    for entry in data:
-        schema = {}
-        if mapping:
-            for api_name, rename in mapping.items():
-                cast = caster_functions.get(rename, lambda unchanged: unchanged)
-                api_value = cast(entry.get(api_name))
-                schema[rename] = api_value
-        else:
-            for api_name, api_value in entry.items():
-                cast = caster_functions.get(api_name, lambda unchanged: unchanged)
-                api_value = cast(entry.get(api_name))
-                schema[api_name] = api_value
-        if not filter or filter(schema):
-            schemas.append(schema)
-    return schemas
-
-
 class JiraSystemConfigLoader:
     def __init__(self, client: "JiraClient") -> None:
         self.client = client
 
-    def write_to_system_cache(self, filename: str, issue_enums: str) -> None:
-        self.client.cache.write(f"system/{filename}", issue_enums)
-
-    def get_from_system_cache(self, filename: str) -> str | None:
-        return self.client.cache.get(f"system/{filename}")
-
-    def get_from_system_cache_decoded(self, filename: str) -> dict | None:
-        return self.client.cache.get_decoded(f"system/{filename}")
+    @property
+    def cache(self):
+        return self.client.cache
 
     def loop_issuetype_fields(self) -> Generator[Path, Any, None]:
-        for file in self.client.cache.issuetype_fields.iterdir():
+        for file in self.cache.issuetype_fields.iterdir():
             yield file
 
-    def update_issuetypes_cache(self) -> None:
-        types_filter: Callable[[dict], bool] = lambda d: int(d["id"]) <= self.client.options.type_id_cutoff \
-                and d["name"] in (
-            "Bug",
-            "Task",
-            "Epic",
-            "Story",
-            "Sub-Task",
-            "Subtask",
-            # "Incident",
-            # "New Feature",
+    def update_projects_cache(self) -> list[dict[str, Any]]:
+        url = 'project'
+        response = self.client._get(url)
+        try:
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            print(e.response.reason)
+            print(e.response.content)
+            exit()
+        payload: list[dict[str, Any]] = response.json()
+        self.cache.write_to_system_cache("projects.json", json.dumps(payload))
+        return payload
+        data = [{'id': _['id'], 'key': _['key']} for _ in response.json() if _.get('key') == self.client.options.project][0]
+        projects = [_ for _ in response.json() if _.get('key') == self.client.options.project][0]
+        self.cache.write_to_system_cache(
+            f"issuetype_fields/project.json", json.dumps(data)
         )
-        mapping = {"id": "id", "description": "description", "untranslatedName": "name"}
-        caster_functions = {"id": int}
-        issue_enums = fetch_enums(
-            self.client,
-            endpoint="issuetype",
-            filter=types_filter,
-            mapping=mapping,
-            caster_functions=caster_functions,
-        )
-        self.write_to_system_cache("issuetypes.json", json.dumps(issue_enums))
+        return data
+    
+    def get_projects(self) -> list[dict[str, Any]]:
+        if not self.client._no_read_cache:
+            projects = self.cache.get_projects_from_system_cache()
+            if projects:
+                assert isinstance(projects, list), f"To satisfy the type checker. Got: {projects}"
+                return projects
+        return self.update_projects_cache()
 
-    def get_issuetypes_names_from_cache(self) -> list[dict[str, int | str]] | None:
-        issuetypes = self.get_from_system_cache("issuetypes.json")
-        if issuetypes:
-            return json.loads(issuetypes)
-        return None
+    def update_issuetypes_cache(self) -> list[dict[str, Any]]:
+        url = 'issuetype'
+        response = self.client._get(url)
+        try:
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            print(e.response.reason)
+            print(e.response.content)
+            exit()
 
-    def update_project_field_keys(self) -> list[str]:
-        for issuetype in self.client.issues.allowed_types:
+        issuetypes: list[dict[str, Any]] = response.json()
+        assert isinstance(issuetypes, list)
+
+        self.cache.write_issuetypes_to_system_cache(issuetypes)
+        return issuetypes
+
+    def get_issuetypes(self) -> list[dict[str, Any]]:
+        if not self.client._no_read_cache:
+            from_cache = self.cache.get_issuetypes_from_system_cache()
+            if from_cache:
+                return from_cache
+        return self.update_issuetypes_cache()
+
+    def get_issuetypes_for_project(self) -> list[dict[str, Any]]:
+        data = [_ for _ in self.get_issuetypes()
+                if _.get('scope', {}).get('project', {}).get('id') == self.client.project_id]
+        self.cache.write_issuetypes_to_system_cache(data)
+        try:
+            assert len(data)
+        except AssertionError as e:
+            raise ValueError('List of issuetypes has length of zero. Something is probably very wrong.') from e
+        return data
+
+    def update_project_field_keys(self) -> list[str] | None:
+        issuetypes = self.get_issuetypes_for_project()
+        if not issuetypes:
+            raise ValueError('Issue types not initialized')
+
+        names = [_['name'] for _ in issuetypes]
+        for issuetype in names:
+            # assert issuetype in names, f'issuetypes not in names: "{issuetype}" in {names}'
+            type_id = [_['id'] for _ in issuetypes if _['name'] == issuetype][0]
             url = (
-                f"issue/createmeta"
-                f"?projectKeys={self.client.project_name}"
-                f"&issuetypeNames={issuetype}"
-                "&expand=projects.issuetypes.fields"
+                "issue/createmeta"
+                f"/{self.client.project_name}"
+                "/issuetypes/"
+                f"{type_id}"
             )
             response = self.client._get(url)
             response.raise_for_status()
-            data = response.json()
-            self.write_to_system_cache(
-                f"issuetype_fields/{issuetype}.json", json.dumps(data)
-            )
+            data: list[dict[str, Any]] = response.json()
+            self.cache.write_createmeta(issuetype, data)
         return self.client.issues.allowed_types
 
     def compile_plugins(self) -> None:
-        for input_file in self.client.cache.iter_dir("issuetype_fields"):
+        for input_file in self.cache.iter_dir("issuetype_fields"):
             with open(input_file, "r") as f:
                 content = f.read()
             # Remove the .json extension
@@ -176,11 +158,9 @@ class JiraSystemConfigLoader:
 
     def get_project_field_keys_from_cache(self) -> Dict[str, ProjectFieldKeys]:
         d: Dict[str, ProjectFieldKeys] = {}
-        for issuetype in self.client.issues.allowed_types:
+        for issuetype in self.client.issues.allowed_types or []:
             try:
-                loaded_json = self.get_from_system_cache_decoded(
-                    f"issuetype_fields/{issuetype}.json"
-                )
+                loaded_json = self.cache.get_createmeta_from_issuetype_fields_cache(issuetype)
                 issuetype_fields = IssueTypeFields.model_validate(loaded_json)
             except ValidationError as e:
                 raise CacheMissException(
@@ -192,4 +172,4 @@ class JiraSystemConfigLoader:
     def inspect(self) -> None:
         data = self.get_project_field_keys_from_cache()
         all_keys = self.get_all_keys_from_nested_dicts(data)
-        self.print_table(self.client.issues.allowed_types, all_keys, data)
+        self.print_table(self.client.issues.allowed_types or [], all_keys, data)
