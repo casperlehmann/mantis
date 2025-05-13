@@ -48,7 +48,7 @@ class Cache:
             return json.load(f)
 
     def get_issue(self, key: str) -> dict | None:
-        if self.client._no_cache:
+        if self.client._no_read_cache:
             return None
         issue_data = self.get(f"issues/{key}.json")
         if issue_data:

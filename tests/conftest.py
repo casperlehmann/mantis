@@ -83,8 +83,8 @@ def jira_client_from_fake_cli(opts_from_fake_cli):
 
 
 @pytest.fixture
-def with_no_cache(fake_jira: JiraClient):
-    fake_jira._no_cache = True
+def with_no_read_cache(fake_jira: JiraClient):
+    fake_jira._no_read_cache = True
 
 
 @pytest.fixture

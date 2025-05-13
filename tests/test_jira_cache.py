@@ -4,7 +4,7 @@ from mantis.jira import JiraClient
 
 
 def test_cache_get_caches_jira_issue(fake_jira: JiraClient):
-    assert not fake_jira._no_cache
+    assert not fake_jira._no_read_cache
     assert fake_jira.cache.get_decoded("issues/TASK-1.json") is None
 
     with open(fake_jira.cache.root / "issues/TASK-1.json", "w") as f:
@@ -14,9 +14,9 @@ def test_cache_get_caches_jira_issue(fake_jira: JiraClient):
     assert decoded == {"fields": {"status": {"name": "resolved"}}, "key": "TASK-1"}
 
 
-def test_cache_get_issue_returns_none_when_no_cache_is_set(fake_jira: JiraClient):
+def test_cache_get_issue_returns_none_when_no_read_cache_is_set(fake_jira: JiraClient):
     # Make sure nothing is cached
-    assert not fake_jira._no_cache
+    assert not fake_jira._no_read_cache
     nothing_1 = fake_jira.cache.get_issue("TASK-1")
     assert nothing_1 is None
 
@@ -27,7 +27,7 @@ def test_cache_get_issue_returns_none_when_no_cache_is_set(fake_jira: JiraClient
     assert something is not None
 
     # Deactivate the cache and make sure nothing is retrieved
-    fake_jira._no_cache = True
+    fake_jira._no_read_cache = True
     nothing_2 = fake_jira.cache.get_issue("TASK-1")
     assert nothing_2 is None
 
