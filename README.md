@@ -150,3 +150,16 @@ Customfield10002
 Customfield10003
 [...]
 ```
+
+# Persisting example payloads for tests
+
+```sh
+python main.py --action=reset
+python main.py --action=get-issue ECS-1 ECS-2 ECS-3 ECS-4 ECS-5 ECS-6
+[ECS-1] (Sample) User Authentication
+[ECS-2] (Sample) Payment Processing
+[ECS-3] (Sample) Credit Card Payment Integration
+[ECS-4] (Sample) User Registration
+[ECS-5] (Sample) Order Confirmation
+[ECS-6] (Sample) User Login
+```
