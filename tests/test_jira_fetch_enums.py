@@ -175,7 +175,7 @@ def test_print_table_raises_on_non_existent_key(fake_jira: "JiraClient", capsys)
         config_loader.print_table(["non-existent"], {"placeholder"}, data_in)
 
 
-def test_get_project_field_keys_from_cache(fake_jira: "JiraClient"):
+def test_get_project_field_keys_from_cache(fake_jira: "JiraClient", with_fake_allowed_types):
     config_loader = fake_jira.system_config_loader
     with pytest.raises(CacheMissException):
         config_loader.get_project_field_keys_from_cache()

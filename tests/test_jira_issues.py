@@ -88,7 +88,7 @@ def test_jira_issues_get_real(jira_client_from_user_toml):
 
 
 @patch("mantis.jira.jira_client.requests.post")
-def test_jira_issues_create(mock_post, fake_jira: JiraClient):
+def test_jira_issues_create(mock_post, fake_jira: JiraClient, with_fake_allowed_types):
     mock_post.return_value.json.return_value = {}
     with pytest.raises(ValueError):
         issue = fake_jira.issues.create(issuetype="Bug", title="Tester", data={})
