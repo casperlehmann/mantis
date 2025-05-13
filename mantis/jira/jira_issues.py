@@ -28,7 +28,7 @@ class JiraIssue:
         # https://docs.pydantic.dev/1.10/datamodel_code_generator/
 
     def get(self, key: str, default: Any = None) -> dict | None:
-        return self.data.get(key, default)
+        return self.data.get(key, default) or default
 
     @property
     def fields(self) -> dict:
@@ -39,7 +39,7 @@ class JiraIssue:
 
     def get_field(self, key: str, default: Any = None) -> Any:
         # Note that the key can exist and the value can still be None
-        return self.fields.get(key, default)
+        return self.fields.get(key, default) or default
 
 
 class JiraIssues:
