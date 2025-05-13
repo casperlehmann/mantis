@@ -1,6 +1,7 @@
 import json
 import os
 from pathlib import Path
+import shutil
 from typing import TYPE_CHECKING, Any, Generator
 
 if TYPE_CHECKING:
@@ -14,6 +15,15 @@ class CacheMissException(Exception):
 class Cache:
     def __init__(self, jira_client: "JiraClient") -> None:
         self.client = jira_client
+        self.root.mkdir(exist_ok=True)
+        self.issues.mkdir(exist_ok=True)
+        self.system.mkdir(exist_ok=True)
+        self.issuetype_fields.mkdir(exist_ok=True)
+
+    def invalidate(self) -> None:
+        if self.root.exists():
+            # This violently removes everything. Don't store anything important in the cache.
+            shutil.rmtree(self.root)
         self.root.mkdir(exist_ok=True)
         self.issues.mkdir(exist_ok=True)
         self.system.mkdir(exist_ok=True)
