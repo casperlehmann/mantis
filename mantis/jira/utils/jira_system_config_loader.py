@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Dict, Generator, Mapping
+from typing import TYPE_CHECKING, Any, Dict, Generator, Mapping
 
 from datamodel_code_generator import DataModelType, InputFileType, generate
 from pydantic import ValidationError
