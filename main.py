@@ -44,6 +44,8 @@ if __name__ == '__main__':
 
         from plugins.plugins_test import Schema
         print(Schema(type='a', system='b'))
+    elif jira_options.action == 'invalidate-cache':
+        jira.cache.invalidate()
     else:
         print(f'Action {jira_options.action} not recognized')
 
