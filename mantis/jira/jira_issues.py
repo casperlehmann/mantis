@@ -60,7 +60,7 @@ class JiraIssues:
             self.allowed_types = [str(_.get("name")) for _ in sorted_cached_issuetypes]
 
     def get(self, key: str) -> JiraIssue:
-        if not self.client._no_cache:
+        if not self.client._no_read_cache:
             issue_from_cache = self.client.cache.get_issue(key)
             if issue_from_cache:
                 return JiraIssue(self.client, issue_from_cache)
@@ -70,8 +70,7 @@ class JiraIssues:
         except HTTPError as e:
             self.handle_http_error(e, key)
         data: dict[str, dict] = response.json()
-        if not self.client._no_cache:
-            self.client.cache.write_issue(key, data)
+        self.client.cache.write_issue(key, data)
         return JiraIssue(self.client, data)
 
     def create(self, issue_type: str, title: str, data: dict) -> dict:

@@ -16,8 +16,8 @@ def test_jira_issues_get_fake(fake_jira: JiraClient):
     assert task_1.get("fields", {}).get("status") == {"name": "resolved"}
 
 
-def test_jira_issues_get_mocked(fake_jira: JiraClient, with_no_cache):
-    assert fake_jira._no_cache is True
+def test_jira_issues_get_mocked(fake_jira: JiraClient, with_no_read_cache):
+    assert fake_jira._no_read_cache is True
     expected = {"key": "TASK-1", "fields": {"status": {"name": "resolved"}}}
     mock_response = Mock()
     mock_response.status_code = 200
@@ -31,7 +31,7 @@ def test_jira_issues_get_mocked(fake_jira: JiraClient, with_no_cache):
     assert task_1.get("fields", {}).get("status") == {"name": "resolved"}
 
 
-def test_jira_issues_get_non_existent(with_no_cache, fake_jira: JiraClient):
+def test_jira_issues_get_non_existent(with_no_read_cache, fake_jira: JiraClient):
     mock_response = Mock()
     mock_response.reason = "Not Found"
     mock_response.raise_for_status.side_effect = HTTPError()
@@ -144,7 +144,7 @@ def test_jira_no_issues_fields_raises(fake_jira: JiraClient, mock_post_request):
 
 
 def test_jira_issues_cached_issuetypes_parses_allowed_types(fake_jira: JiraClient):
-    fake_jira._no_cache = False
+    fake_jira._no_read_cache = False
     cached_issuetypes = [{"id": 1, "name": "Bug"}, {"id": 2, "name": "Task"}]
     fake_jira.system_config_loader.get_issuetypes_names_from_cache = (
         lambda *args, **kwargs: cached_issuetypes
@@ -154,7 +154,7 @@ def test_jira_issues_cached_issuetypes_parses_allowed_types(fake_jira: JiraClien
 
 
 def test_jira_issues_get_does_write_to_cache(fake_jira: JiraClient):
-    fake_jira._no_cache = False
+    fake_jira._no_read_cache = False
     assert fake_jira.cache.get_issue("TASK-1") is None
     assert len([file for file in fake_jira.cache.issues.iterdir()]) == 0
     issue = fake_jira.issues.get("TASK-1")
@@ -166,7 +166,7 @@ def test_jira_issues_get_does_write_to_cache(fake_jira: JiraClient):
 
 
 def test_jira_issues_get_does_retrieve_from_cache(fake_jira: JiraClient):
-    fake_jira._no_cache = False
+    fake_jira._no_read_cache = False
     data = {"redacted": "True"}
     with open(fake_jira.cache.issues / "TASK-1.json", "w") as f:
         json.dump(data, f)
