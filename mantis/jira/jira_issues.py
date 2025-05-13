@@ -43,21 +43,31 @@ class JiraIssue:
 
 
 class JiraIssues:
-    allowed_types = ["Story", "Sub-Task", "Epic", "Bug", "Task"]
+    _allowed_types: list[str] | None = None
 
     def __init__(self, client: "JiraClient"):
         self.client = client
+
+    def load_allowed_types(self) -> None:
         cached_issuetypes = (
-            client.system_config_loader.get_issuetypes_names_from_cache()
+            self.client.system_config_loader.get_issuetypes_for_project()
         )
-        if cached_issuetypes:
-            assert isinstance(cached_issuetypes, list)
-            assert isinstance(cached_issuetypes[0], dict)
-            assert isinstance(cached_issuetypes[0]["id"], int)
-            sorted_cached_issuetypes = sorted(
-                cached_issuetypes, key=lambda x: str(x.get("id"))
-            )
-            self.allowed_types = [str(_.get("name")) for _ in sorted_cached_issuetypes]
+        if not cached_issuetypes:
+            return None
+        assert isinstance(cached_issuetypes, list)
+        assert isinstance(cached_issuetypes[0], dict)
+        assert isinstance(cached_issuetypes[0]["id"], str), f'Unexpected type of cached_issuetypes[0]["id"]: {cached_issuetypes[0]["id"]} ({type(cached_issuetypes[0]["id"])})'
+        sorted_cached_issuetypes = sorted(
+            cached_issuetypes, key=lambda x: str(x.get("id"))
+        )
+        assert len(sorted_cached_issuetypes), 'List sorted_cached_issuetypes must not be empty'
+        self._allowed_types = [_.get("name", '') for _ in sorted_cached_issuetypes]
+
+    @property
+    def allowed_types(self) -> list[str] | None:
+        if self._allowed_types is None:
+            self.load_allowed_types()
+        return self._allowed_types
 
     def get(self, key: str) -> JiraIssue:
         if not self.client._no_read_cache:
@@ -74,7 +84,7 @@ class JiraIssues:
         return JiraIssue(self.client, data)
 
     def create(self, issuetype: str, title: str, data: dict) -> dict:
-        assert issuetype in self.allowed_types
+        assert self.allowed_types and issuetype in self.allowed_types
         if len(data.keys()) == 0:
             raise ValueError("The data object is an empty payload")
         print(f"Create issue ({issuetype}): {title}")

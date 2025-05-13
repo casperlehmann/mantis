@@ -1,3 +1,5 @@
+from pprint import pprint
+import re
 import requests
 
 from pathlib import Path
@@ -13,6 +15,9 @@ if TYPE_CHECKING:
 
 
 class JiraClient:
+
+    _project_id: None | str = None
+
     def __init__(
         self, jira_option: "JiraOptions", auth: "JiraAuth", no_cache: bool = False
     ):
@@ -44,6 +49,24 @@ class JiraClient:
         return self.options.project
     
     @property
+    def project_id(self) -> str:
+        if self._project_id:
+            # Will be loaded when downloading issuetypes
+            return self._project_id
+        projects = self.system_config_loader.get_projects()
+        assert isinstance(projects, list), f"To satisfy the type checker. Got: {projects}"
+        for project in projects:
+            if project.get('key') == self.project_name:
+                project_id = project.get('id')
+                break
+        else:
+            raise RuntimeError('Could not find matching project id')
+        assert isinstance(project_id, str), f'project_id should be a str. Got: {project_id} ({type(project_id)})'
+        assert re.match(r'^[0-9]*$', project_id), f'project_id must be numeric. Got: {project_id}'
+        self._project_id = project_id
+        return self._project_id
+    
+    @property
     def api_url(self) -> str:
         assert self.options.url
         return self.options.url + "/rest/api/latest"
@@ -61,6 +84,20 @@ class JiraClient:
 
     def post_issue(self, data: dict) -> requests.Response:
         return self._post("issue", data=data)
+
+    def warmup(self) -> None:
+        self.system_config_loader.update_projects_cache()
+        assert not self.cache.get_issuetypes_from_system_cache()
+        self.system_config_loader.update_issuetypes_cache()
+        self.system_config_loader.get_issuetypes()
+        assert self.cache.get_issuetypes_from_system_cache()
+        resp = self.system_config_loader.update_project_field_keys()
+        pprint(resp)
+
+    def get_projects(self) -> None:
+        projects = self.cache.get_projects_from_system_cache()
+        if not projects:
+            raise ValueError('Projects not initialized')
 
     def get_current_user(self) -> dict[str, str]:
         response = self._get("myself")
