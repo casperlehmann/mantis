@@ -112,10 +112,10 @@ def test_update_project_field_keys(mock_get, fake_jira: JiraClient):
     if not (fake_jira.cache.issuetype_fields / 'createmeta_testtype.json').exists():
         raise FileNotFoundError('File "createmeta_testtype.json" should have been created')
     assert 'Testtype' in (allowed_types or []), f"Testtype not in allowed_types: {allowed_types}"
-    fake_jira._no_read_cache = False
+    # fake_jira._no_read_cache = False
     with open(fake_jira.cache.issuetype_fields / "createmeta_testtype.json", "r") as f:
         assert f.read() == '{"name": "Testtype"}'
-    fake_jira._no_read_cache = True
+    # fake_jira._no_read_cache = True
 
 
 @patch("mantis.jira.jira_client.requests.get")

@@ -144,7 +144,6 @@ def test_jira_no_issues_fields_raises(fake_jira: JiraClient, mock_post_request):
 
 
 def test_jira_issues_cached_issuetypes_parses_allowed_types(fake_jira: JiraClient):
-    fake_jira._no_read_cache = False
     cached_issuetypes = [{"id": '1', "name": "Bug", 'scope': {'project': {'id': '10000'}}},
                          {"id": '2', "name": "Task", 'scope': {'project': {'id': '10000'}}}]
     fake_jira.system_config_loader.get_issuetypes_for_project = (
@@ -156,7 +155,6 @@ def test_jira_issues_cached_issuetypes_parses_allowed_types(fake_jira: JiraClien
     assert fake_jira.issues._allowed_types
 
 def test_jira_issues_get_does_write_to_cache(fake_jira: JiraClient):
-    fake_jira._no_read_cache = False
     assert fake_jira.cache.get_issue("TASK-1") is None
     assert len([file for file in fake_jira.cache.issues.iterdir()]) == 0
     issue = fake_jira.issues.get("TASK-1")
@@ -168,7 +166,6 @@ def test_jira_issues_get_does_write_to_cache(fake_jira: JiraClient):
 
 
 def test_jira_issues_get_does_retrieve_from_cache(fake_jira: JiraClient):
-    fake_jira._no_read_cache = False
     data = {"redacted": "True"}
     with open(fake_jira.cache.issues / "TASK-1.json", "w") as f:
         json.dump(data, f)
