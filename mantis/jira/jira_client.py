@@ -1,3 +1,4 @@
+from pprint import pprint
 import re
 import requests
 
@@ -18,12 +19,12 @@ class JiraClient:
     _project_id: None | str = None
 
     def __init__(
-        self, jira_option: "JiraOptions", auth: "JiraAuth", no_cache: bool = False
+        self, jira_option: "JiraOptions", auth: "JiraAuth", no_read_cache: bool = False
     ):
         self.options = jira_option
         self.auth = auth.auth
         self.no_verify_ssl = auth.no_verify_ssl
-        self._no_cache = no_cache
+        self._no_read_cache = no_read_cache
         self.requests_kwargs: dict[str, 'HTTPBasicAuth | bool | dict[str, Any]'] = {
             "auth": self.auth,
             "headers": {"Content-Type": "application/json"},
@@ -83,6 +84,21 @@ class JiraClient:
 
     def post_issue(self, data: dict) -> requests.Response:
         return self._post("issue", data=data)
+
+    def warmup(self):
+        self.cache.invalidate()
+        self.system_config_loader.update_projects_cache()
+        assert not self.cache.get_issuetypes_from_system_cache()
+        self.system_config_loader.update_issuetypes_cache()
+        self.system_config_loader.get_issuetypes()
+        assert self.cache.get_issuetypes_from_system_cache()
+        resp = self.system_config_loader.update_project_field_keys()
+        pprint(resp)
+
+    def get_projects(self):
+        projects = self.cache.get_projects_from_system_cache()
+        if not projects:
+            raise ValueError('Projects not initialized')
 
     def get_current_user(self) -> dict[str, str]:
         response = self._get("myself")

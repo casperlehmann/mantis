@@ -83,8 +83,8 @@ def jira_client_from_fake_cli(opts_from_fake_cli):
 
 
 @pytest.fixture
-def with_no_cache(fake_jira: JiraClient):
-    fake_jira._no_cache = True
+def with_no_read_cache(fake_jira: JiraClient):
+    fake_jira._no_read_cache = True
 
 
 @pytest.fixture
@@ -104,6 +104,9 @@ def with_fake_plugins_dir(opts_from_fake_cli, tmp_path: Path):
     (tmp_path / "plugins").mkdir(exist_ok=True)
     opts_from_fake_cli.plugins_dir = tmp_path / "plugins"
 
+@pytest.fixture
+def with_fake_allowed_types(fake_jira: JiraClient):
+    fake_jira.issues._allowed_types = ["Story", "Subtask", "Epic", "Bug", "Task", "Testtype"]
 
 @pytest.fixture
 def fake_jira(

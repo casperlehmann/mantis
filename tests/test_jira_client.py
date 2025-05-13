@@ -14,7 +14,8 @@ def test_jira_options_override(mock_get, fake_jira: JiraClient):
 
 def test_cache_exists(fake_jira: JiraClient):
     assert str(fake_jira.cache.root) != ".jira_cache_test"
-    assert len(list(fake_jira.cache.root.iterdir())) == 2
+    list_of = [str(_).split('/')[-1] for _ in fake_jira.cache.root.iterdir()]
+    assert len(list(fake_jira.cache.root.iterdir())) == 2, f'Iter root: {list_of}'
     for item in fake_jira.cache.root.iterdir():
         assert item.name in ("system", "issues")
     assert len(list(fake_jira.cache.system.iterdir())) == 1

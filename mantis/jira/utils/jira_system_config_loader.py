@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+import re
 from typing import TYPE_CHECKING, Any, Callable, Dict, Generator, Mapping
 
 from datamodel_code_generator import DataModelType, InputFileType, generate
@@ -13,56 +14,6 @@ if TYPE_CHECKING:
     from mantis.jira.jira_client import JiraClient
 
 
-def fetch_enums(
-    jira: "JiraClient",
-    endpoint: str = "issuetype",
-    filter: Callable[[dict], bool] | None = None,
-    mapping: dict = {},
-    caster_functions: dict = {},
-) -> list:
-    """Get the enums of the fields in a jira tenant
-
-    Args:
-        jira (_type_): Client for connecting to the endpoint.
-        endpoint (str, optional): The endpoint for the specific field. Defaults to 'issuetype'.
-        filter (_type_, optional): Filters the return value if set. Defaults to None.
-        mapping (dict, optional): Renames an internal field name in the Jira api to something custom. Defaults to {}.
-        caster_functions (dict, optional): Casts fields using custom conversion functions. Defaults to {}.
-
-    Returns:
-        _type_: _description_
-
-    Example for /rest/api/2/issuetype:
-        types_filter = lambda d: int(d['id']) < 100 and d['name'] in ('Bug', 'Task', 'Epic',
-                                 'Story', 'Incident', 'New Feature', 'Sub-Task')
-        mapping = {'id': 'id', 'description': 'description', 'untranslatedName': 'name'}
-        caster_functions = {'id': int}
-        issue_enums = fetch_enums(jira, endpoint = 'issuetype', filter = types_filter,
-                                  mapping = mapping, caster_functions = caster_functions)
-
-    See https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issue-types/#api-rest-api-2-issuetype-get
-    """
-    response = jira._get(f"/{endpoint}")
-    response.raise_for_status()
-    data = response.json()
-    schemas = []
-    for entry in data:
-        schema = {}
-        if mapping:
-            for api_name, rename in mapping.items():
-                cast = caster_functions.get(rename, lambda unchanged: unchanged)
-                api_value = cast(entry.get(api_name))
-                schema[rename] = api_value
-        else:
-            for api_name, api_value in entry.items():
-                cast = caster_functions.get(api_name, lambda unchanged: unchanged)
-                api_value = cast(entry.get(api_name))
-                schema[api_name] = api_value
-        if not filter or filter(schema):
-            schemas.append(schema)
-    return schemas
-
-
 class JiraSystemConfigLoader:
     def __init__(self, client: "JiraClient") -> None:
         self.client = client
@@ -71,15 +22,15 @@ class JiraSystemConfigLoader:
     def cache(self):
         return self.client.cache
 
+    def loop_issuetype_fields(self) -> Generator[Path, Any, None]:
+        for file in self.cache.issuetype_fields.iterdir():
+            yield file
+
     def get_from_system_cache(self, file_name: str) -> str | None:
         return self.client.cache.get(f"system/{file_name}")
 
     def get_from_system_cache_decoded(self, file_name: str) -> dict | None:
         return self.client.cache.get_decoded(f"system/{file_name}")
-
-    def loop_issue_type_fields(self) -> Generator[Path, Any, None]:
-        for file in self.client.cache.issue_type_fields.iterdir():
-            yield file
 
     def update_projects_cache(self) -> list[dict[str, Any]]:
         url = 'project'
@@ -163,7 +114,7 @@ class JiraSystemConfigLoader:
         return self.client.issues.allowed_types
 
     def compile_plugins(self) -> None:
-        for input_file in self.client.cache.iter_dir("issue_type_fields"):
+        for input_file in self.cache.iter_dir("issue_type_fields"):
             with open(input_file, "r") as f:
                 content = f.read()
             # Remove the .json extension
@@ -214,11 +165,9 @@ class JiraSystemConfigLoader:
 
     def get_project_field_keys_from_cache(self) -> Dict[str, ProjectFieldKeys]:
         d: Dict[str, ProjectFieldKeys] = {}
-        for issue_type in self.client.issues.allowed_types:
+        for issue_type in self.client.issues.allowed_types or []:
             try:
-                loaded_json = self.get_from_system_cache_decoded(
-                    f"issue_type_fields/{issue_type}.json"
-                )
+                loaded_json = self.cache.get_createmeta_from_issue_type_fields_cache(issue_type)
                 issue_type_fields = IssueTypeFields.model_validate(loaded_json)
             except ValidationError as e:
                 raise CacheMissException(
@@ -230,4 +179,4 @@ class JiraSystemConfigLoader:
     def inspect(self) -> None:
         data = self.get_project_field_keys_from_cache()
         all_keys = self.get_all_keys_from_nested_dicts(data)
-        self.print_table(self.client.issues.allowed_types, all_keys, data)
+        self.print_table(self.client.issues.allowed_types or [], all_keys, data)
