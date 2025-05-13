@@ -27,7 +27,7 @@ class Draft:
         summary = self.issue.get_field("summary")
         issuetype = self.issue.get_field("issuetype").get("name")
         assignee = self.issue.get_field("assignee", {})
-        assignee = assignee.get("displayName")
+        assignee_name = assignee.get("displayName")
         description = self.issue.get_field("description")
 
         with open(self.jira.drafts_dir / f"{key}.md", "w") as f:
@@ -38,7 +38,7 @@ class Draft:
             f.write(f"parent: {parent}\n")
             f.write(f"summary: {summary}\n")
             f.write(f"issuetype: {issuetype}\n")
-            f.write(f"assignee: {assignee}\n")
+            f.write(f"assignee: {assignee_name}\n")
             f.write("---\n")
             f.write(f"# {summary}\n")
             f.write("\n")
