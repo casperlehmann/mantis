@@ -67,8 +67,10 @@ class JiraSystemConfigLoader:
     def __init__(self, client: "JiraClient") -> None:
         self.client = client
 
-    def write_to_system_cache(self, file_name: str, issue_enums: str) -> None:
-        self.client.cache.write(f"system/{file_name}", issue_enums)
+    @property
+    def cache(self):
+        return self.client.cache
+
 
     def get_from_system_cache(self, file_name: str) -> str | None:
         return self.client.cache.get(f"system/{file_name}")
