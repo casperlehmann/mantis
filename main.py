@@ -15,9 +15,12 @@ if __name__ == '__main__':
     elif jira_options.action == 'me-as-assignee':
         print(jira.get_current_user_as_assignee())
     elif jira_options.action == 'fetch-issuetypes':
-        jira.system_config_loader.update_issuetypes_cache()
+        jira.system_config_loader.get_issuetypes()
         print('Updated local cache for issuetypes:')
-        pprint(jira.system_config_loader.get_issuetypes_names_from_cache())
+        pprint(jira.cache.get_issuetypes_from_system_cache())
+    elif jira_options.action == 'fetch-types':
+        x = jira.system_config_loader.get_issuetypes()
+        pprint (x)
     elif jira_options.action == 'get-issue':
         for issue_key in jira_options.issues:
             issue = jira.issues.get(key=issue_key)
