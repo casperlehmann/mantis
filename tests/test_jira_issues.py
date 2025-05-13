@@ -6,7 +6,7 @@ from unittest.mock import Mock, patch
 import pytest
 from requests.models import HTTPError
 
-from mantis.jira import JiraAuth, JiraClient
+from mantis.jira import JiraClient
 from mantis.jira.jira_issues import JiraIssues, process_key
 
 

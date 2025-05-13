@@ -1,11 +1,8 @@
-import inspect
-import json
-import os
 from unittest.mock import patch
 
 import pytest
 
-from mantis.jira import JiraAuth, JiraClient
+from mantis.jira import JiraClient
 from mantis.jira.utils.cache import CacheMissException
 from mantis.jira.utils.jira_types import ProjectFieldKeys
 from tests.data import get_issuetypes_response, update_projects_cache_response
