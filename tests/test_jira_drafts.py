@@ -1,9 +1,7 @@
-from pathlib import Path
-
 import pytest
 
 from mantis.drafts import Draft
-from mantis.jira import JiraAuth, JiraClient
+from mantis.jira import JiraClient
 from mantis.jira.jira_issues import JiraIssue
 
 
