@@ -20,7 +20,7 @@ class Cache:
         self.system.mkdir(exist_ok=True)
         self.issuetype_fields.mkdir(exist_ok=True)
 
-    def invalidate(self):
+    def invalidate(self) -> None:
         if self.root.exists:
             # This violently removes everything. Don't store anything important in the cache.
             shutil.rmtree(self.root)
