@@ -35,16 +35,16 @@ class Cache:
     def issue_type_fields(self) -> Path:
         return self.system / "issue_type_fields"
 
-    def get(self, file_name: str) -> str | None:
-        if not (self.root / file_name).exists():
+    def get(self, filename: str) -> str | None:
+        if not (self.root / filename).exists():
             return None
-        with open(self.root / file_name, "r") as f:
+        with open(self.root / filename, "r") as f:
             return f.read()
 
-    def get_decoded(self, file_name: str) -> dict | None:
-        if not (self.root / file_name).exists():
+    def get_decoded(self, filename: str) -> dict | None:
+        if not (self.root / filename).exists():
             return None
-        with open(self.root / file_name, "r") as f:
+        with open(self.root / filename, "r") as f:
             return json.load(f)
 
     def get_issue(self, key: str) -> dict | None:
@@ -55,17 +55,17 @@ class Cache:
             return json.loads(issue_data)
         return None
 
-    def write(self, file_name: str, contents: str) -> int:
-        with open(self.root / file_name, "w") as f:
+    def write(self, filename: str, contents: str) -> int:
+        with open(self.root / filename, "w") as f:
             return f.write(contents)
 
     def write_issue(self, key: str, data: dict) -> int:
         return self.write(f"issues/{key}.json", json.dumps(data))
 
-    def remove(self, file_name: str) -> bool:
-        if not (self.root / file_name).exists():
+    def remove(self, filename: str) -> bool:
+        if not (self.root / filename).exists():
             return False
-        os.remove(self.root / file_name)
+        os.remove(self.root / filename)
         return True
 
     def remove_issue(self, key: str) -> bool:

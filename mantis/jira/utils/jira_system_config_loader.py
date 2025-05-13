@@ -66,14 +66,14 @@ class JiraSystemConfigLoader:
     def __init__(self, client: "JiraClient") -> None:
         self.client = client
 
-    def write_to_system_cache(self, file_name: str, issue_enums: str) -> None:
-        self.client.cache.write(f"system/{file_name}", issue_enums)
+    def write_to_system_cache(self, filename: str, issue_enums: str) -> None:
+        self.client.cache.write(f"system/{filename}", issue_enums)
 
-    def get_from_system_cache(self, file_name: str) -> str | None:
-        return self.client.cache.get(f"system/{file_name}")
+    def get_from_system_cache(self, filename: str) -> str | None:
+        return self.client.cache.get(f"system/{filename}")
 
-    def get_from_system_cache_decoded(self, file_name: str) -> dict | None:
-        return self.client.cache.get_decoded(f"system/{file_name}")
+    def get_from_system_cache_decoded(self, filename: str) -> dict | None:
+        return self.client.cache.get_decoded(f"system/{filename}")
 
     def loop_issue_type_fields(self) -> Generator[Path, Any, None]:
         for file in self.client.cache.issue_type_fields.iterdir():
