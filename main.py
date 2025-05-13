@@ -49,6 +49,8 @@ if __name__ == '__main__':
         print(Schema(type='a', system='b'))
     elif jira_options.action == 'invalidate-cache':
         jira.cache.invalidate()
+    elif jira_options.action == 'reset':
+        jira.warmup()
     else:
         print(f'Action {jira_options.action} not recognized')
 
