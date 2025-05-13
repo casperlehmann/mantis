@@ -85,7 +85,6 @@ class JiraClient:
     def post_issue(self, data: dict) -> requests.Response:
         return self._post("issue", data=data)
 
-        self.cache.invalidate()
     def warmup(self) -> None:
         self.system_config_loader.update_projects_cache()
         assert not self.cache.get_issuetypes_from_system_cache()
