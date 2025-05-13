@@ -22,7 +22,6 @@ def json_response(mock_get_request):
 
 
 def test_jira_draft(fake_jira: JiraClient, json_response):
-    fake_jira._no_read_cache = True
     assert str(fake_jira.cache.root) != ".jira_cache_test"
     assert str(fake_jira.drafts_dir) != "drafts_test"
     # assert str(fake_jira.cache.root) != str(fake_jira.drafts_dir)
