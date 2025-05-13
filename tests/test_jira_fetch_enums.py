@@ -8,6 +8,7 @@ from mantis.jira import JiraAuth, JiraClient
 from mantis.jira.utils.cache import CacheMissException
 from mantis.jira.utils.jira_system_config_loader import fetch_enums
 from mantis.jira.utils.jira_types import ProjectFieldKeys
+from tests.data import get_issuetypes_response, update_projects_cache_response
 from tests.test_jira_types import ISSUETYPEFIELDS
 
 VAL = [
@@ -191,7 +192,7 @@ def test_fetch_issuetype_enums_real_no_casting(jira_client_from_user_toml):
 def test_config_loader_update_issuetypes_writes_to_cache(
     mock_get, fake_jira: JiraClient
 ):
-    mock_get.return_value.json.return_value = VAL
+    mock_get.return_value.json.return_value = get_issuetypes_response
     config_loader = fake_jira.system_config_loader
     assert (
         len(list(fake_jira.cache.system.iterdir())) == 1
@@ -205,7 +206,7 @@ def test_config_loader_update_issuetypes_writes_to_cache(
 
 @patch("mantis.jira.jira_client.requests.get")
 def test_config_loader_get_issuetypes_names_from_cache(mock_get, fake_jira: JiraClient):
-    mock_get.return_value.json.return_value = VAL
+    mock_get.return_value.json.return_value = get_issuetypes_response
     config_loader = fake_jira.system_config_loader
     with open(fake_jira.cache.system / "issue_types.json", "w") as f:
         f.write('{"a": "b"}')
@@ -215,7 +216,7 @@ def test_config_loader_get_issuetypes_names_from_cache(mock_get, fake_jira: Jira
 
 @patch("mantis.jira.jira_client.requests.get")
 def test_config_loader_loop_yields_files(mock_get, fake_jira: JiraClient):
-    mock_get.return_value.json.return_value = VAL
+    mock_get.return_value.json.return_value = get_issuetypes_response
     config_loader = fake_jira.system_config_loader
     assert len(list(config_loader.loop_issue_type_fields())) == 0
     # cache something

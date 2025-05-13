@@ -1,0 +1,30 @@
+update_projects_cache_response = [{
+    "expand": "description,lead,issueTypes,url,projectKeys,permissions,insight",
+    "self": "https://",
+    "id": "10001",
+    "key": "LEARNJIRA",
+    "name": "(Learn) Jira Premium benefits in 5 min 👋",
+    "avatarUrls": {},
+    "projectTypeKey": "software",
+    "simplified":True,
+    "style": "next-gen",
+    "isPrivate":False,
+    "properties": {},
+    "entityId": "fba6ffc9-d429-408f-8495-00edce965d92",
+    "uuid": "fba6ffc9-d429-408f-8495-00edce965d92"
+},
+{
+    "expand": "description,lead,issueTypes,url,projectKeys,permissions,insight",
+    "self": "https://",
+    "id": "10000",
+    "key": "TEST",
+    "name": "TEST",
+    "avatarUrls": {},
+    "projectTypeKey": "software",
+    "simplified":True,
+    "style": "next-gen",
+    "isPrivate":False,
+    "properties": {},
+    "entityId": "f853ead8-876c-46a8-9dbe-6479d9f03449",
+    "uuid": "f853ead8-876c-46a8-9dbe-6479d9f03449"
+}]
