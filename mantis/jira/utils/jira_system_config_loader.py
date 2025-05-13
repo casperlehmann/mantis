@@ -75,8 +75,8 @@ class JiraSystemConfigLoader:
     def get_from_system_cache_decoded(self, filename: str) -> dict | None:
         return self.client.cache.get_decoded(f"system/{filename}")
 
-    def loop_issue_type_fields(self) -> Generator[Path, Any, None]:
-        for file in self.client.cache.issue_type_fields.iterdir():
+    def loop_issuetype_fields(self) -> Generator[Path, Any, None]:
+        for file in self.client.cache.issuetype_fields.iterdir():
             yield file
 
     def update_issuetypes_cache(self) -> None:
@@ -100,32 +100,32 @@ class JiraSystemConfigLoader:
             mapping=mapping,
             caster_functions=caster_functions,
         )
-        self.write_to_system_cache("issue_types.json", json.dumps(issue_enums))
+        self.write_to_system_cache("issuetypes.json", json.dumps(issue_enums))
 
     def get_issuetypes_names_from_cache(self) -> list[dict[str, int | str]] | None:
-        issuetypes = self.get_from_system_cache("issue_types.json")
+        issuetypes = self.get_from_system_cache("issuetypes.json")
         if issuetypes:
             return json.loads(issuetypes)
         return None
 
     def update_project_field_keys(self) -> list[str]:
-        for issue_type in self.client.issues.allowed_types:
+        for issuetype in self.client.issues.allowed_types:
             url = (
                 f"issue/createmeta"
                 f"?projectKeys={self.client.project_name}"
-                f"&issuetypeNames={issue_type}"
+                f"&issuetypeNames={issuetype}"
                 "&expand=projects.issuetypes.fields"
             )
             response = self.client._get(url)
             response.raise_for_status()
             data = response.json()
             self.write_to_system_cache(
-                f"issue_type_fields/{issue_type}.json", json.dumps(data)
+                f"issuetype_fields/{issuetype}.json", json.dumps(data)
             )
         return self.client.issues.allowed_types
 
     def compile_plugins(self) -> None:
-        for input_file in self.client.cache.iter_dir("issue_type_fields"):
+        for input_file in self.client.cache.iter_dir("issuetype_fields"):
             with open(input_file, "r") as f:
                 content = f.read()
             # Remove the .json extension
@@ -144,29 +144,29 @@ class JiraSystemConfigLoader:
     ) -> set[str]:
         d: dict[str, list[str]] = {}
         all_field_keys: set[str] = set()
-        for issue_type, field_keys in data.items():
-            d[issue_type] = field_keys.fields
-            all_field_keys = all_field_keys.union(set(d[issue_type]))
+        for issuetype, field_keys in data.items():
+            d[issuetype] = field_keys.fields
+            all_field_keys = all_field_keys.union(set(d[issuetype]))
         return all_field_keys
 
     def print_table(
         self,
         column_order: list[str],
         all_field_keys: set[str],
-        issue_type_field_map: Mapping[str, ProjectFieldKeys],
+        issuetype_field_map: Mapping[str, ProjectFieldKeys],
     ) -> None:
         def print_header_footer() -> None:
             print(f"{'':<20} - ", end="")
-            for issue_type_name in column_order:
-                if issue_type_name not in issue_type_field_map.keys():
+            for issuetype_name in column_order:
+                if issuetype_name not in issuetype_field_map.keys():
                     raise ValueError("column_order contains non-existent key")
-                print(f"{issue_type_name:<10}", end="")
+                print(f"{issuetype_name:<10}", end="")
             print()
 
         print_header_footer()
         for each in all_field_keys:
             print(f"{each:<20} - ", end="")
-            for _, project_field_keys in issue_type_field_map.items():
+            for _, project_field_keys in issuetype_field_map.items():
                 print(
                     f"{'1   ' if each in project_field_keys.fields else '':<10}",
                     end="",
@@ -176,17 +176,17 @@ class JiraSystemConfigLoader:
 
     def get_project_field_keys_from_cache(self) -> Dict[str, ProjectFieldKeys]:
         d: Dict[str, ProjectFieldKeys] = {}
-        for issue_type in self.client.issues.allowed_types:
+        for issuetype in self.client.issues.allowed_types:
             try:
                 loaded_json = self.get_from_system_cache_decoded(
-                    f"issue_type_fields/{issue_type}.json"
+                    f"issuetype_fields/{issuetype}.json"
                 )
-                issue_type_fields = IssueTypeFields.model_validate(loaded_json)
+                issuetype_fields = IssueTypeFields.model_validate(loaded_json)
             except ValidationError as e:
                 raise CacheMissException(
-                    f"issue_type {issue_type} does not exist. Did you remember to download types?"
+                    f"issuetype {issuetype} does not exist. Did you remember to download types?"
                 ) from e
-            d[issue_type] = ProjectFieldKeys(issue_type, issue_type_fields)
+            d[issuetype] = ProjectFieldKeys(issuetype, issuetype_fields)
         return d
 
     def inspect(self) -> None:

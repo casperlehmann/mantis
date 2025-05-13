@@ -17,7 +17,7 @@ class Cache:
         self.root.mkdir(exist_ok=True)
         self.issues.mkdir(exist_ok=True)
         self.system.mkdir(exist_ok=True)
-        self.issue_type_fields.mkdir(exist_ok=True)
+        self.issuetype_fields.mkdir(exist_ok=True)
 
     @property
     def root(self) -> Path:
@@ -32,8 +32,8 @@ class Cache:
         return self.root / "system"
 
     @property
-    def issue_type_fields(self) -> Path:
-        return self.system / "issue_type_fields"
+    def issuetype_fields(self) -> Path:
+        return self.system / "issuetype_fields"
 
     def get(self, filename: str) -> str | None:
         if not (self.root / filename).exists():
@@ -72,6 +72,6 @@ class Cache:
         return self.remove(f"issues/{key}.json")
 
     def iter_dir(self, identifier: str) -> Generator[Path, None, None]:
-        if identifier == "issue_type_fields":
-            for file in self.issue_type_fields.iterdir():
+        if identifier == "issuetype_fields":
+            for file in self.issuetype_fields.iterdir():
                 yield file

@@ -19,7 +19,7 @@ def test_cache_exists(fake_jira: JiraClient):
         assert item.name in ("system", "issues")
     assert len(list(fake_jira.cache.system.iterdir())) == 1
     for item in fake_jira.cache.system.iterdir():
-        assert item.name in ("issue_type_fields")
+        assert item.name in ("issuetype_fields")
 
 
 @pytest.fixture

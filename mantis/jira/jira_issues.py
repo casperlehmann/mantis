@@ -73,11 +73,11 @@ class JiraIssues:
         self.client.cache.write_issue(key, data)
         return JiraIssue(self.client, data)
 
-    def create(self, issue_type: str, title: str, data: dict) -> dict:
-        assert issue_type in self.allowed_types
+    def create(self, issuetype: str, title: str, data: dict) -> dict:
+        assert issuetype in self.allowed_types
         if len(data.keys()) == 0:
             raise ValueError("The data object is an empty payload")
-        print(f"Create issue ({issue_type}): {title}")
+        print(f"Create issue ({issuetype}): {title}")
 
         response = self.client.post_issue(data)
         from pprint import pprint
