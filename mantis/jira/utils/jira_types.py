@@ -31,9 +31,9 @@ class IssueTypeFields(BaseModel):
 
 
 class ProjectFieldKeys:
-    def __init__(self, name: str, issue_type_fields: IssueTypeFields) -> None:
+    def __init__(self, name: str, issuetype_fields: IssueTypeFields) -> None:
         self.name = name
-        self.data = issue_type_fields
+        self.data = issuetype_fields
 
     @property
     def fields(self) -> list[str]:
@@ -41,11 +41,11 @@ class ProjectFieldKeys:
         assert projects, 'Data does not contain "projects" field'
         assert len(projects) == 1, "Expected exactly one project"
         project = projects[0]
-        issue_types = project.issuetypes
-        assert issue_types, 'Projects does not contain "issuetypes" field'
-        assert len(issue_types) == 1, "Expected exactly one issue_type"
-        issue_type = issue_types[0]
-        fields = issue_type.fields
+        issuetypes = project.issuetypes
+        assert issuetypes, 'Projects does not contain "issuetypes" field'
+        assert len(issuetypes) == 1, "Expected exactly one issuetype"
+        issuetype = issuetypes[0]
+        fields = issuetype.fields
         assert fields, 'Issue_types does not contain "fields" field'
         assert len(fields) > 0
         return list(fields.keys())

@@ -70,12 +70,12 @@ def test_fetch_issuetype_enums_mock(mock_get, fake_jira: JiraClient):
     assert (
         len(issue_enums) == 7
     ), f"Exactly seven matches the filter: {str(inspect.getsource(types_filter)).strip()}"
-    issue_type_1_bugs = [_ for _ in issue_enums if _["id"] == 1]
-    assert len(issue_type_1_bugs) == 1, f"Exactly one with id == 1"
-    issue_type_1_bug = issue_type_1_bugs[0]
-    assert issue_type_1_bug["name"] == "Bug", "Issue of id == 1 has wrong name"
+    issuetype_1_bugs = [_ for _ in issue_enums if _["id"] == 1]
+    assert len(issuetype_1_bugs) == 1, f"Exactly one with id == 1"
+    issuetype_1_bug = issuetype_1_bugs[0]
+    assert issuetype_1_bug["name"] == "Bug", "Issue of id == 1 has wrong name"
     assert (
-        issue_type_1_bug["description"] == "A problem or error."
+        issuetype_1_bug["description"] == "A problem or error."
     ), "Issue of id == 1 has wrong description"
 
 
@@ -95,10 +95,10 @@ def test_fetch_issuetype_enums_mock_no_casting(mock_get, fake_jira: JiraClient):
     assert (
         len(issue_enums) == 1
     ), f"Exactly one matches the filter: {str(inspect.getsource(types_filter)).strip()}"
-    issue_type_1_bug = issue_enums[0]
-    assert issue_type_1_bug["name"] == "Bug", "Issue of id == '1' has wrong name"
+    issuetype_1_bug = issue_enums[0]
+    assert issuetype_1_bug["name"] == "Bug", "Issue of id == '1' has wrong name"
     assert (
-        issue_type_1_bug["description"] == "A problem or error."
+        issuetype_1_bug["description"] == "A problem or error."
     ), "Issue of id == '1' has wrong description"
 
 
@@ -118,9 +118,9 @@ def test_fetch_issuetype_enums_mock_no_mapping(mock_get, fake_jira: JiraClient):
     assert (
         len(issue_enums) == 1
     ), f"Exactly one matches the filter: {str(inspect.getsource(types_filter)).strip()}"
-    issue_type_1_bug = issue_enums[0]
+    issuetype_1_bug = issue_enums[0]
     assert (
-        issue_type_1_bug["untranslatedName"] == "Bug"
+        issuetype_1_bug["untranslatedName"] == "Bug"
     ), "Issue of id == '1' has wrong untranslatedName"
 
 
@@ -152,12 +152,12 @@ def test_fetch_issuetype_enums_real(jira_client_from_user_toml):
     assert (
         len(issue_enums) == 7
     ), f"Exactly seven matches the filter: {str(inspect.getsource(types_filter)).strip()}"
-    issue_type_1_bugs = [_ for _ in issue_enums if _["id"] == 1]
-    assert len(issue_type_1_bugs) == 1, f"Exactly one with id == 1"
-    issue_type_1_bug = issue_type_1_bugs[0]
-    assert issue_type_1_bug["name"] == "Bug", "Issue of id == 1 has wrong name"
+    issuetype_1_bugs = [_ for _ in issue_enums if _["id"] == 1]
+    assert len(issuetype_1_bugs) == 1, f"Exactly one with id == 1"
+    issuetype_1_bug = issuetype_1_bugs[0]
+    assert issuetype_1_bug["name"] == "Bug", "Issue of id == 1 has wrong name"
     assert (
-        issue_type_1_bug["description"] == "A problem or error."
+        issuetype_1_bug["description"] == "A problem or error."
     ), "Issue of id == 1 has wrong description"
 
 
@@ -181,10 +181,10 @@ def test_fetch_issuetype_enums_real_no_casting(jira_client_from_user_toml):
     assert (
         len(issue_enums) == 1
     ), f"Exactly one matches the filter: {str(inspect.getsource(types_filter)).strip()}"
-    issue_type_1_bug = issue_enums[0]
-    assert issue_type_1_bug["name"] == "Bug", "Issue of id == '1' has wrong name"
+    issuetype_1_bug = issue_enums[0]
+    assert issuetype_1_bug["name"] == "Bug", "Issue of id == '1' has wrong name"
     assert (
-        issue_type_1_bug["description"] == "A problem or error."
+        issuetype_1_bug["description"] == "A problem or error."
     ), "Issue of id == '1' has wrong description"
 
 
@@ -208,7 +208,7 @@ def test_config_loader_update_issuetypes_writes_to_cache(
 def test_config_loader_get_issuetypes_names_from_cache(mock_get, fake_jira: JiraClient):
     mock_get.return_value.json.return_value = get_issuetypes_response
     config_loader = fake_jira.system_config_loader
-    with open(fake_jira.cache.system / "issue_types.json", "w") as f:
+    with open(fake_jira.cache.system / "issuetypes.json", "w") as f:
         f.write('{"a": "b"}')
     retrieved = config_loader.get_issuetypes_names_from_cache()
     assert retrieved == {"a": "b"}
@@ -218,14 +218,14 @@ def test_config_loader_get_issuetypes_names_from_cache(mock_get, fake_jira: Jira
 def test_config_loader_loop_yields_files(mock_get, fake_jira: JiraClient):
     mock_get.return_value.json.return_value = get_issuetypes_response
     config_loader = fake_jira.system_config_loader
-    assert len(list(config_loader.loop_issue_type_fields())) == 0
+    assert len(list(config_loader.loop_issuetype_fields())) == 0
     # cache something
     with open(
-        fake_jira.cache.system / f"issue_type_fields/some_file.json",
+        fake_jira.cache.system / f"issuetype_fields/some_file.json",
         "w",
     ) as f:
         f.write("{}")
-    assert len(list(config_loader.loop_issue_type_fields())) == 1
+    assert len(list(config_loader.loop_issuetype_fields())) == 1
 
 
 @patch("mantis.jira.jira_client.requests.get")
@@ -235,7 +235,7 @@ def test_update_project_field_keys(mock_get, fake_jira: JiraClient):
     config_loader.client.issues.allowed_types = ["test_type"]
     allowed_types = config_loader.update_project_field_keys()
     assert allowed_types == ["test_type"]
-    with open(fake_jira.cache.issue_type_fields / "test_type.json", "r") as f:
+    with open(fake_jira.cache.issuetype_fields / "test_type.json", "r") as f:
         assert f.read() == '{"name": "test_type"}'
 
 
@@ -246,7 +246,7 @@ def test_compile_plugins(mock_get, fake_jira: JiraClient):
 
     config_loader = fake_jira.system_config_loader
 
-    with open(fake_jira.cache.issue_type_fields / "test_type.json", "w") as f:
+    with open(fake_jira.cache.issuetype_fields / "test_type.json", "w") as f:
         f.write('{"name": "test_type"}')
 
     assert (
@@ -261,8 +261,8 @@ def test_get_all_keys_from_nested_dicts(
 ):
     config_loader = fake_jira.system_config_loader
     data_in = {
-        "a": ProjectFieldKeys(name="test_a", issue_type_fields=ISSUETYPEFIELDS),
-        "b": ProjectFieldKeys(name="test_b", issue_type_fields=ISSUETYPEFIELDS),
+        "a": ProjectFieldKeys(name="test_a", issuetype_fields=ISSUETYPEFIELDS),
+        "b": ProjectFieldKeys(name="test_b", issuetype_fields=ISSUETYPEFIELDS),
     }
     data_out = config_loader.get_all_keys_from_nested_dicts(data_in)
     assert data_out
@@ -271,8 +271,8 @@ def test_get_all_keys_from_nested_dicts(
 def test_print_table(fake_jira: "JiraClient", capsys):
     config_loader = fake_jira.system_config_loader
     data_in = {
-        "a": ProjectFieldKeys(name="test_a", issue_type_fields=ISSUETYPEFIELDS),
-        "b": ProjectFieldKeys(name="test_b", issue_type_fields=ISSUETYPEFIELDS),
+        "a": ProjectFieldKeys(name="test_a", issuetype_fields=ISSUETYPEFIELDS),
+        "b": ProjectFieldKeys(name="test_b", issuetype_fields=ISSUETYPEFIELDS),
     }
     data_out = config_loader.print_table(["a"], {"placeholder"}, data_in)
     assert data_out is None
@@ -289,8 +289,8 @@ def test_print_table(fake_jira: "JiraClient", capsys):
 def test_print_table_raises_on_non_existent_key(fake_jira: "JiraClient", capsys):
     config_loader = fake_jira.system_config_loader
     data_in = {
-        "a": ProjectFieldKeys(name="test_a", issue_type_fields=ISSUETYPEFIELDS),
-        "b": ProjectFieldKeys(name="test_b", issue_type_fields=ISSUETYPEFIELDS),
+        "a": ProjectFieldKeys(name="test_a", issuetype_fields=ISSUETYPEFIELDS),
+        "b": ProjectFieldKeys(name="test_b", issuetype_fields=ISSUETYPEFIELDS),
     }
     with pytest.raises(ValueError):
         config_loader.print_table(["non-existent"], {"placeholder"}, data_in)
@@ -302,8 +302,8 @@ def test_get_project_field_keys_from_cache(fake_jira: "JiraClient"):
         config_loader.get_project_field_keys_from_cache()
 
     fake_jira.issues.allowed_types = ["test"]
-    dummy = ProjectFieldKeys(name="test_b", issue_type_fields=ISSUETYPEFIELDS)
-    with open(fake_jira.cache.issue_type_fields / "test.json", "w") as f:
+    dummy = ProjectFieldKeys(name="test_b", issuetype_fields=ISSUETYPEFIELDS)
+    with open(fake_jira.cache.issuetype_fields / "test.json", "w") as f:
         f.write(dummy.data.model_dump_json())
     from_cache = config_loader.get_project_field_keys_from_cache()
     assert from_cache
@@ -312,7 +312,7 @@ def test_get_project_field_keys_from_cache(fake_jira: "JiraClient"):
 def test_inspect(fake_jira: "JiraClient"):
     config_loader = fake_jira.system_config_loader
     fake_jira.issues.allowed_types = ["test"]
-    dummy = ProjectFieldKeys(name="test_b", issue_type_fields=ISSUETYPEFIELDS)
-    with open(fake_jira.cache.issue_type_fields / "test.json", "w") as f:
+    dummy = ProjectFieldKeys(name="test_b", issuetype_fields=ISSUETYPEFIELDS)
+    with open(fake_jira.cache.issuetype_fields / "test.json", "w") as f:
         f.write(dummy.data.model_dump_json())
     config_loader.inspect()
