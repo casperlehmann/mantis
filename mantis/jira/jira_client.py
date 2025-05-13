@@ -85,8 +85,8 @@ class JiraClient:
     def post_issue(self, data: dict) -> requests.Response:
         return self._post("issue", data=data)
 
-    def warmup(self):
         self.cache.invalidate()
+    def warmup(self) -> None:
         self.system_config_loader.update_projects_cache()
         assert not self.cache.get_issuetypes_from_system_cache()
         self.system_config_loader.update_issuetypes_cache()
@@ -95,7 +95,7 @@ class JiraClient:
         resp = self.system_config_loader.update_project_field_keys()
         pprint(resp)
 
-    def get_projects(self):
+    def get_projects(self) -> None:
         projects = self.cache.get_projects_from_system_cache()
         if not projects:
             raise ValueError('Projects not initialized')

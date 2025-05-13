@@ -43,27 +43,28 @@ class JiraIssue:
 
 
 class JiraIssues:
-    _allowed_types = None
+    _allowed_types: list[str] | None = None
 
     def __init__(self, client: "JiraClient"):
         self.client = client
 
-    def load_allowed_types(self):
+    def load_allowed_types(self) -> None:
         cached_issuetypes = (
             self.client.system_config_loader.get_issuetypes_for_project()
         )
         if not cached_issuetypes:
-            return
+            return None
         assert isinstance(cached_issuetypes, list)
         assert isinstance(cached_issuetypes[0], dict)
         assert isinstance(cached_issuetypes[0]["id"], str), f'Unexpected type of cached_issuetypes[0]["id"]: {cached_issuetypes[0]["id"]} ({type(cached_issuetypes[0]["id"])})'
         sorted_cached_issuetypes = sorted(
             cached_issuetypes, key=lambda x: str(x.get("id"))
         )
-        self._allowed_types = [str(_.get("name")) for _ in sorted_cached_issuetypes]
+        assert len(sorted_cached_issuetypes), 'List sorted_cached_issuetypes must not be empty'
+        self._allowed_types = [_.get("name", '') for _ in sorted_cached_issuetypes]
 
     @property
-    def allowed_types(self):
+    def allowed_types(self) -> list[str] | None:
         if self._allowed_types is None:
             self.load_allowed_types()
         return self._allowed_types

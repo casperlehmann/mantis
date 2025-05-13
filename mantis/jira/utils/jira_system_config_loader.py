@@ -11,6 +11,7 @@ from mantis.jira.utils.jira_types import IssueTypeFields, ProjectFieldKeys
 
 if TYPE_CHECKING:
     from mantis.jira.jira_client import JiraClient
+    from mantis.jira.utils import Cache
 
 
 class JiraSystemConfigLoader:
@@ -18,7 +19,7 @@ class JiraSystemConfigLoader:
         self.client = client
 
     @property
-    def cache(self):
+    def cache(self) -> 'Cache':
         return self.client.cache
 
     def loop_issuetype_fields(self) -> Generator[Path, Any, None]:
