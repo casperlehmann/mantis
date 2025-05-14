@@ -1,9 +1,7 @@
 import re
 from typing import Callable, TYPE_CHECKING
 
-import frontmatter
-
-# type: ignore import-untyped
+import frontmatter  # type: ignore
 
 # To-do: Create converter for Jira syntax to markdown.
 j2m: Callable[[str], str] = lambda x: x
