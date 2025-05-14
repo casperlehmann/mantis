@@ -41,6 +41,12 @@ class JiraIssue:
         # Note that the key can exist and the value can still be None
         return self.fields.get(key, default) or default
 
+    def update_field(self, data):
+        key = self.data.get('key')
+        if not key:
+            raise ValueError('No key')
+        self.client.update_field(key, data)
+    
 
 class JiraIssues:
     _allowed_types: list[str] | None = None
