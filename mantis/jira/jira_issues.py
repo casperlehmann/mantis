@@ -22,7 +22,7 @@ def process_key(key: str, exception: Exception) -> tuple[str, str]:
 
 
 class JiraIssue:
-    def __init__(self, client: "JiraClient", raw_data: dict[str, dict]) -> None:
+    def __init__(self, client: "JiraClient", raw_data: dict[str, Any]) -> None:
         self.client = client
         self.data = raw_data
         # https://docs.pydantic.dev/1.10/datamodel_code_generator/
@@ -31,7 +31,7 @@ class JiraIssue:
         return self.data.get(key, default) or default
 
     @property
-    def fields(self) -> dict:
+    def fields(self) -> dict[str, Any]:
         fields = self.data.get("fields")
         if not fields:
             raise KeyError("JiraIssue.data does not have any fields")
@@ -41,7 +41,7 @@ class JiraIssue:
         # Note that the key can exist and the value can still be None
         return self.fields.get(key, default) or default
 
-    def update_field(self, data):
+    def update_field(self, data: dict[str, Any]) -> None:
         key = self.data.get('key')
         if not key:
             raise ValueError('No key')

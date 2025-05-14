@@ -116,7 +116,7 @@ class JiraClient:
     def get_current_user_as_assignee(self) -> dict:
         return {"assignee": {"accountId": self.get_current_user_account_id()}}
 
-    def update_field(self, key, data):
+    def update_field(self, key: str, data: dict) -> bool:
         uri = f"issue/{key}"
         response = self._put(uri, data)
         try:
