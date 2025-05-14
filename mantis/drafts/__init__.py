@@ -3,6 +3,8 @@ from typing import Callable, TYPE_CHECKING
 
 import frontmatter
 
+# type: ignore import-untyped
+
 # To-do: Create converter for Jira syntax to markdown.
 j2m: Callable[[str], str] = lambda x: x
 
@@ -23,25 +25,25 @@ class Draft:
         self._materialize()
 
     @property
-    def key(self):
+    def key(self) -> dict:
         key = self.issue.get("key")
         assert key, "No key in issue"
         assert (len(key) < 20), f'The length of the key is suspiciously long: "{key[:20]}..."'
         return key
 
     @property
-    def formatted_header(self):
+    def formatted_header(self) -> str:
         return f'[{self.key}] {self.summary}'
 
     @property
-    def required_frontmatter(self):
+    def required_frontmatter(self) -> list[str]:
         return list(self.template.metadata.keys())
 
-    def load_template(self):
+    def load_template(self) -> frontmatter.Post:
         with open('mantis/drafts/template.md', 'r') as f:
             return frontmatter.load(f)
 
-    def generate_frontmatter(self):
+    def generate_frontmatter(self) -> None:
         for field_name in self.required_frontmatter:
             value = self.issue.get_field(field_name, None)
             template_value = self.template.metadata.get(field_name)
@@ -56,7 +58,7 @@ class Draft:
         # The header is not a Jira field.
         self.template.metadata['header'] = self.formatted_header
 
-    def generate_body(self):
+    def generate_body(self) -> None:
         description = self.issue.get_field("description")
         self.template.content = (self.template.content
             .replace('{summary}', self.summary)
@@ -69,12 +71,12 @@ class Draft:
         with open(self.draft_path, "wb") as f:
             frontmatter.dump(self.template, f)
 
-    def remove_draft_header(self, post: frontmatter.Post):
+    def remove_draft_header(self, post: frontmatter.Post) -> frontmatter.Post:
         extra_header = f'# {self.summary}'
         post.content = re.sub("^" + re.escape(extra_header)+'\\n*', '', post.content)
         return post
 
-    def read_draft(self):
+    def read_draft(self) -> frontmatter.Post:
         with open(self.draft_path, "r") as f:
             draft_data = frontmatter.load(f)
         draft_data = self.remove_draft_header(draft_data)

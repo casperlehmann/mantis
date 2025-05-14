@@ -27,7 +27,7 @@ class JiraIssue:
         self.data = raw_data
         # https://docs.pydantic.dev/1.10/datamodel_code_generator/
 
-    def get(self, key: str, default: Any = None) -> dict | None:
+    def get(self, key: str, default: Any = None) -> Any:
         return self.data.get(key, default) or default
 
     @property
