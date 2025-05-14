@@ -22,7 +22,7 @@ def process_key(key: str, exception: Exception) -> tuple[str, str]:
 
 
 class JiraIssue:
-    def __init__(self, client: "JiraClient", raw_data: dict[str, dict]) -> None:
+    def __init__(self, client: "JiraClient", raw_data: dict[str, Any]) -> None:
         self.client = client
         self.data = raw_data
         # https://docs.pydantic.dev/1.10/datamodel_code_generator/
@@ -31,7 +31,7 @@ class JiraIssue:
         return self.data.get(key, default) or default
 
     @property
-    def fields(self) -> dict:
+    def fields(self) -> dict[str, Any]:
         fields = self.data.get("fields")
         if not fields:
             raise KeyError("JiraIssue.data does not have any fields")
@@ -41,6 +41,12 @@ class JiraIssue:
         # Note that the key can exist and the value can still be None
         return self.fields.get(key, default) or default
 
+    def update_field(self, data: dict[str, Any]) -> None:
+        key = self.data.get('key')
+        if not key:
+            raise ValueError('No key')
+        self.client.update_field(key, data)
+    
 
 class JiraIssues:
     _allowed_types: list[str] | None = None
@@ -71,17 +77,18 @@ class JiraIssues:
 
     def get(self, key: str) -> JiraIssue:
         if not self.client._no_read_cache:
-            issue_from_cache = self.client.cache.get_issue(key)
-            if issue_from_cache:
-                return JiraIssue(self.client, issue_from_cache)
+            issue_data_from_cache = self.client.cache.get_issue(key)
+            if issue_data_from_cache:
+                return JiraIssue(self.client, issue_data_from_cache)
         response = self.client.get_issue(key)
         try:
             response.raise_for_status()
         except HTTPError as e:
             self.handle_http_error(e, key)
-        data: dict[str, dict] = response.json()
-        self.client.cache.write_issue(key, data)
-        return JiraIssue(self.client, data)
+        issue_data: dict[str, dict] = response.json()
+        if not self.client._no_read_cache:
+            self.client.cache.write_issue(key, issue_data)
+        return JiraIssue(self.client, issue_data)
 
     def create(self, issuetype: str, title: str, data: dict) -> dict:
         assert self.allowed_types and issuetype in self.allowed_types

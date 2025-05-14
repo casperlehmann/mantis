@@ -79,6 +79,10 @@ class JiraClient:
         url = f"{self.api_url}/{uri}"
         return requests.post(url, json=data, **self.requests_kwargs)  # type: ignore
 
+    def _put(self, uri: str, data: dict) -> requests.Response:
+        url = f"{self.api_url}/{uri}"
+        return requests.put(url, json=data, **self.requests_kwargs)  # type: ignore
+
     def get_issue(self, key: str) -> requests.Response:
         return self._get(f"issue/{key}")
 
@@ -112,6 +116,17 @@ class JiraClient:
     def get_current_user_as_assignee(self) -> dict:
         return {"assignee": {"accountId": self.get_current_user_account_id()}}
 
+    def update_field(self, key: str, data: dict) -> bool:
+        uri = f"issue/{key}"
+        response = self._put(uri, data)
+        try:
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            print (e.response.reason )
+            print (e.response.json() )
+            exit()
+        return True
+    
     def test_auth(self) -> bool:
         try:
             user = self.get_current_user()
