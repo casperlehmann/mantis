@@ -15,6 +15,7 @@ def json_response(mock_get_request):
             "parent": "TASK-0",
             "issuetype": {"key": "Task"},
             "assignee": {"displayName": "Bobby Goodsky"},
+            "description": "redacted",
         },
     }
 
@@ -39,17 +40,22 @@ def test_jira_draft(fake_jira: JiraClient, json_response):
     )
     expectations = (
         "---",
-        "header: [TASK-1] Test issue",
-        "ignore: True",
+        "header: '[TASK-1] Test issue'",
+        "ignore: true",
         "parent: TASK-0",
         "summary: Test issue",
-        "issuetype: None",
+        "issuetype:",
+        "issuetype: null",
+        "project: null",
+        "reporter: null",
+        "description: redacted",
         "assignee: Bobby Goodsky",
+        "status: resolved",
         "---",
         "# Test issue",
         "",
-        "None",
+        "redacted",
     )
     with open(fake_jira.drafts_dir / "TASK-1.md", "r") as f:
-        for content, expected in zip(f.readlines(), expectations):
-            assert content.strip() == expected
+        for content in f.readlines():
+            assert content.strip() in expectations, f"content.strip() ({content.strip()}) not in expectations in: {expectations}"

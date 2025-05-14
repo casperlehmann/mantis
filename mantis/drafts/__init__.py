@@ -1,4 +1,7 @@
+import re
 from typing import Callable, TYPE_CHECKING
+
+import frontmatter  # type: ignore
 
 # To-do: Create converter for Jira syntax to markdown.
 j2m: Callable[[str], str] = lambda x: x
@@ -10,39 +13,69 @@ if TYPE_CHECKING:
 
 class Draft:
     def __init__(self, jira: "JiraClient", issue: "JiraIssue") -> None:
+        self.template = self.load_template()
         assert jira.drafts_dir
         self.jira = jira
         self.issue = issue
+        self.draft_path = self.jira.drafts_dir / f"{self.key}.md"
+        self.summary = self.issue.get_field("summary", "")
+        assert self.required_frontmatter == ['ignore', 'header', 'project', 'parent', 'summary', 'status', 'issuetype', 'assignee', 'reporter']
         self._materialize()
 
-    def _materialize(self) -> None:
+    @property
+    def key(self) -> dict:
         key = self.issue.get("key")
-        # key = json_payload.get('key')
         assert key, "No key in issue"
-        assert (
-            len(key) < 20
-        ), f'The length of the key is suspeciously long: "{key[:20]}..."'
-        # project = self.issue.get('fields', {}).get('project', {}).get('key')
-        parent = self.issue.get_field("parent", "None")
-        summary = self.issue.get_field("summary")
-        issuetype = self.issue.get_field("issuetype").get("name")
-        assignee = self.issue.get_field("assignee", {})
-        assignee_name = assignee.get("displayName")
-        description = self.issue.get_field("description")
+        assert (len(key) < 20), f'The length of the key is suspiciously long: "{key[:20]}..."'
+        return key
 
-        with open(self.jira.drafts_dir / f"{key}.md", "w") as f:
-            f.write("---\n")
-            f.write(f"header: [{key}] {summary}\n")
-            f.write("ignore: True\n")
-            # f.write(f'project: {project}\n')
-            f.write(f"parent: {parent}\n")
-            f.write(f"summary: {summary}\n")
-            f.write(f"issuetype: {issuetype}\n")
-            f.write(f"assignee: {assignee_name}\n")
-            f.write("---\n")
-            f.write(f"# {summary}\n")
-            f.write("\n")
-            f.write(f"{j2m(description)}\n")
-            f.write("\n")
-            # f.write(f'\n')
-            # f.write(f'{description}\n')
+    @property
+    def formatted_header(self) -> str:
+        return f'[{self.key}] {self.summary}'
+
+    @property
+    def required_frontmatter(self) -> list[str]:
+        return list(self.template.metadata.keys())
+
+    def load_template(self) -> frontmatter.Post:
+        with open('mantis/drafts/template.md', 'r') as f:
+            return frontmatter.load(f)
+
+    def generate_frontmatter(self) -> None:
+        for field_name in self.required_frontmatter:
+            value = self.issue.get_field(field_name, None)
+            template_value = self.template.metadata.get(field_name)
+            if str(template_value) in ('True', 'False'):
+                self.template.metadata[field_name] = template_value
+            elif isinstance(value, dict):
+                for nested_field in ('displayName', 'name'):
+                    if nested_field in value:
+                        self.template.metadata[field_name] = value.get(nested_field)
+            else:
+                self.template.metadata[field_name] = value
+        # The header is not a Jira field.
+        self.template.metadata['header'] = self.formatted_header
+
+    def generate_body(self) -> None:
+        description = self.issue.get_field("description")
+        self.template.content = (self.template.content
+            .replace('{summary}', self.summary)
+            .replace('{description}', j2m(description))
+        )
+
+    def _materialize(self) -> None:
+        self.generate_frontmatter()
+        self.generate_body()
+        with open(self.draft_path, "wb") as f:
+            frontmatter.dump(self.template, f)
+
+    def remove_draft_header(self, post: frontmatter.Post) -> frontmatter.Post:
+        extra_header = f'# {self.summary}'
+        post.content = re.sub("^" + re.escape(extra_header)+'\\n*', '', post.content)
+        return post
+
+    def read_draft(self) -> frontmatter.Post:
+        with open(self.draft_path, "r") as f:
+            draft_data = frontmatter.load(f)
+        draft_data = self.remove_draft_header(draft_data)
+        return draft_data
