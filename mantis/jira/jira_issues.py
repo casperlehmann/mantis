@@ -71,17 +71,18 @@ class JiraIssues:
 
     def get(self, key: str) -> JiraIssue:
         if not self.client._no_read_cache:
-            issue_from_cache = self.client.cache.get_issue(key)
-            if issue_from_cache:
-                return JiraIssue(self.client, issue_from_cache)
+            issue_data_from_cache = self.client.cache.get_issue(key)
+            if issue_data_from_cache:
+                return JiraIssue(self.client, issue_data_from_cache)
         response = self.client.get_issue(key)
         try:
             response.raise_for_status()
         except HTTPError as e:
             self.handle_http_error(e, key)
-        data: dict[str, dict] = response.json()
-        self.client.cache.write_issue(key, data)
-        return JiraIssue(self.client, data)
+        issue_data: dict[str, dict] = response.json()
+        if not self.client._no_read_cache:
+            self.client.cache.write_issue(key, issue_data)
+        return JiraIssue(self.client, issue_data)
 
     def create(self, issuetype: str, title: str, data: dict) -> dict:
         assert self.allowed_types and issuetype in self.allowed_types
