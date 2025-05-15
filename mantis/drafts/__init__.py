@@ -58,9 +58,10 @@ class Draft:
 
     def generate_body(self) -> None:
         description = self.issue.get_field("description")
+        # assert description, f'Field description is None in issue: {self.issue.data}'
         self.template.content = (self.template.content
             .replace('{summary}', self.summary)
-            .replace('{description}', j2m(description))
+            .replace('{description}', j2m(description or 'Placeholder'))
         )
 
     def _materialize(self) -> None:
