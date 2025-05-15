@@ -278,6 +278,13 @@ class JiraSystemConfigLoader:
             response.raise_for_status()
             data: list[dict[str, Any]] = response.json()
             self.cache.write_createmeta(issuetype_name, data)
+        # This can't be done for a type.
+        # I need to execute this at runtime for each individual issue
+        # issueIdOrKey = 'ecs-1'
+        # response = self.client.get_editmeta(issueIdOrKey)
+        # response.raise_for_status()
+        # data = response.json()
+        # self.cache.write_editemeta(issuetype, data)
         return self.client.issues.load_allowed_types()
 
     def compile_plugins(self) -> None:
