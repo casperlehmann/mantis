@@ -21,6 +21,7 @@ if __name__ == '__main__':
         x = jira.system_config_loader.get_issuetypes()
         pprint (x)
     elif jira_options.action == 'get-issue':
+        jira._no_read_cache = True
         for issue_key in jira_options.issues:
             issue = jira.issues.get(key=issue_key)
             key = issue.get('key', 'N/A')
