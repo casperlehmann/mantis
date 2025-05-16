@@ -104,7 +104,7 @@
         "creator": {
             "self": "https://caspertestaccount.atlassian.net/rest/api/2/user?accountId=712020%3A95f28275-1a43-4b1d-a411-4142f5ab13df",
             "accountId": "712020:95f28275-1a43-4b1d-a411-4142f5ab13df",
-            "emailAddress": "casper@mail.com",
+            "emailAddress": "dummy@example.com",
             "avatarUrls": {
                 "48x48": "https://secure.gravatar.com/avatar/506859740cf84f211085dc189b77abbd?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FCL-3.png",
                 "24x24": "https://secure.gravatar.com/avatar/506859740cf84f211085dc189b77abbd?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FCL-3.png",
@@ -122,7 +122,7 @@
         "reporter": {
             "self": "https://caspertestaccount.atlassian.net/rest/api/2/user?accountId=712020%3A95f28275-1a43-4b1d-a411-4142f5ab13df",
             "accountId": "712020:95f28275-1a43-4b1d-a411-4142f5ab13df",
-            "emailAddress": "casper@mail.com",
+            "emailAddress": "dummy@example.com",
             "avatarUrls": {
                 "48x48": "https://secure.gravatar.com/avatar/506859740cf84f211085dc189b77abbd?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FCL-3.png",
                 "24x24": "https://secure.gravatar.com/avatar/506859740cf84f211085dc189b77abbd?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FCL-3.png",
