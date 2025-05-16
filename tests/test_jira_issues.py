@@ -13,7 +13,7 @@ from mantis.jira.jira_issues import JiraIssues, process_key
 def test_jira_issues_get_fake(fake_jira: JiraClient):
     task_1 = fake_jira.issues.get("TASK-1")
     assert task_1.get("key") == "TASK-1"
-    assert task_1.get("fields", {}).get("status") == {"name": "resolved"}
+    assert task_1.get("fields", {}).get("status") == {"name": "resolved"}  # type: ignore None risk of second get. Since it's explicitly returning a dict as default.
 
 
 def test_jira_issues_get_mocked(fake_jira: JiraClient, with_no_read_cache):
