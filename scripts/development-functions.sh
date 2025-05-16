@@ -40,3 +40,32 @@ show_coverage() {
   pytest --cov-report html --cov
   open htmlcov/index.html
 }
+
+format_test_data() {
+    find tests/data/jira_cache -type f -name '*.json' -exec sh -c 'jq . "$1" > "$1.tmp" && mv "$1.tmp" "$1"' _ {} \;
+}
+
+anonymize_test_data() {
+    find tests/data/ -type f -name '*.json' -exec sh -c '
+    for file do
+        # Format JSON with jq, then replace emails
+        tmp="${file}.tmp"
+        if jq . "$file" > "$tmp"; then
+        # Replace emails with dummy value (e.g., dummy@example.com)
+        sed -E -i.bak "s/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/dummy@example.com/g" "$tmp"
+        mv "$tmp" "$file"
+        rm "$tmp.bak"
+        else
+        echo "Invalid JSON: $file"
+        rm -f "$tmp"
+        fi
+    done
+    ' sh {} +
+}
+
+update_test_data() {
+    cp -rf drafts/ tests/data/drafts
+    cp -rf .jira_cache/* tests/data/jira_cache/
+    format_test_data
+    anonymize_test_data
+}

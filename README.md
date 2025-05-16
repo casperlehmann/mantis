@@ -201,3 +201,49 @@ python main.py --action=get-issue ECS-1 ECS-2 ECS-3 ECS-4 ECS-5 ECS-6
 [ECS-5] (Sample) Order Confirmation
 [ECS-6] (Sample) User Login
 ```
+
+# Copy to test data
+
+Copy demo data to the test directory:
+
+```sh
+cp -rf drafts/ tests/data/drafts
+cp -rf .jira_cache/* tests/data/jira_cache/
+```
+
+Format the JSON files using `jq`:
+
+```sh
+find tests/data/jira_cache -type f -name '*.json' -exec sh -c 'jq . "$1" > "$1.tmp" && mv "$1.tmp" "$1"' _ {} \;
+```
+
+Then anonomize the files:
+
+```sh
+find tests/data/ -type f -name '*.json' -exec sh -c '
+  for file do
+    # Format JSON with jq, then replace emails
+    tmp="${file}.tmp"
+    if jq . "$file" > "$tmp"; then
+      # Replace emails with dummy value (e.g., dummy@example.com)
+      sed -E -i.bak "s/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/dummy@example.com/g" "$tmp"
+      mv "$tmp" "$file"
+      rm "$tmp.bak"
+    else
+      echo "Invalid JSON: $file"
+      rm -f "$tmp"
+    fi
+  done
+' sh {} +
+```
+
+All in one function in `development-functions.sh`:
+
+```sh
+update_test_data() {
+    cp -rf drafts/ tests/data/drafts
+    cp -rf .jira_cache/* tests/data/jira_cache/
+    format_test_data
+    anonymize_test_data
+}
+```
