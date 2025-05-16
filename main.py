@@ -49,6 +49,8 @@ if __name__ == '__main__':
         jira.cache.invalidate()
     elif jira_options.action == 'reset':
         jira.warmup()
+    elif jira_options.action == 'attempt':
+        jira.system_config_loader.attempt()
     else:
         print(f'Action {jira_options.action} not recognized')
 

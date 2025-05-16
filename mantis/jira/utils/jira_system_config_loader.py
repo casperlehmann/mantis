@@ -1,9 +1,11 @@
+import datetime
+from enum import Enum
 import json
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, Generator, Mapping
+from typing import TYPE_CHECKING, Any, Dict, Generator, Mapping, Optional, Union
 
 from datamodel_code_generator import DataModelType, InputFileType, generate
-from pydantic import ValidationError
+from pydantic import BaseModel, Field, ValidationError, create_model
 import requests
 
 from mantis.jira.utils.cache import CacheMissException
@@ -14,9 +16,187 @@ if TYPE_CHECKING:
     from mantis.jira.utils import Cache
 
 
+class Operation(Enum):
+    add = "add"
+    set = "set"
+    remove = "remove"
+    copy = "copy"
+    edit = "edit"
+
+
+class SchemaType(Enum):
+    any = "any"
+    array = "array"
+    date = "date"
+    issuelink = "issuelink"
+    issuerestriction = "issuerestriction"
+    issuetype = "issuetype"
+    project = "project"
+    string = "string"
+    team = "team"
+    user = "user"
+    # Edit only:
+    comments_page = "comments-page"
+
+
+class ItemsType(Enum):
+    option = "option"
+    design = "design.field.name"
+    string = "string"
+    attachment = "attachment"
+    issuelinks = "issuelinks"
+
+
+class _Schema(BaseModel):
+    type: SchemaType
+
+
+class _SchemaHasSystem(_Schema):
+    system: str
+
+
+class _SchemaHasItems(_Schema):
+    items: ItemsType
+
+
+class _SchemaHasCustomCustomid(_Schema):
+    custom: str
+    customId: int
+
+
+class SchemaSystem(_SchemaHasSystem):
+    pass
+
+
+class SchemaItemsSystem(_SchemaHasSystem, _SchemaHasItems):
+    pass
+
+
+class SchemaCustomCustomid(_SchemaHasCustomCustomid):
+    pass
+
+
+class SchemaItemsCustomCustomid(_SchemaHasCustomCustomid, _SchemaHasItems):
+    pass
+
+
+SchemaUnion = Union[
+    SchemaSystem
+    ,SchemaItemsSystem
+    ,SchemaCustomCustomid
+    ,SchemaItemsCustomCustomid
+]
+
+class JiraIssueFieldSchema(BaseModel):
+    required: bool
+    alias_schema: SchemaUnion = Field(alias='schema')
+    name: str
+    key: str
+    hasDefaultValue: Optional[bool] = None # only required for create
+    autoCompleteUrl: Optional[str] = None
+    operations: list[Operation] = []
+    allowedValues: Optional[list[dict]] = None
+
+    @property
+    def schema_as_python_type(self):
+        simple_type = self.alias_schema.type
+        if simple_type is SchemaType.string:
+            return str
+        elif simple_type is SchemaType.date:
+            return datetime.date
+        elif isinstance(self.alias_schema, _SchemaHasItems) and simple_type is SchemaType.array:
+            item_type = self.alias_schema.items
+            if item_type is ItemsType.string:
+                return list[str]
+            else:
+                # Todo
+                return list[str]
+        elif simple_type in (SchemaType.issuetype, SchemaType.issuerestriction,
+                             SchemaType.issuelink, SchemaType.any, SchemaType.project,
+                             SchemaType.user, SchemaType.team, SchemaType.comments_page):
+            return Any
+        raise ValueError(f'No valid Python type implemented for {self.name} (type: {self.alias_schema.type}) alias_schema {type(self.alias_schema)}')
+
+
+class Fields:
+    createmeta_path = '.jira_cache/system/issuetype_fields/createmeta_{}.json'
+
+    ignored_non_meta_field = (
+        'statuscategorychangedate', 'components', 'timespent',
+        # 'environment' #legacy field (only in edit)
+    )
+
+    def __init__(self, jira: 'JiraClient', type_name: str): #plugin
+        self.jira = jira
+
+        self.type_name = type_name.lower()
+        with open(self.createmeta_path.format(self.type_name), 'r') as f:
+            self.meta = json.load(f)
+
+        meta_fields: list[dict[str, Any]] = self.meta['fields']
+
+        # out_fields: 'dict[str, tuple[Any, Any]]' = {}
+        out_fields: dict[Any, Any] = {}
+        getters = {}
+        self.attributes = []
+        for meta_field_value in meta_fields:
+            meta_field_key = meta_field_value['key']
+            if meta_field_key in self.ignored_non_meta_field:
+                continue
+            # Only createmeta has "hasDefaultValue".
+            # Only reporter field has "hasDefaultValue": true.
+            meta = JiraIssueFieldSchema.model_validate(meta_field_value)            
+            print (f'meta_field_name; {meta_field_value['name']} == {meta.name} | ({meta.key})')
+            # Assignee == Assignee | (assignee)
+            # development == development | (customfield_10031)
+            # Issue Type == Issue Type | (issuetype)
+            python_type = meta.schema_as_python_type
+            # print (f'{type(meta.alias_schema).__name__:<60} {str(python_type.__name__):<60}')
+            if meta.required:
+                out_fields[meta_field_key] = (python_type, ...)
+            else:
+                out_fields[meta_field_key] = (Optional[python_type], None)
+            if meta_field_key.startswith('customfield_'):
+                getters[meta.name.lower()] = meta_field_key
+                self.attributes.append(meta.name.lower())
+            else:
+                self.attributes.append(meta_field_key)
+
+        fields_model = create_model("FieldsModel", **out_fields)
+
+        # map instance.rank -> instance.customfield_10019
+        for alias, original_name in getters.items():
+            def make_property(field_name):
+                return property(lambda self: getattr(self, field_name))
+            setattr(fields_model, alias, make_property(original_name))
+
+        with_nested_fields = {
+            'key': str,
+            'id': str,
+            'fields': fields_model
+        }
+        issue_model = create_model("IssueModel", **with_nested_fields)
+
+        # model = create_model(model_name, **with_nested_fields)
+        self.model = issue_model
+    
+    def make(self, issue_payload: dict):
+        return self.model.model_validate(issue_payload)
+
+
 class JiraSystemConfigLoader:
     def __init__(self, client: "JiraClient") -> None:
         self.client = client
+
+    def attempt(self):
+        issue_id = 'ECS-1'
+        with open(f'.jira_cache/issues/{issue_id}.json', 'r') as f:
+            data = json.load(f)
+        fields = Fields(self.client, 'epic')
+        loaded = fields.make(data)
+        assert loaded.key == issue_id  # type: ignore
+        print (loaded.key)
+        print (loaded.fields.description)
 
     @property
     def cache(self) -> 'Cache':
