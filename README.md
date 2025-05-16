@@ -72,6 +72,9 @@ Updated local cache for issuetypes:
 # Re-fetches config files
 $ python main.py --action reset
 ['Epic', 'Subtask', 'Task', 'Story', 'Bug']
+
+# Fornat the fetched json in the Jira cache
+$ find .jira_cache -type f -name '*.json' -exec sh -c 'jq . "$1" > "$1.tmp" && mv "$1.tmp" "$1"' _ {} \;
 ```
 
 Or to overwrite options on the command line (remember to set the JIRA_TOKEN env var):
