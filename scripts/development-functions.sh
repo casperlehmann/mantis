@@ -11,3 +11,11 @@ get_and_fmt() {
   jsonfmt
 }
 
+run_coverage() {
+  pytest --cov
+}
+
+show_coverage() {
+  pytest --cov-report html --cov
+  open htmlcov/index.html
+}

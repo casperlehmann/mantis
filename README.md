@@ -123,6 +123,19 @@ $ pytest --cov
 $ pytest --cov-report html --cov
 ```
 
+See functions in `development-functions.sh`:
+
+```sh
+run_coverage() {
+  pytest --cov
+}
+
+show_coverage() {
+  pytest --cov-report html --cov
+  open htmlcov/index.html
+}
+```
+
 An example of the coverage report:
 
 ![Markdown coverage report](docs/img/pytest-coverage-html-report.png)
