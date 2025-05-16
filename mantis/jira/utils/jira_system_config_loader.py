@@ -48,7 +48,7 @@ class JiraSystemConfigLoader:
         return self.update_projects_cache()
 
     def update_issuetypes_cache(self) -> list[dict[str, Any]]:
-        url = 'issuetype'
+        url = f'issue/createmeta/{self.client.project_name}/issuetypes'
         response = self.client._get(url)
         try:
             response.raise_for_status()
