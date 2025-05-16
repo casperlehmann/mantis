@@ -1,5 +1,6 @@
 import importlib
 import os
+from pydantic import BaseModel
 
 module_dir = os.path.dirname(__file__)
 
@@ -23,7 +24,7 @@ class Plugins:
         print(plugin)
     """
 
-    all_plugins: dict[str, any] = {}
+    all_plugins: dict[str, BaseModel] = {}
 
     @classmethod
     def stats(cls):
