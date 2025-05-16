@@ -77,6 +77,24 @@ $ python main.py --action reset
 $ find .jira_cache -type f -name '*.json' -exec sh -c 'jq . "$1" > "$1.tmp" && mv "$1.tmp" "$1"' _ {} \;
 ```
 
+For iterative testing, we can rely on the functions defined in `scripts/development-functions.sh` to reset and/or re-populate the cache and drafts directory:
+
+```sh
+reset_cache() {
+  python main.py --action reset
+}
+
+jsonfmt() {
+  python main.py --action reset
+  find .jira_cache -type f -name '*.json' -exec sh -c 'jq . "$1" > "$1.tmp" && mv "$1.tmp" "$1"' _ {} \;
+}
+
+getandfmt() {
+  jsonfmt
+  python main.py --action get-issue ECS-1 ECS-2 ECS-3 ECS-4 ECS-5 ECS-6
+}
+```
+
 Or to overwrite options on the command line (remember to set the JIRA_TOKEN env var):
 
 ```sh
