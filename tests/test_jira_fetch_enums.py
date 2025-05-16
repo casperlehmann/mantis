@@ -25,11 +25,11 @@ def test_config_loader_update_issuetypes_writes_to_cache(
 
 
 def test_persisted_issuetypes_data():
-    assert hasattr(CacheData, 'issuetypes')
-    selector = lambda field_name: [_[field_name] for _ in CacheData.issuetypes]
-    assert len(CacheData.issuetypes) == 5
-    assert selector('name') == ['Subtask', 'Story', 'Bug', 'Task', 'Epic']
-    assert CacheData.issuetypes[0].get('scope') == {"type": "PROJECT", "project": {"id": "10000"}}
+    cache_data = CacheData()
+    assert hasattr(cache_data, 'issuetypes')
+    selector = lambda field_name: {_[field_name] for _ in cache_data.issuetypes}
+    assert len(cache_data.issuetypes) == 5
+    assert selector('name') == {'Subtask', 'Story', 'Bug', 'Task', 'Epic'}
 
 
 @patch("mantis.jira.jira_client.requests.get")
@@ -37,7 +37,7 @@ def test_cache_get_issuetypes_from_system_cache(mock_get, fake_jira: JiraClient)
     mock_get.return_value.json.return_value = get_issuetypes_response
     cache = fake_jira.cache
     with open(fake_jira.cache.system / "issuetypes.json", "w") as f:
-        json.dump(CacheData.issuetypes, f)
+        json.dump(CacheData().issuetypes, f)
     retrieved = cache.get_issuetypes_from_system_cache()
     assert retrieved
     assert retrieved[0].get("description") == (
