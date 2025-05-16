@@ -127,3 +127,6 @@ class Cache:
         if identifier == "issuetype_fields":
             for file in self.issuetype_fields.iterdir():
                 yield file
+        if identifier == "issues":
+            for file in self.issues.iterdir():
+                yield file
