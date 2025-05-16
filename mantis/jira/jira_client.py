@@ -83,6 +83,15 @@ class JiraClient:
         url = f"{self.api_url}/{uri}"
         return requests.put(url, json=data, **self.requests_kwargs)  # type: ignore
 
+    def get_createmeta(self, project_name: str, issuetype_id: str) -> requests.Response:
+        url = (
+            "issue/createmeta"
+            f"/{project_name}"
+            "/issuetypes/"
+            f"{issuetype_id}"
+        )
+        return self._get(url)
+
     def get_issue(self, key: str) -> requests.Response:
         return self._get(f"issue/{key}")
 

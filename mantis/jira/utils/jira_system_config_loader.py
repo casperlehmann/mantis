@@ -47,8 +47,8 @@ class JiraSystemConfigLoader:
                 return projects
         return self.update_projects_cache()
 
-    def update_issuetypes_cache(self) -> list[dict[str, Any]]:
-        url = 'issuetype'
+    def update_issuetypes_cache(self) -> dict[str, Any]:
+        url = f'issue/createmeta/{self.client.project_name}/issuetypes'
         response = self.client._get(url)
         try:
             response.raise_for_status()
@@ -57,22 +57,23 @@ class JiraSystemConfigLoader:
             print(e.response.content)
             exit()
 
-        issuetypes: list[dict[str, Any]] = response.json()
-        assert isinstance(issuetypes, list)
+        issuetypes: dict[str, Any] = response.json()
+        assert isinstance(issuetypes, dict), f'issuetypes is not a dict: {issuetypes}'
+        assert 'issueTypes' in issuetypes, f"'issueTypes' not in issuetypes. Got: {issuetypes}"
+        assert isinstance(issuetypes['issueTypes'], list), "issuetypes['issueTypes'] is not a list. Got: {issuetypes}"
 
         self.cache.write_issuetypes_to_system_cache(issuetypes)
         return issuetypes
 
-    def get_issuetypes(self) -> list[dict[str, Any]]:
+    def get_issuetypes(self) -> dict[str, Any]:
         if not self.client._no_read_cache:
             from_cache = self.cache.get_issuetypes_from_system_cache()
             if from_cache:
                 return from_cache
         return self.update_issuetypes_cache()
 
-    def get_issuetypes_for_project(self) -> list[dict[str, Any]]:
-        data = [_ for _ in self.get_issuetypes()
-                if _.get('scope', {}).get('project', {}).get('id') == self.client.project_id]
+    def get_issuetypes_for_project(self) -> dict[str, Any]:
+        data = self.get_issuetypes()
         self.cache.write_issuetypes_to_system_cache(data)
         try:
             assert len(data)
@@ -80,26 +81,24 @@ class JiraSystemConfigLoader:
             raise ValueError('List of issuetypes has length of zero. Something is probably very wrong.') from e
         return data
 
-    def update_project_field_keys(self) -> list[str] | None:
-        issuetypes = self.get_issuetypes_for_project()
-        if not issuetypes:
-            raise ValueError('Issue types not initialized')
+    def update_project_field_keys(self) -> list[str]:
+        issuetypes: dict[str, Any] = self.get_issuetypes_for_project()
 
-        names = [_['name'] for _ in issuetypes]
-        for issuetype in names:
-            # assert issuetype in names, f'issuetypes not in names: "{issuetype}" in {names}'
-            type_id = [_['id'] for _ in issuetypes if _['name'] == issuetype][0]
-            url = (
-                "issue/createmeta"
-                f"/{self.client.project_name}"
-                "/issuetypes/"
-                f"{type_id}"
-            )
-            response = self.client._get(url)
+        assert isinstance(issuetypes, dict)#
+        assert 'issueTypes' in issuetypes, f'issueTypes has no issueTypes {issuetypes}'
+
+        nested_issuetypes: list[dict[str, Any]] = issuetypes['issueTypes']
+
+        for issuetype in nested_issuetypes:
+            assert 'name' in issuetype.keys()
+            assert 'id' in issuetype.keys()
+            issuetype_name = issuetype['name']
+            issuetype_id = issuetype['id']
+            response = self.client.get_createmeta(self.client.project_name, issuetype_id)
             response.raise_for_status()
             data: list[dict[str, Any]] = response.json()
-            self.cache.write_createmeta(issuetype, data)
-        return self.client.issues.allowed_types
+            self.cache.write_createmeta(issuetype_name, data)
+        return self.client.issues.load_allowed_types()
 
     def compile_plugins(self) -> None:
         for input_file in self.cache.iter_dir("issuetype_fields"):

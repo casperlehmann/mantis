@@ -54,20 +54,24 @@ class JiraIssues:
     def __init__(self, client: "JiraClient"):
         self.client = client
 
-    def load_allowed_types(self) -> None:
-        cached_issuetypes = (
+    def load_allowed_types(self) -> list[str]:
+        issuetypes = (
             self.client.system_config_loader.get_issuetypes_for_project()
         )
-        if not cached_issuetypes:
-            return None
-        assert isinstance(cached_issuetypes, list)
-        assert isinstance(cached_issuetypes[0], dict)
-        assert isinstance(cached_issuetypes[0]["id"], str), f'Unexpected type of cached_issuetypes[0]["id"]: {cached_issuetypes[0]["id"]} ({type(cached_issuetypes[0]["id"])})'
-        sorted_cached_issuetypes = sorted(
-            cached_issuetypes, key=lambda x: str(x.get("id"))
+        if not issuetypes:
+            raise ValueError('No values retrieved for issuetypes')
+        assert isinstance(issuetypes, dict)
+        nested_issuetypes: list[dict] = issuetypes['issueTypes']
+        assert isinstance(nested_issuetypes, list), f"nested_issuetypes: {nested_issuetypes}"
+        assert isinstance(nested_issuetypes[0], dict)
+        assert isinstance(nested_issuetypes[0]["id"], str), f'Unexpected type of nested_issuetypes[0]["id"]: {nested_issuetypes[0]["id"]} ({type(nested_issuetypes[0]["id"])})'
+        sorted_nested_issuetypes = sorted(
+            nested_issuetypes, key=lambda x: str(x.get("id"))
         )
-        assert len(sorted_cached_issuetypes), 'List sorted_cached_issuetypes must not be empty'
-        self._allowed_types = [_.get("name", '') for _ in sorted_cached_issuetypes]
+        assert len(sorted_nested_issuetypes), 'List sorted_nested_issuetypes must not be empty'
+        self._allowed_types = [_.get("name", '') for _ in sorted_nested_issuetypes]
+        assert self._allowed_types
+        return self._allowed_types
 
     @property
     def allowed_types(self) -> list[str] | None:

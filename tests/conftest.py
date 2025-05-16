@@ -117,7 +117,7 @@ def fake_jira(
     mock_get_request,
 ):
     jira = jira_client_from_fake_cli
-    expected = {"key": "TASK-1", "fields": {"status": {"name": "resolved"}}}
+    expected = {"key": "TASK-1", "fields": {"status": {"name": "resolved"}, "description": "redacted"}}
     mock_get_request.return_value.json.return_value = expected
     assert str(jira.cache.root) != ".jira_cache_test"
     assert str(jira.drafts_dir) != "drafts_test"
