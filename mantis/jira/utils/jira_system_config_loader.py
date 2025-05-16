@@ -114,6 +114,20 @@ class JiraSystemConfigLoader:
                 output=output_path,
                 output_model_type=DataModelType.PydanticV2BaseModel,
             )
+        for input_file in self.client.cache.iter_dir("issues"):
+            print(f'input_file: {input_file}')
+            with open(input_file, "r") as f:
+                content = f.read()
+            # Remove the .json extension
+            name = input_file.name[:-5].replace("-", "_").replace("_", "_").lower()
+            output_path = self.client.plugins_dir / f"{name}.py"
+            generate(
+                content,
+                input_file_type=InputFileType.Json,
+                input_filename=str(input_file),
+                output=output_path,
+                output_model_type=DataModelType.PydanticV2BaseModel,
+            )
 
     def get_all_keys_from_nested_dicts(
         self, data: Mapping[str, ProjectFieldKeys]
