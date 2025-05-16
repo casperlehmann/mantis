@@ -138,7 +138,7 @@ def test_handle_http_error_raises_generic_exception(
 
 def test_jira_no_issues_fields_raises(fake_jira: JiraClient, mock_post_request):
     issue = fake_jira.issues.get("TASK-1")
-    issue.data["fields"] = None
+    issue.data["fields"] = None  # type: ignore since we are purely testing that it raises an error
     with pytest.raises(KeyError):
         assert issue.fields
 
