@@ -2,6 +2,8 @@ from typing import TYPE_CHECKING, Any
 
 from requests.models import HTTPError
 
+from mantis.drafts import Draft
+
 if TYPE_CHECKING:
     from .jira_client import JiraClient
 
@@ -26,6 +28,7 @@ class JiraIssue:
         self.client = client
         self.data = raw_data
         # https://docs.pydantic.dev/1.10/datamodel_code_generator/
+        self.draft = Draft(self.client, self)
 
     def get(self, key: str, default: Any = None) -> Any:
         return self.data.get(key, default) or default

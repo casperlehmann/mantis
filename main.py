@@ -2,7 +2,6 @@
 
 from pprint import pprint
 
-from mantis.drafts import Draft
 from mantis.jira import JiraAuth, JiraClient, JiraOptions, parse_args
 
 if __name__ == '__main__':
@@ -27,7 +26,6 @@ if __name__ == '__main__':
             key = issue.get('key', 'N/A')
             title = issue.get_field('summary')
             print(f'[{key}] {title}')
-            draft = Draft(jira, issue)
     elif jira_options.action == 'get-project-keys':
         print ('Fetching from Jira...')
         resp = jira.system_config_loader.update_project_field_keys()
