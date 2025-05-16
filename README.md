@@ -68,6 +68,31 @@ Updated local cache for issuetypes:
   'id': 6,
   'name': 'Story'},
 [...]
+
+# Re-fetches config files
+$ python main.py --action reset
+['Epic', 'Subtask', 'Task', 'Story', 'Bug']
+
+# Fornat the fetched json in the Jira cache
+$ find .jira_cache -type f -name '*.json' -exec sh -c 'jq . "$1" > "$1.tmp" && mv "$1.tmp" "$1"' _ {} \;
+```
+
+For iterative testing, we can rely on the functions defined in `scripts/development-functions.sh` to reset and/or re-populate the cache and drafts directory:
+
+```sh
+reset_cache() {
+  python main.py --action reset
+}
+
+jsonfmt() {
+  python main.py --action reset
+  find .jira_cache -type f -name '*.json' -exec sh -c 'jq . "$1" > "$1.tmp" && mv "$1.tmp" "$1"' _ {} \;
+}
+
+getandfmt() {
+  jsonfmt
+  python main.py --action get-issue ECS-1 ECS-2 ECS-3 ECS-4 ECS-5 ECS-6
+}
 ```
 
 Or to overwrite options on the command line (remember to set the JIRA_TOKEN env var):
@@ -96,6 +121,19 @@ $ pytest --cov
 
 # Generate coverage report (written to ./htmlcov)
 $ pytest --cov-report html --cov
+```
+
+See functions in `development-functions.sh`:
+
+```sh
+run_coverage() {
+  pytest --cov
+}
+
+show_coverage() {
+  pytest --cov-report html --cov
+  open htmlcov/index.html
+}
 ```
 
 An example of the coverage report:
@@ -162,4 +200,50 @@ python main.py --action=get-issue ECS-1 ECS-2 ECS-3 ECS-4 ECS-5 ECS-6
 [ECS-4] (Sample) User Registration
 [ECS-5] (Sample) Order Confirmation
 [ECS-6] (Sample) User Login
+```
+
+# Copy to test data
+
+Copy demo data to the test directory:
+
+```sh
+cp -rf drafts/ tests/data/drafts
+cp -rf .jira_cache/* tests/data/jira_cache/
+```
+
+Format the JSON files using `jq`:
+
+```sh
+find tests/data/jira_cache -type f -name '*.json' -exec sh -c 'jq . "$1" > "$1.tmp" && mv "$1.tmp" "$1"' _ {} \;
+```
+
+Then anonomize the files:
+
+```sh
+find tests/data/ -type f -name '*.json' -exec sh -c '
+  for file do
+    # Format JSON with jq, then replace emails
+    tmp="${file}.tmp"
+    if jq . "$file" > "$tmp"; then
+      # Replace emails with dummy value (e.g., dummy@example.com)
+      sed -E -i.bak "s/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/dummy@example.com/g" "$tmp"
+      mv "$tmp" "$file"
+      rm "$tmp.bak"
+    else
+      echo "Invalid JSON: $file"
+      rm -f "$tmp"
+    fi
+  done
+' sh {} +
+```
+
+All in one function in `development-functions.sh`:
+
+```sh
+update_test_data() {
+    cp -rf drafts/ tests/data/drafts
+    cp -rf .jira_cache/* tests/data/jira_cache/
+    format_test_data
+    anonymize_test_data
+}
 ```
