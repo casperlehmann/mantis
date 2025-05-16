@@ -68,6 +68,10 @@ Updated local cache for issuetypes:
   'id': 6,
   'name': 'Story'},
 [...]
+
+# Re-fetches config files
+$ python main.py --action reset
+['Epic', 'Subtask', 'Task', 'Story', 'Bug']
 ```
 
 Or to overwrite options on the command line (remember to set the JIRA_TOKEN env var):
