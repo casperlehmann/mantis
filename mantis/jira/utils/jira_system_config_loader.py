@@ -38,12 +38,6 @@ class JiraSystemConfigLoader:
         payload: list[dict[str, Any]] = response.json()
         self.cache.write_to_system_cache("projects.json", json.dumps(payload))
         return payload
-        data = [{'id': _['id'], 'key': _['key']} for _ in response.json() if _.get('key') == self.client.options.project][0]
-        projects = [_ for _ in response.json() if _.get('key') == self.client.options.project][0]
-        self.cache.write_to_system_cache(
-            f"issuetype_fields/project.json", json.dumps(data)
-        )
-        return data
     
     def get_projects(self) -> list[dict[str, Any]]:
         if not self.client._no_read_cache:
