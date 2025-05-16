@@ -18,7 +18,7 @@ def test_jira_issues_get_fake(fake_jira: JiraClient):
 
 def test_jira_issues_get_mocked(fake_jira: JiraClient, with_no_read_cache):
     assert fake_jira._no_read_cache is True
-    expected = {"key": "TASK-1", "fields": {"status": {"name": "resolved"}}}
+    expected = {"key": "TASK-1", "fields": {"status": {"name": "resolved"}, "description": "redacted"}}
     mock_response = Mock()
     mock_response.status_code = 200
     mock_response.ok = True
@@ -144,8 +144,12 @@ def test_jira_no_issues_fields_raises(fake_jira: JiraClient, mock_post_request):
 
 
 def test_jira_issues_cached_issuetypes_parses_allowed_types(fake_jira: JiraClient):
-    cached_issuetypes = [{"id": '1', "name": "Bug", 'scope': {'project': {'id': '10000'}}},
-                         {"id": '2', "name": "Task", 'scope': {'project': {'id': '10000'}}}]
+    cached_issuetypes = {
+        "issueTypes": [
+            {"id": '1', "name": "Bug", 'scope': {'project': {'id': '10000'}}},
+            {"id": '2', "name": "Task", 'scope': {'project': {'id': '10000'}}}
+        ]
+    }
     fake_jira.system_config_loader.get_issuetypes_for_project = (
         lambda *args, **kwargs: cached_issuetypes
     )
@@ -162,7 +166,7 @@ def test_jira_issues_get_does_write_to_cache(fake_jira: JiraClient):
     assert len([file for file in fake_jira.cache.issues.iterdir()]) == 1
     with open(fake_jira.cache.issues / "TASK-1.json", "r") as f:
         data = json.load(f)
-    assert data == {"fields": {"status": {"name": "resolved"}}, "key": "TASK-1"}
+    assert data == {"fields": {"status": {"name": "resolved"}, "description": "redacted"}, "key": "TASK-1"}
 
 
 def test_jira_issues_get_does_retrieve_from_cache(fake_jira: JiraClient):
