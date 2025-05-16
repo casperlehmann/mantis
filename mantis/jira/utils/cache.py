@@ -68,13 +68,13 @@ class Cache:
             raise LookupError('Attempted to access cache when _no_read_cache is set')
         return self.get_from_system_cache(f"projects.json")
 
-    def get_issuetypes_from_system_cache(self) -> list[dict[str, Any]] | None:
+    def get_issuetypes_from_system_cache(self) -> dict[str, Any] | None:
         if self.client._no_read_cache:
             raise LookupError('Attempted to access cache when _no_read_cache is set')
         issuetypes = self.get_from_system_cache("issuetypes.json")
         if not issuetypes:
             return None
-        assert isinstance(issuetypes, list), f'{issuetypes} should be of type list. Got: {type(issuetypes)}'
+        assert isinstance(issuetypes, dict), f'{issuetypes} should be of type dict. Got: {type(issuetypes)}: {issuetypes}'
         return issuetypes
 
     def get_from_issuetype_fields_cache(self, filename: str) -> dict[str, Any] | None:
@@ -102,7 +102,7 @@ class Cache:
     def write_to_system_cache(self, filename: str, issue_enums: str) -> None:
         self._write(self.system, filename, issue_enums)
 
-    def write_issuetypes_to_system_cache(self, issuetypes: list[dict[str, Any]]) -> None:
+    def write_issuetypes_to_system_cache(self, issuetypes: dict[str, Any]) -> None:
         self.write_to_system_cache("issuetypes.json", json.dumps(issuetypes))
 
     def write_to_issuetype_fields(self, filename: str, issuetype_fields: list[dict[str, Any]]) -> None:
