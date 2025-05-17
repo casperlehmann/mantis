@@ -164,9 +164,6 @@ mantis/jira/__init__.py:4:1: F401 '.jira_options.parse_args' imported but unused
 mantis/jira/__init__.py:5:1: F401 '.utils.JiraSystemConfigLoader' imported but unused
 mantis/jira/utils/__init__.py:1:1: F401 '.cache.Cache' imported but unused
 mantis/jira/utils/__init__.py:2:1: F401 '.jira_system_config_loader.JiraSystemConfigLoader' imported but unused
-mantis/jira/utils/__init__.py:3:1: F401 '.jira_types.IssueType' imported but unused
-mantis/jira/utils/__init__.py:3:1: F401 '.jira_types.IssueTypeFields' imported but unused
-mantis/jira/utils/__init__.py:3:1: F401 '.jira_types.Project' imported but unused
 12    F401 '.jira_auth.JiraAuth' imported but unused
 12
 ```
