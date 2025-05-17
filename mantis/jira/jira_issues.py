@@ -50,6 +50,22 @@ class JiraIssue:
             raise ValueError('No key')
         self.client.update_field(key, data)
     
+    def update_from_draft(self) -> None:
+        pass
+    
+    def project(self) -> None:
+        pass
+        # CREATE_META_ONLY
+        # Should be set using project meta data
+
+    def comment(self) -> None:
+        pass
+        # EDIT_META_ONLY
+    
+    def environment(self) -> None:
+        pass
+        # EDIT_META_ONLY
+        # Probably don't need this
 
 class JiraIssues:
     _allowed_types: list[str] | None = None
