@@ -111,9 +111,6 @@ class Cache:
     def write_createmeta(self, issuetype_name: str, issuetype_fields: list[dict[str, Any]]) -> None:
         self.write_to_issuetype_fields(f"createmeta_{issuetype_name.lower()}.json", issuetype_fields)
 
-    def write_editemeta(self, issuetype_name: str, issuetype_fields: list[dict[str, Any]]) -> None:
-        self.write_to_issuetype_fields(f"editmeta_{issuetype_name.lower()}.json", issuetype_fields)
-
     def remove(self, filename: str) -> bool:
         if not (self.root / filename).exists():
             return False
