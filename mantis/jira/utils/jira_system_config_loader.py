@@ -231,8 +231,9 @@ class JiraSystemConfigLoader:
     def get_key_names_from_all_types(self, data: dict[str, CreatemetaModelFactory]) -> set[str]:
         d: dict[str, list[str]] = {}
         all_field_keys: set[str] = set()
-        for issuetype, field_keys in data.items():
-            field_keys = list(field_keys.keys())
+        for issuetype, createmeta_factory in data.items():
+            assert isinstance(createmeta_factory, CreatemetaModelFactory)
+            field_keys = list(createmeta_factory.keys())
             d[issuetype] = field_keys
             all_field_keys = all_field_keys.union(set(d[issuetype]))
         return all_field_keys
