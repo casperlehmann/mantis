@@ -259,7 +259,7 @@ class JiraSystemConfigLoader:
         print_header_footer()
         for each in all_field_keys:
             print(f"{each:<20} - ", end="")
-            for _, project_field_keys in issuetype_field_map.items():
+            for project_field_keys in issuetype_field_map.values():
                 print(
                     f"{'1   ' if each in project_field_keys.keys() else '':<10}",
                     end="",
