@@ -228,7 +228,7 @@ class JiraSystemConfigLoader:
                 output_model_type=DataModelType.PydanticV2BaseModel,
             )
 
-    def get_all_keys_from_nested_dicts(self, data: dict[str, CreatemetaModelFactory]) -> set[str]:
+    def get_key_names_from_all_types(self, data: dict[str, CreatemetaModelFactory]) -> set[str]:
         d: dict[str, list[str]] = {}
         all_field_keys: set[str] = set()
         for issuetype, field_keys in data.items():
@@ -273,5 +273,5 @@ class JiraSystemConfigLoader:
 
     def inspect(self) -> None:
         data = self.get_project_field_keys_from_cache()
-        all_keys = self.get_all_keys_from_nested_dicts(data)
+        all_keys = self.get_key_names_from_all_types(data)
         self.print_table(self.client.issues.allowed_types, all_keys, data)
