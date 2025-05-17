@@ -77,9 +77,11 @@ class JiraIssues:
         return self._allowed_types
 
     @property
-    def allowed_types(self) -> list[str] | None:
+    def allowed_types(self) -> list[str]:
         if self._allowed_types is None:
             self.load_allowed_types()
+            if self._allowed_types is None:
+                raise ValueError('Loading allowed_types failed.')
         return self._allowed_types
 
     def get(self, key: str) -> JiraIssue:
@@ -97,7 +99,7 @@ class JiraIssues:
         return JiraIssue(self.client, issue_data)
 
     def create(self, issuetype: str, title: str, data: dict) -> dict:
-        assert self.allowed_types and issuetype in self.allowed_types
+        assert issuetype in self.allowed_types
         if len(data.keys()) == 0:
             raise ValueError("The data object is an empty payload")
         print(f"Create issue ({issuetype}): {title}")

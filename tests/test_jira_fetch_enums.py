@@ -120,7 +120,7 @@ def test_update_project_field_keys(mock_get, fake_jira: JiraClient):
     assert set(allowed_types) == set(['Epic', 'Subtask', 'Task', 'Story', 'Bug'])
     if not (fake_jira.cache.issuetype_fields / 'createmeta_story.json').exists():
         raise FileNotFoundError('File "createmeta_story.json" should have been created')
-    assert 'Story' in (allowed_types or []), f"Testtype not in allowed_types: {allowed_types}"
+    assert 'Story' in allowed_types, f"Testtype not in allowed_types: {allowed_types}"
     with open(fake_jira.cache.issuetype_fields / "createmeta_story.json", "r") as f:
         assert f.read() == '{"issueTypes": {"name": "Testtype"}}'
 
