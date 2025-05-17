@@ -114,6 +114,16 @@ class JiraSystemConfigLoader:
     def __init__(self, client: "JiraClient") -> None:
         self.client = client
 
+    def attempt(self, issue_id: str, issue_type: str) -> None:
+        with open(f".jira_cache/issues/{issue_id}.json", "r") as f:
+            data = json.load(f)
+        fields = CreatemetaModelFactory(self.client, issue_type)
+        loaded = fields.make(data)
+        assert loaded.key == issue_id  # type: ignore
+        print(loaded.key)  # type: ignore
+        print(loaded.fields.description)  # type: ignore
+        assert loaded.fields.customfield_10031 == loaded.fields.development  # type: ignore
+
     @property
     def cache(self) -> 'Cache':
         return self.client.cache
