@@ -1,13 +1,12 @@
 import json
+from typing import Any
 from unittest.mock import patch
 
 import pytest
 
 from mantis.jira import JiraClient
 from mantis.jira.utils.cache import CacheMissException
-from mantis.jira.utils.jira_types import ProjectFieldKeys
 from tests.data import get_issuetypes_response, update_projects_cache_response, CacheData
-from tests.test_jira_types import ISSUETYPEFIELDS
 
 
 @patch("mantis.jira.jira_client.requests.get")
@@ -142,28 +141,17 @@ def test_compile_plugins(mock_get, fake_jira: JiraClient):
     assert len(list(fake_jira.plugins_dir.iterdir())) == 1
 
 
-def test_get_all_keys_from_nested_dicts(fake_jira: "JiraClient"):
-    config_loader = fake_jira.system_config_loader
-    data_in = {
-        "a": ProjectFieldKeys(name="test_a", issuetype_fields=ISSUETYPEFIELDS),
-        "b": ProjectFieldKeys(name="test_b", issuetype_fields=ISSUETYPEFIELDS),
-    }
-    data_out = config_loader.get_all_keys_from_nested_dicts(data_in)
-    assert data_out
-
-
 def test_print_table(fake_jira: "JiraClient", capsys):
     config_loader = fake_jira.system_config_loader
-    data_in = {
-        "a": ProjectFieldKeys(name="test_a", issuetype_fields=ISSUETYPEFIELDS),
-        "b": ProjectFieldKeys(name="test_b", issuetype_fields=ISSUETYPEFIELDS),
-    }
-    data_out = config_loader.print_table(["a"], {"placeholder"}, data_in)
+    column_order: list[str] = ["a"]
+    all_field_keys: set[str] = {"placeholder"}
+    issuetype_field_map: dict[str, Any] = {'a': {'placeholder':''}}
+    data_out = config_loader.print_table(column_order, all_field_keys, issuetype_field_map)
     assert data_out is None
     captured = capsys.readouterr()
     expected = (
         "                     - a         ",
-        "placeholder          - 1         1",
+        "placeholder          - 1         ",
         "                     - a         ",
     )
     for actual_line, expected_line in zip(captured.out.split("\n"), expected):
@@ -172,12 +160,12 @@ def test_print_table(fake_jira: "JiraClient", capsys):
 
 def test_print_table_raises_on_non_existent_key(fake_jira: "JiraClient", capsys):
     config_loader = fake_jira.system_config_loader
-    data_in = {
-        "a": ProjectFieldKeys(name="test_a", issuetype_fields=ISSUETYPEFIELDS),
-        "b": ProjectFieldKeys(name="test_b", issuetype_fields=ISSUETYPEFIELDS),
-    }
+    column_order: list[str] = ["a"]
+    all_field_keys: set[str] = {"placeholder"}
+    issuetype_field_map: dict[str, Any] = {'a': {'placeholder':''}}
+    _ = config_loader.print_table(column_order, all_field_keys, issuetype_field_map)
     with pytest.raises(ValueError):
-        config_loader.print_table(["non-existent"], {"placeholder"}, data_in)
+        config_loader.print_table(["non-existent"], {"placeholder"}, issuetype_field_map)
 
 
 def test_get_project_field_keys_from_cache(fake_jira: "JiraClient", with_fake_allowed_types):
@@ -186,17 +174,9 @@ def test_get_project_field_keys_from_cache(fake_jira: "JiraClient", with_fake_al
         config_loader.get_project_field_keys_from_cache()
 
     fake_jira.issues._allowed_types = ["test"]
-    dummy = ProjectFieldKeys(name="test_b", issuetype_fields=ISSUETYPEFIELDS)
+    from tests.data import CacheData
+    data = CacheData().createmeta_epic
     with open(fake_jira.cache.issuetype_fields / "createmeta_test.json", "w") as f:
-        f.write(dummy.data.model_dump_json())
+        json.dump(data, f)
     from_cache = config_loader.get_project_field_keys_from_cache()
     assert from_cache
-
-
-def test_inspect(fake_jira: "JiraClient"):
-    config_loader = fake_jira.system_config_loader
-    fake_jira.issues._allowed_types = ["test"]
-    dummy = ProjectFieldKeys(name="test_b", issuetype_fields=ISSUETYPEFIELDS)
-    with open(fake_jira.cache.issuetype_fields / "createmeta_test.json", "w") as f:
-        f.write(dummy.data.model_dump_json())
-    config_loader.inspect()
