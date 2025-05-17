@@ -43,6 +43,26 @@ if __name__ == '__main__':
             title = issue.get_field('summary')
             print(f'[{key}] {title}')
             jira._no_read_cache = False
+    elif jira_options.action == 'update-issue-from-draft':
+        for issue_key in jira_options.issues:
+            issue = jira.issues.get(key=issue_key)
+            draft_data = issue.draft.read_draft()
+            print (f'draft_data: {draft_data}')
+
+            local_vars = ('ignore', 'header')
+            for field in draft_data.keys():
+                value = draft_data.get(field)
+                if field in local_vars:  # E.g. Local custom fields
+                    continue
+                if not value:  # E.g. parent not set
+                    continue
+                from_cache = issue.get_field(field, None)
+                if not from_cache:
+                    print (f'Field "{field}" not found in cache')
+                print([value, from_cache])
+                # assert value == from_cache
+            assert draft_data.content == f'{draft_data.to_dict().get('content', '')}'
+            assert not draft_data.content.startswith(f'# {draft_data.get('summary', '')}\n\n')
     elif jira_options.action == 'get-project-keys':
         print ('Fetching from Jira...')
         resp = jira.system_config_loader.fetch_and_update_all_createmeta()
