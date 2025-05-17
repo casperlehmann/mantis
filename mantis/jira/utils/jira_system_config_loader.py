@@ -166,7 +166,7 @@ class JiraSystemConfigLoader:
 
     def get_project_field_keys_from_cache(self) -> Dict[str, ProjectFieldKeys]:
         d: Dict[str, ProjectFieldKeys] = {}
-        for issuetype in self.client.issues.allowed_types or []:
+        for issuetype in self.client.issues.allowed_types:
             try:
                 loaded_json = self.cache.get_createmeta_from_issuetype_fields_cache(issuetype)
                 issuetype_fields = IssueTypeFields.model_validate(loaded_json)
@@ -180,4 +180,4 @@ class JiraSystemConfigLoader:
     def inspect(self) -> None:
         data = self.get_project_field_keys_from_cache()
         all_keys = self.get_all_keys_from_nested_dicts(data)
-        self.print_table(self.client.issues.allowed_types or [], all_keys, data)
+        self.print_table(self.client.issues.allowed_types, all_keys, data)

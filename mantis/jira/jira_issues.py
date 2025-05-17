@@ -77,9 +77,11 @@ class JiraIssues:
         return self._allowed_types
 
     @property
-    def allowed_types(self) -> list[str] | None:
+    def allowed_types(self) -> list[str]:
         if self._allowed_types is None:
             self.load_allowed_types()
+            if self._allowed_types is None:
+                raise ValueError('Loading allowed_types failed.')
         return self._allowed_types
 
     def get(self, key: str) -> JiraIssue:
