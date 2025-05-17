@@ -86,7 +86,7 @@ class JiraIssueFieldSchema(BaseModel):
     allowedValues: Optional[list[dict]] = None
 
     @property
-    def schema_as_python_type(self):
+    def schema_as_python_type(self) -> Any:
         simple_type = self.alias_schema.type
         if simple_type is SchemaType.string:
             return str

@@ -1,70 +1,71 @@
 import json
+from typing import Any
 
 from .update_projects_cache_response import update_projects_cache_response
 from .get_issuetypes_response import get_issuetypes_response
 
 class CacheData:
     @property
-    def ecs_1(self):
+    def ecs_1(self) -> Any:
         with open('tests/data/jira_cache/issues/ECS-1.json', 'r') as f:
             return json.load(f)
 
     @property
-    def ecs_2(self):
+    def ecs_2(self) -> Any:
         with open('tests/data/jira_cache/issues/ECS-2.json', 'r') as f:
             return json.load(f)
 
     @property
-    def ecs_3(self):
+    def ecs_3(self) -> Any:
         with open('tests/data/jira_cache/issues/ECS-3.json', 'r') as f:
             return json.load(f)
 
     @property
-    def ecs_4(self):
+    def ecs_4(self) -> Any:
         with open('tests/data/jira_cache/issues/ECS-4.json', 'r') as f:
             return json.load(f)
 
     @property
-    def ecs_5(self):
+    def ecs_5(self) -> Any:
         with open('tests/data/jira_cache/issues/ECS-5.json', 'r') as f:
             return json.load(f)
 
     @property
-    def ecs_6(self):
+    def ecs_6(self) -> Any:
         with open('tests/data/jira_cache/issues/ECS-6.json', 'r') as f:
             return json.load(f)
 
     @property
-    def issuetypes(self):
+    def issuetypes(self) -> Any:
         with open('tests/data/jira_cache/system/issuetypes.json', 'r') as f:
             return json.load(f)
 
     @property
-    def projects(self):
+    def projects(self) -> Any:
         with open('tests/data/jira_cache/system/projects.json', 'r') as f:
             return json.load(f)
 
     @property
-    def createmeta_bug(self):
+    def createmeta_bug(self) -> Any:
         with open('tests/data/jira_cache/system/issuetype_fields/createmeta_bug.json', 'r') as f:
             return json.load(f)
 
     @property
-    def createmeta_epic(self):
+    def createmeta_epic(self) -> Any:
         with open('tests/data/jira_cache/system/issuetype_fields/createmeta_epic.json', 'r') as f:
             return json.load(f)
 
     @property
-    def createmeta_story(self):
+    def createmeta_story(self) -> Any:
         with open('tests/data/jira_cache/system/issuetype_fields/createmeta_story.json', 'r') as f:
             return json.load(f)
 
     @property
-    def createmeta_subtask(self):
+    def createmeta_subtask(self) -> Any:
         with open('tests/data/jira_cache/system/issuetype_fields/createmeta_subtask.json', 'r') as f:
             return json.load(f)
 
     @property
-    def createmeta_task(self):
+    def createmeta_task(self) -> Any:
         with open('tests/data/jira_cache/system/issuetype_fields/createmeta_task.json', 'r') as f:
             return json.load(f)
