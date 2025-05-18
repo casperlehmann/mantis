@@ -134,25 +134,10 @@ def fake_jira(
     with_fake_plugins_dir,
     jira_client_from_fake_cli,
     mock_get_request,
+    minimal_issue_payload,
 ):
     jira = jira_client_from_fake_cli
-    expected = {
-        "key": "TASK-1",
-        "fields": {
-            "summary": "redacted",
-            "ignore": True,
-            "header": "redacted",
-            "project": {"key": "redacted", "name": "redacted"},
-            "parent": "redacted",
-            "issuetype": "redacted",
-            "assignee": "redacted",
-            "key": "redacted",
-            "reporter": "redacted",
-            "status": {"name": "resolved"},
-            "description": "redacted"
-        }
-    }
-    mock_get_request.return_value.json.return_value = expected
+    mock_get_request.return_value.json.return_value = minimal_issue_payload
     assert str(jira.cache.root) != ".jira_cache_test"
     assert str(jira.drafts_dir) != "drafts_test"
     assert str(jira.plugins_dir) != "plugins_test"
