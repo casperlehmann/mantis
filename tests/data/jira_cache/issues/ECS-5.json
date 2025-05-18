@@ -1,195 +1,195 @@
 {
-    "expand": "renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations",
-    "id": "10004",
-    "self": "https://caspertestaccount.atlassian.net/rest/api/latest/issue/10004",
-    "key": "ECS-5",
-    "fields": {
-        "statuscategorychangedate": "2025-04-23T00:31:20.986+0200",
-        "issuetype": {
-            "self": "https://caspertestaccount.atlassian.net/rest/api/2/issuetype/10003",
-            "id": "10003",
-            "description": "Tasks track small, distinct pieces of work.",
-            "iconUrl": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/issuetype/avatar/10318?size=medium",
-            "name": "Task",
-            "subtask": false,
-            "avatarId": 10318,
-            "entityId": "8b309288-0f8a-4ab7-8c30-e54238a9341e",
-            "hierarchyLevel": 0
-        },
-        "parent": {
-            "id": "10000",
-            "key": "ECS-2",
-            "self": "https://caspertestaccount.atlassian.net/rest/api/2/issue/10000",
-            "fields": {
-                "summary": "(Sample) Payment Processing",
-                "status": {
-                    "self": "https://caspertestaccount.atlassian.net/rest/api/2/status/10001",
-                    "description": "",
-                    "iconUrl": "https://caspertestaccount.atlassian.net/images/icons/statuses/generic.png",
-                    "name": "In Progress",
-                    "id": "10001",
-                    "statusCategory": {
-                        "self": "https://caspertestaccount.atlassian.net/rest/api/2/statuscategory/4",
-                        "id": 4,
-                        "key": "indeterminate",
-                        "colorName": "yellow",
-                        "name": "In Progress"
-                    }
-                },
-                "priority": {
-                    "self": "https://caspertestaccount.atlassian.net/rest/api/2/priority/3",
-                    "iconUrl": "https://caspertestaccount.atlassian.net/images/icons/priorities/medium.svg",
-                    "name": "Medium",
-                    "id": "3"
-                },
-                "issuetype": {
-                    "self": "https://caspertestaccount.atlassian.net/rest/api/2/issuetype/10001",
-                    "id": "10001",
-                    "description": "Epics track collections of related bugs, stories, and tasks.",
-                    "iconUrl": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/issuetype/avatar/10307?size=medium",
-                    "name": "Epic",
-                    "subtask": false,
-                    "avatarId": 10307,
-                    "entityId": "c491e2d1-66be-4f4c-a7cf-46d3eda8e5aa",
-                    "hierarchyLevel": 1
-                }
-            }
-        },
-        "components": [],
-        "timespent": null,
-        "timeoriginalestimate": null,
-        "project": {
-            "self": "https://caspertestaccount.atlassian.net/rest/api/2/project/10000",
-            "id": "10000",
-            "key": "ECS",
-            "name": "E-Commerce Checkout System",
-            "projectTypeKey": "software",
-            "simplified": true,
-            "avatarUrls": {
-                "48x48": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10417",
-                "24x24": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10417?size=small",
-                "16x16": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10417?size=xsmall",
-                "32x32": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10417?size=medium"
-            }
-        },
-        "description": "As a user, I want to receive an order confirmation after my payment is processed.",
-        "fixVersions": [],
-        "aggregatetimespent": null,
-        "statusCategory": {
-            "self": "https://caspertestaccount.atlassian.net/rest/api/2/statuscategory/2",
-            "id": 2,
-            "key": "new",
-            "colorName": "blue-gray",
-            "name": "To Do"
-        },
-        "customfield_10035": null,
-        "resolution": null,
-        "timetracking": {},
-        "security": null,
-        "attachment": [],
-        "aggregatetimeestimate": null,
-        "resolutiondate": null,
-        "workratio": -1,
-        "summary": "(Sample) Order Confirmation",
-        "issuerestriction": {
-            "issuerestrictions": {},
-            "shouldDisplay": true
-        },
-        "watches": {
-            "self": "https://caspertestaccount.atlassian.net/rest/api/2/issue/ECS-5/watchers",
-            "watchCount": 1,
-            "isWatching": true
-        },
-        "lastViewed": "2025-05-12T00:49:30.106+0200",
-        "creator": {
-            "self": "https://caspertestaccount.atlassian.net/rest/api/2/user?accountId=712020%3A95f28275-1a43-4b1d-a411-4142f5ab13df",
-            "accountId": "712020:95f28275-1a43-4b1d-a411-4142f5ab13df",
-            "emailAddress": "dummy@example.com",
-            "avatarUrls": {
-                "48x48": "https://secure.gravatar.com/avatar/506859740cf84f211085dc189b77abbd?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FCL-3.png",
-                "24x24": "https://secure.gravatar.com/avatar/506859740cf84f211085dc189b77abbd?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FCL-3.png",
-                "16x16": "https://secure.gravatar.com/avatar/506859740cf84f211085dc189b77abbd?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FCL-3.png",
-                "32x32": "https://secure.gravatar.com/avatar/506859740cf84f211085dc189b77abbd?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FCL-3.png"
-            },
-            "displayName": "Casper Lehmann",
-            "active": true,
-            "timeZone": "Europe/Copenhagen",
-            "accountType": "atlassian"
-        },
-        "subtasks": [],
-        "created": "2025-04-23T00:31:20.525+0200",
-        "customfield_10021": null,
-        "reporter": {
-            "self": "https://caspertestaccount.atlassian.net/rest/api/2/user?accountId=712020%3A95f28275-1a43-4b1d-a411-4142f5ab13df",
-            "accountId": "712020:95f28275-1a43-4b1d-a411-4142f5ab13df",
-            "emailAddress": "dummy@example.com",
-            "avatarUrls": {
-                "48x48": "https://secure.gravatar.com/avatar/506859740cf84f211085dc189b77abbd?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FCL-3.png",
-                "24x24": "https://secure.gravatar.com/avatar/506859740cf84f211085dc189b77abbd?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FCL-3.png",
-                "16x16": "https://secure.gravatar.com/avatar/506859740cf84f211085dc189b77abbd?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FCL-3.png",
-                "32x32": "https://secure.gravatar.com/avatar/506859740cf84f211085dc189b77abbd?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FCL-3.png"
-            },
-            "displayName": "Casper Lehmann",
-            "active": true,
-            "timeZone": "Europe/Copenhagen",
-            "accountType": "atlassian"
-        },
-        "aggregateprogress": {
-            "progress": 0,
-            "total": 0
+  "expand": "renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations",
+  "id": "10004",
+  "self": "https://caspertestaccount.atlassian.net/rest/api/latest/issue/10004",
+  "key": "ECS-5",
+  "fields": {
+    "statuscategorychangedate": "2025-04-23T00:31:20.986+0200",
+    "issuetype": {
+      "self": "https://caspertestaccount.atlassian.net/rest/api/2/issuetype/10003",
+      "id": "10003",
+      "description": "Tasks track small, distinct pieces of work.",
+      "iconUrl": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/issuetype/avatar/10318?size=medium",
+      "name": "Task",
+      "subtask": false,
+      "avatarId": 10318,
+      "entityId": "8b309288-0f8a-4ab7-8c30-e54238a9341e",
+      "hierarchyLevel": 0
+    },
+    "parent": {
+      "id": "10000",
+      "key": "ECS-2",
+      "self": "https://caspertestaccount.atlassian.net/rest/api/2/issue/10000",
+      "fields": {
+        "summary": "(Sample) Payment Processing",
+        "status": {
+          "self": "https://caspertestaccount.atlassian.net/rest/api/2/status/10001",
+          "description": "",
+          "iconUrl": "https://caspertestaccount.atlassian.net/images/icons/statuses/generic.png",
+          "name": "In Progress",
+          "id": "10001",
+          "statusCategory": {
+            "self": "https://caspertestaccount.atlassian.net/rest/api/2/statuscategory/4",
+            "id": 4,
+            "key": "indeterminate",
+            "colorName": "yellow",
+            "name": "In Progress"
+          }
         },
         "priority": {
-            "self": "https://caspertestaccount.atlassian.net/rest/api/2/priority/3",
-            "iconUrl": "https://caspertestaccount.atlassian.net/images/icons/priorities/medium.svg",
-            "name": "Medium",
-            "id": "3"
+          "self": "https://caspertestaccount.atlassian.net/rest/api/2/priority/3",
+          "iconUrl": "https://caspertestaccount.atlassian.net/images/icons/priorities/medium.svg",
+          "name": "Medium",
+          "id": "3"
         },
-        "customfield_10001": null,
-        "labels": [],
-        "environment": null,
-        "customfield_10019": "0|i0000v:",
-        "timeestimate": null,
-        "aggregatetimeoriginalestimate": null,
-        "versions": [],
-        "duedate": null,
-        "progress": {
-            "progress": 0,
-            "total": 0
-        },
-        "issuelinks": [],
-        "votes": {
-            "self": "https://caspertestaccount.atlassian.net/rest/api/2/issue/ECS-5/votes",
-            "votes": 0,
-            "hasVoted": false
-        },
-        "comment": {
-            "comments": [],
-            "self": "https://caspertestaccount.atlassian.net/rest/api/2/issue/10004/comment",
-            "maxResults": 0,
-            "total": 0,
-            "startAt": 0
-        },
-        "assignee": null,
-        "worklog": {
-            "startAt": 0,
-            "maxResults": 20,
-            "total": 0,
-            "worklogs": []
-        },
-        "updated": "2025-04-23T00:31:21.068+0200",
-        "status": {
-            "self": "https://caspertestaccount.atlassian.net/rest/api/2/status/10000",
-            "description": "",
-            "iconUrl": "https://caspertestaccount.atlassian.net/images/icons/statuses/generic.png",
-            "name": "To Do",
-            "id": "10000",
-            "statusCategory": {
-                "self": "https://caspertestaccount.atlassian.net/rest/api/2/statuscategory/2",
-                "id": 2,
-                "key": "new",
-                "colorName": "blue-gray",
-                "name": "To Do"
-            }
+        "issuetype": {
+          "self": "https://caspertestaccount.atlassian.net/rest/api/2/issuetype/10001",
+          "id": "10001",
+          "description": "Epics track collections of related bugs, stories, and tasks.",
+          "iconUrl": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/issuetype/avatar/10307?size=medium",
+          "name": "Epic",
+          "subtask": false,
+          "avatarId": 10307,
+          "entityId": "c491e2d1-66be-4f4c-a7cf-46d3eda8e5aa",
+          "hierarchyLevel": 1
         }
+      }
+    },
+    "components": [],
+    "timespent": null,
+    "timeoriginalestimate": null,
+    "project": {
+      "self": "https://caspertestaccount.atlassian.net/rest/api/2/project/10000",
+      "id": "10000",
+      "key": "ECS",
+      "name": "E-Commerce Checkout System",
+      "projectTypeKey": "software",
+      "simplified": true,
+      "avatarUrls": {
+        "48x48": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10417",
+        "24x24": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10417?size=small",
+        "16x16": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10417?size=xsmall",
+        "32x32": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10417?size=medium"
+      }
+    },
+    "description": "As a user, I want to receive an order confirmation after my payment is processed.",
+    "fixVersions": [],
+    "aggregatetimespent": null,
+    "statusCategory": {
+      "self": "https://caspertestaccount.atlassian.net/rest/api/2/statuscategory/2",
+      "id": 2,
+      "key": "new",
+      "colorName": "blue-gray",
+      "name": "To Do"
+    },
+    "customfield_10035": null,
+    "resolution": null,
+    "timetracking": {},
+    "security": null,
+    "attachment": [],
+    "aggregatetimeestimate": null,
+    "resolutiondate": null,
+    "workratio": -1,
+    "summary": "(Sample) Order Confirmation",
+    "issuerestriction": {
+      "issuerestrictions": {},
+      "shouldDisplay": true
+    },
+    "watches": {
+      "self": "https://caspertestaccount.atlassian.net/rest/api/2/issue/ECS-5/watchers",
+      "watchCount": 1,
+      "isWatching": true
+    },
+    "lastViewed": "2025-05-12T00:49:30.106+0200",
+    "creator": {
+      "self": "https://caspertestaccount.atlassian.net/rest/api/2/user?accountId=712020%3A95f28275-1a43-4b1d-a411-4142f5ab13df",
+      "accountId": "712020:95f28275-1a43-4b1d-a411-4142f5ab13df",
+      "emailAddress": "dummy@example.com",
+      "avatarUrls": {
+        "48x48": "https://secure.gravatar.com/avatar/506859740cf84f211085dc189b77abbd?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FCL-3.png",
+        "24x24": "https://secure.gravatar.com/avatar/506859740cf84f211085dc189b77abbd?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FCL-3.png",
+        "16x16": "https://secure.gravatar.com/avatar/506859740cf84f211085dc189b77abbd?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FCL-3.png",
+        "32x32": "https://secure.gravatar.com/avatar/506859740cf84f211085dc189b77abbd?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FCL-3.png"
+      },
+      "displayName": "Casper Lehmann",
+      "active": true,
+      "timeZone": "Europe/Copenhagen",
+      "accountType": "atlassian"
+    },
+    "subtasks": [],
+    "created": "2025-04-23T00:31:20.525+0200",
+    "customfield_10021": null,
+    "reporter": {
+      "self": "https://caspertestaccount.atlassian.net/rest/api/2/user?accountId=712020%3A95f28275-1a43-4b1d-a411-4142f5ab13df",
+      "accountId": "712020:95f28275-1a43-4b1d-a411-4142f5ab13df",
+      "emailAddress": "dummy@example.com",
+      "avatarUrls": {
+        "48x48": "https://secure.gravatar.com/avatar/506859740cf84f211085dc189b77abbd?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FCL-3.png",
+        "24x24": "https://secure.gravatar.com/avatar/506859740cf84f211085dc189b77abbd?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FCL-3.png",
+        "16x16": "https://secure.gravatar.com/avatar/506859740cf84f211085dc189b77abbd?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FCL-3.png",
+        "32x32": "https://secure.gravatar.com/avatar/506859740cf84f211085dc189b77abbd?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FCL-3.png"
+      },
+      "displayName": "Casper Lehmann",
+      "active": true,
+      "timeZone": "Europe/Copenhagen",
+      "accountType": "atlassian"
+    },
+    "aggregateprogress": {
+      "progress": 0,
+      "total": 0
+    },
+    "priority": {
+      "self": "https://caspertestaccount.atlassian.net/rest/api/2/priority/3",
+      "iconUrl": "https://caspertestaccount.atlassian.net/images/icons/priorities/medium.svg",
+      "name": "Medium",
+      "id": "3"
+    },
+    "customfield_10001": null,
+    "labels": [],
+    "environment": null,
+    "customfield_10019": "0|i0000v:",
+    "timeestimate": null,
+    "aggregatetimeoriginalestimate": null,
+    "versions": [],
+    "duedate": null,
+    "progress": {
+      "progress": 0,
+      "total": 0
+    },
+    "issuelinks": [],
+    "votes": {
+      "self": "https://caspertestaccount.atlassian.net/rest/api/2/issue/ECS-5/votes",
+      "votes": 0,
+      "hasVoted": false
+    },
+    "comment": {
+      "comments": [],
+      "self": "https://caspertestaccount.atlassian.net/rest/api/2/issue/10004/comment",
+      "maxResults": 0,
+      "total": 0,
+      "startAt": 0
+    },
+    "assignee": null,
+    "worklog": {
+      "startAt": 0,
+      "maxResults": 20,
+      "total": 0,
+      "worklogs": []
+    },
+    "updated": "2025-04-23T00:31:21.068+0200",
+    "status": {
+      "self": "https://caspertestaccount.atlassian.net/rest/api/2/status/10000",
+      "description": "",
+      "iconUrl": "https://caspertestaccount.atlassian.net/images/icons/statuses/generic.png",
+      "name": "To Do",
+      "id": "10000",
+      "statusCategory": {
+        "self": "https://caspertestaccount.atlassian.net/rest/api/2/statuscategory/2",
+        "id": 2,
+        "key": "new",
+        "colorName": "blue-gray",
+        "name": "To Do"
+      }
     }
+  }
 }

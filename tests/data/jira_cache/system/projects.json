@@ -1,42 +1,42 @@
 [
-    {
-        "expand": "description,lead,issueTypes,url,projectKeys,permissions,insight",
-        "self": "https://caspertestaccount.atlassian.net/rest/api/2/project/10001",
-        "id": "10001",
-        "key": "LEARNJIRA",
-        "name": "(Learn) Jira Premium benefits in 5 min 👋",
-        "avatarUrls": {
-            "48x48": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10407",
-            "24x24": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10407?size=small",
-            "16x16": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10407?size=xsmall",
-            "32x32": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10407?size=medium"
-        },
-        "projectTypeKey": "software",
-        "simplified": true,
-        "style": "next-gen",
-        "isPrivate": false,
-        "properties": {},
-        "entityId": "fba6ffc9-d429-408f-8495-00edce965d92",
-        "uuid": "fba6ffc9-d429-408f-8495-00edce965d92"
+  {
+    "expand": "description,lead,issueTypes,url,projectKeys,permissions,insight",
+    "self": "https://caspertestaccount.atlassian.net/rest/api/2/project/10001",
+    "id": "10001",
+    "key": "LEARNJIRA",
+    "name": "(Learn) Jira Premium benefits in 5 min 👋",
+    "avatarUrls": {
+      "48x48": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10407",
+      "24x24": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10407?size=small",
+      "16x16": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10407?size=xsmall",
+      "32x32": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10407?size=medium"
     },
-    {
-        "expand": "description,lead,issueTypes,url,projectKeys,permissions,insight",
-        "self": "https://caspertestaccount.atlassian.net/rest/api/2/project/10000",
-        "id": "10000",
-        "key": "ECS",
-        "name": "E-Commerce Checkout System",
-        "avatarUrls": {
-            "48x48": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10417",
-            "24x24": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10417?size=small",
-            "16x16": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10417?size=xsmall",
-            "32x32": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10417?size=medium"
-        },
-        "projectTypeKey": "software",
-        "simplified": true,
-        "style": "next-gen",
-        "isPrivate": false,
-        "properties": {},
-        "entityId": "f853ead8-876c-46a8-9dbe-6479d9f03449",
-        "uuid": "f853ead8-876c-46a8-9dbe-6479d9f03449"
-    }
+    "projectTypeKey": "software",
+    "simplified": true,
+    "style": "next-gen",
+    "isPrivate": false,
+    "properties": {},
+    "entityId": "fba6ffc9-d429-408f-8495-00edce965d92",
+    "uuid": "fba6ffc9-d429-408f-8495-00edce965d92"
+  },
+  {
+    "expand": "description,lead,issueTypes,url,projectKeys,permissions,insight",
+    "self": "https://caspertestaccount.atlassian.net/rest/api/2/project/10000",
+    "id": "10000",
+    "key": "ECS",
+    "name": "E-Commerce Checkout System",
+    "avatarUrls": {
+      "48x48": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10417",
+      "24x24": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10417?size=small",
+      "16x16": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10417?size=xsmall",
+      "32x32": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10417?size=medium"
+    },
+    "projectTypeKey": "software",
+    "simplified": true,
+    "style": "next-gen",
+    "isPrivate": false,
+    "properties": {},
+    "entityId": "f853ead8-876c-46a8-9dbe-6479d9f03449",
+    "uuid": "f853ead8-876c-46a8-9dbe-6479d9f03449"
+  }
 ]

@@ -1,350 +1,350 @@
 {
-    "startAt": 0,
-    "maxResults": 50,
-    "total": 20,
-    "fields": [
-        {
-            "required": false,
-            "schema": {
-                "type": "user",
-                "system": "assignee"
-            },
-            "name": "Assignee",
-            "key": "assignee",
-            "autoCompleteUrl": "https://caspertestaccount.atlassian.net/rest/api/2/user/assignable/search?project=ECS&query=",
-            "hasDefaultValue": false,
-            "operations": [
-                "set"
-            ],
-            "fieldId": "assignee"
-        },
-        {
-            "required": false,
-            "schema": {
-                "type": "array",
-                "items": "attachment",
-                "system": "attachment"
-            },
-            "name": "Attachment",
-            "key": "attachment",
-            "hasDefaultValue": false,
-            "operations": [
-                "set",
-                "copy"
-            ],
-            "fieldId": "attachment"
-        },
-        {
-            "required": false,
-            "schema": {
-                "type": "team",
-                "custom": "com.atlassian.jira.plugin.system.customfieldtypes:atlassian-team",
-                "customId": 10001,
-                "configuration": {
-                    "com.atlassian.jira.plugin.system.customfieldtypes:atlassian-team": true
-                }
-            },
-            "name": "Team",
-            "key": "customfield_10001",
-            "autoCompleteUrl": "https://caspertestaccount.atlassian.net/gateway/api/v1/recommendations",
-            "hasDefaultValue": false,
-            "operations": [
-                "set"
-            ],
-            "fieldId": "customfield_10001"
-        },
-        {
-            "required": false,
-            "schema": {
-                "type": "date",
-                "custom": "com.atlassian.jira.plugin.system.customfieldtypes:datepicker",
-                "customId": 10015
-            },
-            "name": "Start date",
-            "key": "customfield_10015",
-            "hasDefaultValue": false,
-            "operations": [
-                "set"
-            ],
-            "fieldId": "customfield_10015"
-        },
-        {
-            "required": false,
-            "schema": {
-                "type": "string",
-                "custom": "com.pyxis.greenhopper.jira:jsw-issue-color",
-                "customId": 10017
-            },
-            "name": "Issue color",
-            "key": "customfield_10017",
-            "hasDefaultValue": false,
-            "operations": [
-                "set"
-            ],
-            "fieldId": "customfield_10017"
-        },
-        {
-            "required": false,
-            "schema": {
-                "type": "any",
-                "custom": "com.pyxis.greenhopper.jira:gh-lexo-rank",
-                "customId": 10019
-            },
-            "name": "Rank",
-            "key": "customfield_10019",
-            "hasDefaultValue": false,
-            "operations": [
-                "set"
-            ],
-            "fieldId": "customfield_10019"
-        },
-        {
-            "required": false,
-            "schema": {
-                "type": "array",
-                "items": "option",
-                "custom": "com.atlassian.jira.plugin.system.customfieldtypes:multicheckboxes",
-                "customId": 10021
-            },
-            "name": "Flagged",
-            "key": "customfield_10021",
-            "hasDefaultValue": false,
-            "operations": [
-                "add",
-                "set",
-                "remove"
-            ],
-            "allowedValues": [
-                {
-                    "self": "https://caspertestaccount.atlassian.net/rest/api/2/customFieldOption/10019",
-                    "value": "Impediment",
-                    "id": "10019"
-                }
-            ],
-            "fieldId": "customfield_10021"
-        },
-        {
-            "required": false,
-            "schema": {
-                "type": "any",
-                "custom": "com.atlassian.jira.plugins.jira-development-integration-plugin:devsummarycf",
-                "customId": 10031
-            },
-            "name": "development",
-            "key": "customfield_10031",
-            "hasDefaultValue": false,
-            "operations": [
-                "set"
-            ],
-            "fieldId": "customfield_10031"
-        },
-        {
-            "required": false,
-            "schema": {
-                "type": "any",
-                "custom": "com.atlassian.jira.plugins.jira-development-integration-plugin:vulnerabilitycf",
-                "customId": 10034
-            },
-            "name": "Vulnerability",
-            "key": "customfield_10034",
-            "hasDefaultValue": false,
-            "operations": [
-                "set"
-            ],
-            "fieldId": "customfield_10034"
-        },
-        {
-            "required": false,
-            "schema": {
-                "type": "array",
-                "items": "design.field.name",
-                "custom": "com.atlassian.jira.plugins.jira-development-integration-plugin:designcf",
-                "customId": 10035
-            },
-            "name": "Design",
-            "key": "customfield_10035",
-            "autoCompleteUrl": "",
-            "hasDefaultValue": false,
-            "operations": [
-                "set"
-            ],
-            "fieldId": "customfield_10035"
-        },
-        {
-            "required": false,
-            "schema": {
-                "type": "string",
-                "system": "description"
-            },
-            "name": "Description",
-            "key": "description",
-            "hasDefaultValue": false,
-            "operations": [
-                "set"
-            ],
-            "fieldId": "description"
-        },
-        {
-            "required": false,
-            "schema": {
-                "type": "date",
-                "system": "duedate"
-            },
-            "name": "Due date",
-            "key": "duedate",
-            "hasDefaultValue": false,
-            "operations": [
-                "set"
-            ],
-            "fieldId": "duedate"
-        },
-        {
-            "required": false,
-            "schema": {
-                "type": "array",
-                "items": "issuelinks",
-                "system": "issuelinks"
-            },
-            "name": "Linked Issues",
-            "key": "issuelinks",
-            "autoCompleteUrl": "https://caspertestaccount.atlassian.net/rest/api/2/issue/picker?currentProjectId=&showSubTaskParent=true&showSubTasks=true&currentIssueKey=null&query=",
-            "hasDefaultValue": false,
-            "operations": [
-                "add",
-                "copy"
-            ],
-            "fieldId": "issuelinks"
-        },
-        {
-            "required": false,
-            "schema": {
-                "type": "issuerestriction",
-                "system": "issuerestriction"
-            },
-            "name": "Restrict to",
-            "key": "issuerestriction",
-            "hasDefaultValue": false,
-            "operations": [
-                "set"
-            ],
-            "allowedValues": [],
-            "fieldId": "issuerestriction"
-        },
-        {
-            "required": true,
-            "schema": {
-                "type": "issuetype",
-                "system": "issuetype"
-            },
-            "name": "Issue Type",
-            "key": "issuetype",
-            "hasDefaultValue": false,
-            "operations": [],
-            "allowedValues": [
-                {
-                    "self": "https://caspertestaccount.atlassian.net/rest/api/2/issuetype/10001",
-                    "id": "10001",
-                    "description": "Epics track collections of related bugs, stories, and tasks.",
-                    "iconUrl": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/issuetype/avatar/10307?size=medium",
-                    "name": "Epic",
-                    "subtask": false,
-                    "avatarId": 10307,
-                    "entityId": "c491e2d1-66be-4f4c-a7cf-46d3eda8e5aa",
-                    "hierarchyLevel": 1
-                }
-            ],
-            "fieldId": "issuetype"
-        },
-        {
-            "required": false,
-            "schema": {
-                "type": "array",
-                "items": "string",
-                "system": "labels"
-            },
-            "name": "Labels",
-            "key": "labels",
-            "autoCompleteUrl": "https://caspertestaccount.atlassian.net/rest/api/1.0/labels/suggest?query=",
-            "hasDefaultValue": false,
-            "operations": [
-                "add",
-                "set",
-                "remove"
-            ],
-            "fieldId": "labels"
-        },
-        {
-            "required": false,
-            "schema": {
-                "type": "issuelink",
-                "system": "parent"
-            },
-            "name": "Parent",
-            "key": "parent",
-            "hasDefaultValue": false,
-            "operations": [
-                "set"
-            ],
-            "fieldId": "parent"
-        },
-        {
-            "required": true,
-            "schema": {
-                "type": "project",
-                "system": "project"
-            },
-            "name": "Project",
-            "key": "project",
-            "hasDefaultValue": false,
-            "operations": [
-                "set"
-            ],
-            "allowedValues": [
-                {
-                    "self": "https://caspertestaccount.atlassian.net/rest/api/2/project/10000",
-                    "id": "10000",
-                    "key": "ECS",
-                    "name": "E-Commerce Checkout System",
-                    "projectTypeKey": "software",
-                    "simplified": true,
-                    "avatarUrls": {
-                        "48x48": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10417",
-                        "24x24": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10417?size=small",
-                        "16x16": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10417?size=xsmall",
-                        "32x32": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10417?size=medium"
-                    }
-                }
-            ],
-            "fieldId": "project"
-        },
-        {
-            "required": true,
-            "schema": {
-                "type": "user",
-                "system": "reporter"
-            },
-            "name": "Reporter",
-            "key": "reporter",
-            "autoCompleteUrl": "https://caspertestaccount.atlassian.net/rest/api/2/user/recommend?context=Reporter&issueKey=",
-            "hasDefaultValue": true,
-            "operations": [
-                "set"
-            ],
-            "fieldId": "reporter"
-        },
-        {
-            "required": true,
-            "schema": {
-                "type": "string",
-                "system": "summary"
-            },
-            "name": "Summary",
-            "key": "summary",
-            "hasDefaultValue": false,
-            "operations": [
-                "set"
-            ],
-            "fieldId": "summary"
+  "startAt": 0,
+  "maxResults": 50,
+  "total": 20,
+  "fields": [
+    {
+      "required": false,
+      "schema": {
+        "type": "user",
+        "system": "assignee"
+      },
+      "name": "Assignee",
+      "key": "assignee",
+      "autoCompleteUrl": "https://caspertestaccount.atlassian.net/rest/api/2/user/assignable/search?project=ECS&query=",
+      "hasDefaultValue": false,
+      "operations": [
+        "set"
+      ],
+      "fieldId": "assignee"
+    },
+    {
+      "required": false,
+      "schema": {
+        "type": "array",
+        "items": "attachment",
+        "system": "attachment"
+      },
+      "name": "Attachment",
+      "key": "attachment",
+      "hasDefaultValue": false,
+      "operations": [
+        "set",
+        "copy"
+      ],
+      "fieldId": "attachment"
+    },
+    {
+      "required": false,
+      "schema": {
+        "type": "team",
+        "custom": "com.atlassian.jira.plugin.system.customfieldtypes:atlassian-team",
+        "customId": 10001,
+        "configuration": {
+          "com.atlassian.jira.plugin.system.customfieldtypes:atlassian-team": true
         }
-    ]
+      },
+      "name": "Team",
+      "key": "customfield_10001",
+      "autoCompleteUrl": "https://caspertestaccount.atlassian.net/gateway/api/v1/recommendations",
+      "hasDefaultValue": false,
+      "operations": [
+        "set"
+      ],
+      "fieldId": "customfield_10001"
+    },
+    {
+      "required": false,
+      "schema": {
+        "type": "date",
+        "custom": "com.atlassian.jira.plugin.system.customfieldtypes:datepicker",
+        "customId": 10015
+      },
+      "name": "Start date",
+      "key": "customfield_10015",
+      "hasDefaultValue": false,
+      "operations": [
+        "set"
+      ],
+      "fieldId": "customfield_10015"
+    },
+    {
+      "required": false,
+      "schema": {
+        "type": "string",
+        "custom": "com.pyxis.greenhopper.jira:jsw-issue-color",
+        "customId": 10017
+      },
+      "name": "Issue color",
+      "key": "customfield_10017",
+      "hasDefaultValue": false,
+      "operations": [
+        "set"
+      ],
+      "fieldId": "customfield_10017"
+    },
+    {
+      "required": false,
+      "schema": {
+        "type": "any",
+        "custom": "com.pyxis.greenhopper.jira:gh-lexo-rank",
+        "customId": 10019
+      },
+      "name": "Rank",
+      "key": "customfield_10019",
+      "hasDefaultValue": false,
+      "operations": [
+        "set"
+      ],
+      "fieldId": "customfield_10019"
+    },
+    {
+      "required": false,
+      "schema": {
+        "type": "array",
+        "items": "option",
+        "custom": "com.atlassian.jira.plugin.system.customfieldtypes:multicheckboxes",
+        "customId": 10021
+      },
+      "name": "Flagged",
+      "key": "customfield_10021",
+      "hasDefaultValue": false,
+      "operations": [
+        "add",
+        "set",
+        "remove"
+      ],
+      "allowedValues": [
+        {
+          "self": "https://caspertestaccount.atlassian.net/rest/api/2/customFieldOption/10019",
+          "value": "Impediment",
+          "id": "10019"
+        }
+      ],
+      "fieldId": "customfield_10021"
+    },
+    {
+      "required": false,
+      "schema": {
+        "type": "any",
+        "custom": "com.atlassian.jira.plugins.jira-development-integration-plugin:devsummarycf",
+        "customId": 10031
+      },
+      "name": "development",
+      "key": "customfield_10031",
+      "hasDefaultValue": false,
+      "operations": [
+        "set"
+      ],
+      "fieldId": "customfield_10031"
+    },
+    {
+      "required": false,
+      "schema": {
+        "type": "any",
+        "custom": "com.atlassian.jira.plugins.jira-development-integration-plugin:vulnerabilitycf",
+        "customId": 10034
+      },
+      "name": "Vulnerability",
+      "key": "customfield_10034",
+      "hasDefaultValue": false,
+      "operations": [
+        "set"
+      ],
+      "fieldId": "customfield_10034"
+    },
+    {
+      "required": false,
+      "schema": {
+        "type": "array",
+        "items": "design.field.name",
+        "custom": "com.atlassian.jira.plugins.jira-development-integration-plugin:designcf",
+        "customId": 10035
+      },
+      "name": "Design",
+      "key": "customfield_10035",
+      "autoCompleteUrl": "",
+      "hasDefaultValue": false,
+      "operations": [
+        "set"
+      ],
+      "fieldId": "customfield_10035"
+    },
+    {
+      "required": false,
+      "schema": {
+        "type": "string",
+        "system": "description"
+      },
+      "name": "Description",
+      "key": "description",
+      "hasDefaultValue": false,
+      "operations": [
+        "set"
+      ],
+      "fieldId": "description"
+    },
+    {
+      "required": false,
+      "schema": {
+        "type": "date",
+        "system": "duedate"
+      },
+      "name": "Due date",
+      "key": "duedate",
+      "hasDefaultValue": false,
+      "operations": [
+        "set"
+      ],
+      "fieldId": "duedate"
+    },
+    {
+      "required": false,
+      "schema": {
+        "type": "array",
+        "items": "issuelinks",
+        "system": "issuelinks"
+      },
+      "name": "Linked Issues",
+      "key": "issuelinks",
+      "autoCompleteUrl": "https://caspertestaccount.atlassian.net/rest/api/2/issue/picker?currentProjectId=&showSubTaskParent=true&showSubTasks=true&currentIssueKey=null&query=",
+      "hasDefaultValue": false,
+      "operations": [
+        "add",
+        "copy"
+      ],
+      "fieldId": "issuelinks"
+    },
+    {
+      "required": false,
+      "schema": {
+        "type": "issuerestriction",
+        "system": "issuerestriction"
+      },
+      "name": "Restrict to",
+      "key": "issuerestriction",
+      "hasDefaultValue": false,
+      "operations": [
+        "set"
+      ],
+      "allowedValues": [],
+      "fieldId": "issuerestriction"
+    },
+    {
+      "required": true,
+      "schema": {
+        "type": "issuetype",
+        "system": "issuetype"
+      },
+      "name": "Issue Type",
+      "key": "issuetype",
+      "hasDefaultValue": false,
+      "operations": [],
+      "allowedValues": [
+        {
+          "self": "https://caspertestaccount.atlassian.net/rest/api/2/issuetype/10001",
+          "id": "10001",
+          "description": "Epics track collections of related bugs, stories, and tasks.",
+          "iconUrl": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/issuetype/avatar/10307?size=medium",
+          "name": "Epic",
+          "subtask": false,
+          "avatarId": 10307,
+          "entityId": "c491e2d1-66be-4f4c-a7cf-46d3eda8e5aa",
+          "hierarchyLevel": 1
+        }
+      ],
+      "fieldId": "issuetype"
+    },
+    {
+      "required": false,
+      "schema": {
+        "type": "array",
+        "items": "string",
+        "system": "labels"
+      },
+      "name": "Labels",
+      "key": "labels",
+      "autoCompleteUrl": "https://caspertestaccount.atlassian.net/rest/api/1.0/labels/suggest?query=",
+      "hasDefaultValue": false,
+      "operations": [
+        "add",
+        "set",
+        "remove"
+      ],
+      "fieldId": "labels"
+    },
+    {
+      "required": false,
+      "schema": {
+        "type": "issuelink",
+        "system": "parent"
+      },
+      "name": "Parent",
+      "key": "parent",
+      "hasDefaultValue": false,
+      "operations": [
+        "set"
+      ],
+      "fieldId": "parent"
+    },
+    {
+      "required": true,
+      "schema": {
+        "type": "project",
+        "system": "project"
+      },
+      "name": "Project",
+      "key": "project",
+      "hasDefaultValue": false,
+      "operations": [
+        "set"
+      ],
+      "allowedValues": [
+        {
+          "self": "https://caspertestaccount.atlassian.net/rest/api/2/project/10000",
+          "id": "10000",
+          "key": "ECS",
+          "name": "E-Commerce Checkout System",
+          "projectTypeKey": "software",
+          "simplified": true,
+          "avatarUrls": {
+            "48x48": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10417",
+            "24x24": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10417?size=small",
+            "16x16": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10417?size=xsmall",
+            "32x32": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10417?size=medium"
+          }
+        }
+      ],
+      "fieldId": "project"
+    },
+    {
+      "required": true,
+      "schema": {
+        "type": "user",
+        "system": "reporter"
+      },
+      "name": "Reporter",
+      "key": "reporter",
+      "autoCompleteUrl": "https://caspertestaccount.atlassian.net/rest/api/2/user/recommend?context=Reporter&issueKey=",
+      "hasDefaultValue": true,
+      "operations": [
+        "set"
+      ],
+      "fieldId": "reporter"
+    },
+    {
+      "required": true,
+      "schema": {
+        "type": "string",
+        "system": "summary"
+      },
+      "name": "Summary",
+      "key": "summary",
+      "hasDefaultValue": false,
+      "operations": [
+        "set"
+      ],
+      "fieldId": "summary"
+    }
+  ]
 }
