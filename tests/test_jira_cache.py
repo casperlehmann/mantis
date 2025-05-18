@@ -38,13 +38,13 @@ def test_cache_remove_does_removals(fake_jira: JiraClient, minimal_issue_payload
     # cache something
     with open(fake_jira.cache.root / "issues/TASK-1.json", "w") as f:
         json.dump(minimal_issue_payload, f)
-    something_1 = fake_jira.cache.get_issue("task-1")
+    something_1 = fake_jira.cache.get_issue("TASK-1")
     assert something_1 is not None
 
     # remove with cache.remove
-    assert fake_jira.cache.remove("issues/task-1.json")
-    assert not fake_jira.cache.remove("issues/task-1.json")
-    nothing_1 = fake_jira.cache.get_issue("task-1")
+    assert fake_jira.cache.remove("issues/TASK-1.json")
+    assert not fake_jira.cache.remove("issues/TASK-1.json")
+    nothing_1 = fake_jira.cache.get_issue("TASK-1")
     assert nothing_1 is None
 
 
@@ -52,12 +52,12 @@ def test_cache_remove_issue_does_removals(fake_jira: JiraClient, minimal_issue_p
     # cache something
     with open(fake_jira.cache.root / "issues/TASK-1.json", "w") as f:
         json.dump(minimal_issue_payload, f)
-    something_2 = fake_jira.cache.get_issue("task-1")
+    something_2 = fake_jira.cache.get_issue("TASK-1")
     assert something_2 is not None
 
     # remove with cache.remove_issue
-    fake_jira.cache.remove_issue("task-1")
-    nothing_2 = fake_jira.cache.get_issue("task-1")
+    fake_jira.cache.remove_issue("TASK-1")
+    nothing_2 = fake_jira.cache.get_issue("TASK-1")
     assert nothing_2 is None
 
 

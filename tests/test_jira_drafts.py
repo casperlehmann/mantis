@@ -23,7 +23,7 @@ def test_jira_draft(fake_jira: JiraClient, minimal_issue_payload):
     with open(fake_jira.drafts_dir / "TASK-1.md", "r") as f:
         content = f.read()
     assert "assignee: Bobby Goodsky" in content
-    assert "Bobby Goodsky" == fake_jira.issues.get('Task-1').draft.issue.get_field("assignee", {}).get(
+    assert "Bobby Goodsky" == fake_jira.issues.get('TASK-1').draft.issue.get_field("assignee", {}).get(
         "displayName", ""
     )
     expectations = (
