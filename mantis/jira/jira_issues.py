@@ -27,8 +27,17 @@ class JiraIssue:
         return fields
 
     def get_field(self, key: str, default: Any = None) -> Any:
-        # Note that the key can exist and the value can still be None
-        return self.fields.get(key, default) or default
+        if key in {'ignore', 'header'}:
+            return default
+        # Guarding against non-existing fields in the source data. This allows us to do only
+        # a single None-check below.
+        if key not in self.fields:
+            raise ValueError(f"key '{key}' not in self.fields (i.e. not present upstream)")
+        # Note that the key can exist and the value can still be None.
+        # We only want to fall back on the default value when the value is actually None.
+        # Boolean values would break if we relied on Truthiness.
+        value = self.fields[key]
+        return default if value is None else value
 
     def update_field(self, data: dict[str, Any]) -> None:
         key = self.data.get('key')
