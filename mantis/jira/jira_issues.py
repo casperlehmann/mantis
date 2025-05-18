@@ -13,6 +13,7 @@ class JiraIssue:
         self.client = client
         self.data = raw_data
         # https://docs.pydantic.dev/1.10/datamodel_code_generator/
+        # Only writes if not exists.
         self.draft = Draft(self.client, self)
 
     def get(self, key: str, default: Any = None) -> Any:

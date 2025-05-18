@@ -64,10 +64,12 @@ class Draft:
         )
 
     def _materialize(self) -> None:
-        self.generate_frontmatter()
-        self.generate_body()
-        with open(self.draft_path, "wb") as f:
-            frontmatter.dump(self.template, f)
+        # Only write if not exists!
+        if not self.draft_path.exists():
+            self.generate_frontmatter()
+            self.generate_body()
+            with open(self.draft_path, "wb") as f:
+                frontmatter.dump(self.template, f)
 
     def remove_draft_header(self, post: frontmatter.Post) -> frontmatter.Post:
         extra_header = f'# {self.summary}'
