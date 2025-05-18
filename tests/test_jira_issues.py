@@ -7,7 +7,8 @@ import pytest
 from requests.models import HTTPError
 
 from mantis.jira import JiraClient
-from mantis.jira.jira_issues import JiraIssues, process_key
+from mantis.jira.jira_client import process_key
+from mantis.jira.jira_issues import JiraIssues
 
 
 def test_jira_issues_get_fake(fake_jira: JiraClient):
