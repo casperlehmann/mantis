@@ -47,3 +47,26 @@ def test_jira_draft(fake_jira: JiraClient, minimal_issue_payload):
     with open(fake_jira.drafts_dir / "TASK-1.md", "r") as f:
         for content in f.readlines():
             assert content.strip() in expectations, f"content.strip() ({content.strip()}) not in expectations in: {expectations}"
+
+def test_read_draft(fake_jira: JiraClient):
+    issue_key = 'TEST-1'
+    issue = fake_jira.issues.get(key=issue_key)
+    draft_data = issue.draft.read_draft()
+    assert draft_data
+    assert draft_data.content == "redacted"
+    assert set(draft_data.keys()) == {
+        'assignee',
+        'header',
+        'ignore',
+        'issuetype',
+        'parent',
+        'project',
+        'reporter',
+        'status',
+        'summary',
+    }
+    issue_field = issue.get_field('summary', 'N/A')
+    extracted_from_issue_field = issue_field if isinstance(issue_field, str) else issue_field.get('displayName') or issue_field.get('name')
+    draft_field = draft_data.get('summary', 'N/A')
+    assert extracted_from_issue_field == draft_field
+
