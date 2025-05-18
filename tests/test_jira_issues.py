@@ -187,7 +187,24 @@ def test_jira_issues_get_does_write_to_cache(fake_jira: JiraClient):
 
 def test_jira_issues_get_does_retrieve_from_cache(fake_jira: JiraClient):
     fake_jira._no_read_cache = False
-    data = {"key": "TASK-1", "redacted": "True", "fields": {"status": {"name": "resolved"}, "description": "redacted"}}
+    data = {
+        "key": "TASK-1",
+        "redacted": "True",
+        "fields": {
+            "summary": "redacted",
+            "ignore": True,
+            "header": "redacted",
+            "project": {"key": "redacted", "name": "redacted"},
+            "parent": "redacted",
+            "issuetype": "redacted",
+            "assignee": "redacted",
+            "key": "redacted",
+            "reporter": "redacted",
+
+            "status": {"name": "resolved"},
+            "description": "redacted"
+        }
+    }
     with open(fake_jira.cache.issues / "TASK-1.json", "w") as f:
         json.dump(data, f)
     issue = fake_jira.issues.get("TASK-1")
