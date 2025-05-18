@@ -110,9 +110,6 @@ $ python main.py \
 ```sh
 $ pytest
 
-#Run also the tests marked as skipped (Note: This will make calls to Jira api if configured):
-$ EXECUTE_SKIPPED=1 pytest
-
 # Run tests every time a file changes (using `pytest-xdist`):
 $ pytest -f
 
