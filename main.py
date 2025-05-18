@@ -32,7 +32,8 @@ if __name__ == '__main__':
             issue = jira.issues.get(key=issue_key)
             data = {
                 "fields": {
-                    "assignee": jira.get_current_user(),
+                    # "assignee": jira.get_current_user(),
+                    "assignee": None,
                 }
             }
             resp = issue.update_field(data)
