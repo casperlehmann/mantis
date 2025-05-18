@@ -26,6 +26,22 @@ if __name__ == '__main__':
             key = issue.get('key', 'N/A')
             title = issue.get_field('summary')
             print(f'[{key}] {title}')
+        jira._no_read_cache = False
+    elif jira_options.action == 'update-issue':
+        for issue_key in jira_options.issues:
+            issue = jira.issues.get(key=issue_key)
+            data = {
+                "fields": {
+                    "assignee": jira.get_current_user(),
+                }
+            }
+            resp = issue.update_field(data)
+            jira._no_read_cache = True
+            issue = jira.issues.get(key=issue_key)
+            key = issue.get('key', 'N/A')
+            title = issue.get_field('summary')
+            print(f'[{key}] {title}')
+            jira._no_read_cache = False
     elif jira_options.action == 'get-project-keys':
         print ('Fetching from Jira...')
         resp = jira.system_config_loader.update_project_field_keys()
