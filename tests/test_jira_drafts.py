@@ -16,6 +16,8 @@ def json_response(mock_get_request):
             "issuetype": {"key": "Task"},
             "assignee": {"displayName": "Bobby Goodsky"},
             "description": "redacted",
+            "project": "lolcorp",
+            "reporter": "null",
         },
     }
 
@@ -46,8 +48,8 @@ def test_jira_draft(fake_jira: JiraClient, json_response):
         "summary: Test issue",
         "issuetype:",
         "issuetype: null",
-        "project: null",
-        "reporter: null",
+        "project: lolcorp",
+        "reporter: 'null'",
         "description: redacted",
         "assignee: Bobby Goodsky",
         "status: resolved",

@@ -19,7 +19,22 @@ def test_jira_issues_get_fake(fake_jira: JiraClient):
 
 def test_jira_issues_get_mocked(fake_jira: JiraClient, with_no_read_cache):
     assert fake_jira._no_read_cache is True
-    expected = {"key": "TASK-1", "fields": {"status": {"name": "resolved"}, "description": "redacted"}}
+    expected = {
+        "key": "TASK-1",
+        "fields": {
+            "summary": "redacted",
+            "ignore": True,
+            "header": "redacted",
+            "project": {"key": "redacted", "name": "redacted"},
+            "parent": "redacted",
+            "issuetype": "redacted",
+            "assignee": "redacted",
+            "key": "redacted",
+            "reporter": "redacted",
+            "status": {"name": "resolved"},
+            "description": "redacted"
+        }
+    }
     mock_response = Mock()
     mock_response.status_code = 200
     mock_response.ok = True
