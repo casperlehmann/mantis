@@ -109,6 +109,25 @@ def with_fake_allowed_types(fake_jira: JiraClient):
     fake_jira.issues._allowed_types = ["Story", "Subtask", "Epic", "Bug", "Task", "Testtype"]
 
 @pytest.fixture
+def minimal_issue_payload():
+    return {
+        "key": "TASK-1",
+        "fields": {
+            "summary": "redacted",
+            "ignore": True,
+            "header": "redacted",
+            "project": {"key": "redacted", "name": "redacted"},
+            "parent": "redacted",
+            "issuetype": {"id": "10001", "name": "Task"},
+            "assignee": "redacted",
+            "key": "redacted",
+            "reporter": "redacted",
+            "status": {"name": "resolved"},
+            "description": "redacted"
+        }
+    }
+
+@pytest.fixture
 def fake_jira(
     with_fake_cache,
     with_fake_drafts_dir,
