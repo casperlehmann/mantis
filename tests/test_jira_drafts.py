@@ -5,56 +5,42 @@ from mantis.jira import JiraClient
 from mantis.jira.jira_issues import JiraIssue
 
 
-@pytest.fixture
-def json_response(mock_get_request):
-    mock_get_request.return_value.json.return_value = {
-        "key": "TASK-1",
-        "fields": {
-            "status": {"name": "resolved"},
-            "summary": "Test issue",
-            "parent": "TASK-0",
-            "issuetype": {"key": "Task"},
-            "assignee": {"displayName": "Bobby Goodsky"},
-            "description": "redacted",
-            "project": "lolcorp",
-            "reporter": "null",
-        },
-    }
-
-
-def test_jira_draft(fake_jira: JiraClient, json_response):
+def test_jira_draft(fake_jira: JiraClient, minimal_issue_payload):
+    minimal_issue_payload['fields']['assignee'] = {"displayName": "Bobby Goodsky"}
     assert str(fake_jira.cache.root) != ".jira_cache_test"
     assert str(fake_jira.drafts_dir) != "drafts_test"
     # assert str(fake_jira.cache.root) != str(fake_jira.drafts_dir)
+    
     assert len(list(fake_jira.drafts_dir.iterdir())) == 0
-
-    # assert list(fake_jira.drafts_dir.iterdir())[0] == ""
-    task_1 = fake_jira.issues.get("TASK-44")
-    assert type(task_1) == JiraIssue
-    draft = Draft(fake_jira, task_1)
+    task_1 = fake_jira.issues.get("TASK-1")
     assert len([*fake_jira.drafts_dir.iterdir()]) == 1
+    assert isinstance(task_1, JiraIssue)
+
+    minimal_issue_payload['key'] = "TASK-2"
+    task_2 = fake_jira.issues.get("TASK-2")
+    assert len([*fake_jira.drafts_dir.iterdir()]) == 2
 
     with open(fake_jira.drafts_dir / "TASK-1.md", "r") as f:
         content = f.read()
     assert "assignee: Bobby Goodsky" in content
-    assert "Bobby Goodsky" == draft.issue.get_field("assignee", {}).get(
+    assert "Bobby Goodsky" == fake_jira.issues.get('TASK-1').draft.issue.get_field("assignee", {}).get(
         "displayName", ""
     )
     expectations = (
         "---",
-        "header: '[TASK-1] Test issue'",
+        "header: '[TASK-1] redacted'",
         "ignore: true",
-        "parent: TASK-0",
-        "summary: Test issue",
+        "parent: redacted",
+        "summary: redacted",
         "issuetype:",
-        "issuetype: null",
-        "project: lolcorp",
-        "reporter: 'null'",
+        "issuetype: Task",
+        "project: redacted",
+        "reporter: redacted",
         "description: redacted",
         "assignee: Bobby Goodsky",
         "status: resolved",
         "---",
-        "# Test issue",
+        "# redacted",
         "",
         "redacted",
     )

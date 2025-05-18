@@ -17,24 +17,9 @@ def test_jira_issues_get_fake(fake_jira: JiraClient):
     assert task_1.get("fields", {}).get("status") == {"name": "resolved"}  # type: ignore None risk of second get. Since it's explicitly returning a dict as default.
 
 
-def test_jira_issues_get_mocked(fake_jira: JiraClient, with_no_read_cache):
+def test_jira_issues_get_mocked(fake_jira: JiraClient, with_no_read_cache, minimal_issue_payload):
     assert fake_jira._no_read_cache is True
-    expected = {
-        "key": "TASK-1",
-        "fields": {
-            "summary": "redacted",
-            "ignore": True,
-            "header": "redacted",
-            "project": {"key": "redacted", "name": "redacted"},
-            "parent": "redacted",
-            "issuetype": "redacted",
-            "assignee": "redacted",
-            "key": "redacted",
-            "reporter": "redacted",
-            "status": {"name": "resolved"},
-            "description": "redacted"
-        }
-    }
+    expected = minimal_issue_payload
     mock_response = Mock()
     mock_response.status_code = 200
     mock_response.ok = True
@@ -104,15 +89,12 @@ def test_jira_issues_get_real(jira_client_from_user_toml):
 
 
 @patch("mantis.jira.jira_client.requests.post")
-def test_jira_issues_create(mock_post, fake_jira: JiraClient, with_fake_allowed_types):
+def test_jira_issues_create(mock_post, fake_jira: JiraClient, with_fake_allowed_types, minimal_issue_payload):
     mock_post.return_value.json.return_value = {}
     with pytest.raises(ValueError):
         issue = fake_jira.issues.create(issuetype="Bug", title="Tester", data={})
-    expected = {
-        "key": "TASK-1",
-        "fields": {"status": {"name": "In Progress"}, "issuetype": {"name": "Bug"}},
-    }
-    mock_post.return_value.json.return_value = expected
+    minimal_issue_payload['fields']['issuetype']['name'] = 'Bug'
+    mock_post.return_value.json.return_value = minimal_issue_payload
     issue = fake_jira.issues.create(
         issuetype="Bug", title="Tester", data={"Summary": "a"}
     )
@@ -149,7 +131,7 @@ def test_handle_http_error_raises_generic_exception(
         except HTTPError as e:
             assert e.response.reason == "Unknown error"
             with pytest.raises(AttributeError):
-                fake_jira.issues.handle_http_error(exception=e, key="A-1")
+                fake_jira.handle_http_error(exception=e, key="A-1")
 
 
 def test_jira_no_issues_fields_raises(fake_jira: JiraClient, mock_post_request):
@@ -185,27 +167,9 @@ def test_jira_issues_get_does_write_to_cache(fake_jira: JiraClient):
     assert data["key"] == "TASK-1"
 
 
-def test_jira_issues_get_does_retrieve_from_cache(fake_jira: JiraClient):
+def test_jira_issues_get_does_retrieve_from_cache(fake_jira: JiraClient, minimal_issue_payload):
     fake_jira._no_read_cache = False
-    data = {
-        "key": "TASK-1",
-        "redacted": "True",
-        "fields": {
-            "summary": "redacted",
-            "ignore": True,
-            "header": "redacted",
-            "project": {"key": "redacted", "name": "redacted"},
-            "parent": "redacted",
-            "issuetype": "redacted",
-            "assignee": "redacted",
-            "key": "redacted",
-            "reporter": "redacted",
-
-            "status": {"name": "resolved"},
-            "description": "redacted"
-        }
-    }
     with open(fake_jira.cache.issues / "TASK-1.json", "w") as f:
-        json.dump(data, f)
+        json.dump(minimal_issue_payload, f)
     issue = fake_jira.issues.get("TASK-1")
-    assert issue.get("redacted") == "True"
+    assert issue.get_field("summary") == "redacted"
