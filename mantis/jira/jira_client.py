@@ -14,6 +14,21 @@ if TYPE_CHECKING:
     from mantis.jira.jira_options import JiraOptions
 
 
+def process_key(key: str, exception: Exception) -> tuple[str, str]:
+    match key.split("-"):
+        case (s,):
+            raise NotImplementedError(
+                f"Partial keys are not supported. Please "
+                f'provide the full key for your issue: "PROJ-{s}"'
+            ) from exception
+        case (project, task_no):
+            return (project, task_no)
+        case _:
+            raise NotImplementedError(
+                f'Key contains too many components: "{key}"'
+            ) from exception
+
+
 class JiraClient:
 
     _project_id: None | str = None
@@ -92,8 +107,15 @@ class JiraClient:
         )
         return self._get(url)
 
-    def get_issue(self, key: str) -> requests.Response:
-        return self._get(f"issue/{key}")
+    def get_issue(self, key: str) -> dict[str, dict]:
+        response = self._get(f"issue/{key}")
+        try:
+            response.raise_for_status()
+        except requests.HTTPError as e:
+            self.handle_http_error(e, key)
+        issue_data: dict[str, dict] = response.json()
+        return issue_data
+
 
     def post_issue(self, data: dict) -> requests.Response:
         return self._post("issue", data=data)
@@ -151,3 +173,29 @@ class JiraClient:
         except Exception as e:
             print("test_auth failed for unknown reasons.")
             raise e
+
+    def handle_http_error(self, exception: requests.HTTPError, key: str) -> None:
+        (project_from_key, task_no_from_key) = process_key(key, exception)
+        match exception.response.reason:
+            case "Not Found":
+                if " " in key:
+                    raise ValueError(
+                        f'Whitespace in key is not allowed ("{key}")'
+                    ) from exception
+                elif not task_no_from_key.isnumeric():
+                    raise ValueError(
+                        f'Issue number "{task_no_from_key}" in key "{key}" must be numeric'
+                    ) from exception
+                elif self.options.project not in key:
+                    raise ValueError(
+                        f"The requested issue does not exist. Note that the "
+                        f'provided key "{key}" does not appear to match '
+                        f'your configured project "{self.options.project}"'
+                    ) from exception
+                else:
+                    raise ValueError(
+                        f'The issue "{project_from_key}-{task_no_from_key}" does '
+                        f'not exists in the project "{project_from_key}"'
+                    ) from exception
+            case _:
+                raise AttributeError("Unknown reason") from exception
