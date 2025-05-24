@@ -15,13 +15,14 @@ def test_config_loader_update_issuetypes_writes_to_cache(
 ):
     mock_get.return_value.json.return_value = get_issuetypes_response
     config_loader = fake_jira.system_config_loader
-    assert len(list(fake_jira.cache.system.iterdir())) == 1, (
-        f"Not empty: {fake_jira.cache.system}")
+    set_with_no_issuetypes = {str(_).split('/')[-1] for _ in fake_jira.cache.system.iterdir()}
+    assert set_with_no_issuetypes == {'createmeta', 'editmeta'}, (
+        f"System cache expected 2 values. Got: {set_with_no_issuetypes}")
 
-    config_loader.get_issuetypes(force_skip_cache = True) 
-    assert len(list(fake_jira.cache.system.iterdir())) == 2, (
-        f"Not empty: {fake_jira.cache.system}")
-
+    config_loader.get_issuetypes(force_skip_cache = True)
+    set_with_issuetypes = {str(_).split('/')[-1] for _ in fake_jira.cache.system.iterdir()}
+    assert set_with_issuetypes == {'createmeta', 'editmeta', 'issuetypes.json'}, (
+        f"System cache expected 3 values. Got: {fake_jira.cache.system}")
 
 def test_persisted_issuetypes_data():
     cache_data = CacheData()

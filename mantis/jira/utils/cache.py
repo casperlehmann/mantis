@@ -19,6 +19,7 @@ class Cache:
         self.issues.mkdir(exist_ok=True)
         self.system.mkdir(exist_ok=True)
         self.createmeta.mkdir(exist_ok=True)
+        self.editmeta.mkdir(exist_ok=True)
 
     def invalidate(self) -> None:
         if self.root.exists():
@@ -28,6 +29,7 @@ class Cache:
         self.issues.mkdir(exist_ok=True)
         self.system.mkdir(exist_ok=True)
         self.createmeta.mkdir(exist_ok=True)
+        self.editmeta.mkdir(exist_ok=True)
 
     @property
     def root(self) -> Path:
@@ -44,6 +46,10 @@ class Cache:
     @property
     def createmeta(self) -> Path:
         return self.system / "createmeta"
+
+    @property
+    def editmeta(self) -> Path:
+        return self.system / "editmeta"
 
     def _get(self, path: Path, filename: str) -> dict | None:
         if self.client._no_read_cache:
