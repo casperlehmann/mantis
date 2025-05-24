@@ -175,9 +175,7 @@ class JiraSystemConfigLoader:
             assert 'id' in issuetype.keys()
             issuetype_name = issuetype['name']
             issuetype_id = issuetype['id']
-            response = self.client.get_createmeta(self.client.project_name, issuetype_id)
-            response.raise_for_status()
-            data: list[dict[str, Any]] = response.json()
+            data: list[dict[str, Any]] = self.client.get_createmeta(self.client.project_name, issuetype_id)
             self.cache.write_createmeta(issuetype_name, data)
         return self.client.issues.load_allowed_types()
 
