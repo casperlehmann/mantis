@@ -141,17 +141,14 @@ class JiraSystemConfigLoader:
         self.cache.write_to_system_cache("projects.json", json.dumps(projects))
         return projects
 
-    def update_issuetypes_cache(self) -> dict[str, Any]:
-        issuetypes = self.client.get_issuetypes()
-        self.cache.write_issuetypes_to_system_cache(issuetypes)
-        return issuetypes
-
-    def get_issuetypes(self) -> dict[str, Any]:
-        if not self.client._no_read_cache:
+    def get_issuetypes(self, force_skip_cache: bool = False) -> dict[str, Any]:
+        if not self.client._no_read_cache or force_skip_cache:
             from_cache = self.cache.get_issuetypes_from_system_cache()
             if from_cache:
                 return from_cache
-        return self.update_issuetypes_cache()
+        issuetypes = self.client.get_issuetypes()
+        self.cache.write_issuetypes_to_system_cache(issuetypes)
+        return issuetypes
 
     def get_issuetypes_for_project(self) -> dict[str, Any]:
         data = self.get_issuetypes()

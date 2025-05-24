@@ -18,7 +18,7 @@ def test_config_loader_update_issuetypes_writes_to_cache(
     assert len(list(fake_jira.cache.system.iterdir())) == 1, (
         f"Not empty: {fake_jira.cache.system}")
 
-    config_loader.update_issuetypes_cache()
+    config_loader.get_issuetypes(force_skip_cache = True) 
     assert len(list(fake_jira.cache.system.iterdir())) == 2, (
         f"Not empty: {fake_jira.cache.system}")
 
