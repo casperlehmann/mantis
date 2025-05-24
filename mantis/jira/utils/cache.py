@@ -66,7 +66,11 @@ class Cache:
     def get_projects_from_system_cache(self) -> dict[str, Any] | list[dict[str, Any]] | None:
         if self.client._no_read_cache:
             raise LookupError('Attempted to access cache when _no_read_cache is set')
-        return self.get_from_system_cache(f"projects.json")
+        projects = self.get_from_system_cache(f"projects.json")
+        if not projects:
+            return None
+        assert isinstance(projects, list), f'{projects} should be of type list. Got: {type(projects)}: {projects}'
+        return projects
 
     def get_issuetypes_from_system_cache(self) -> dict[str, Any] | None:
         if self.client._no_read_cache:

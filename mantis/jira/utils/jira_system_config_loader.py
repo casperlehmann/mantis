@@ -1,5 +1,4 @@
 import json
-import requests
 
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, Generator, KeysView, Optional
@@ -131,63 +130,32 @@ class JiraSystemConfigLoader:
     def loop_issuetype_fields(self) -> Generator[Path, Any, None]:
         for file in self.cache.issuetype_fields.iterdir():
             yield file
-
-    def update_projects_cache(self) -> list[dict[str, Any]]:
-        url = 'project'
-        response = self.client._get(url)
-        try:
-            response.raise_for_status()
-        except requests.exceptions.HTTPError as e:
-            print(e.response.reason)
-            print(e.response.content)
-            exit()
-        payload: list[dict[str, Any]] = response.json()
-        self.cache.write_to_system_cache("projects.json", json.dumps(payload))
-        return payload
     
-    def get_projects(self) -> list[dict[str, Any]]:
-        if not self.client._no_read_cache:
+    def get_projects(self, force_skip_cache: bool = False) -> list[dict[str, Any]]:
+        if not self.client._no_read_cache or force_skip_cache:
             projects = self.cache.get_projects_from_system_cache()
             if projects:
                 assert isinstance(projects, list), f"To satisfy the type checker. Got: {projects}"
                 return projects
-        return self.update_projects_cache()
+        projects = self.client.get_projects()
+        self.cache.write_to_system_cache("projects.json", json.dumps(projects))
+        return projects
 
-    def update_issuetypes_cache(self) -> dict[str, Any]:
-        url = f'issue/createmeta/{self.client.project_name}/issuetypes'
-        response = self.client._get(url)
-        try:
-            response.raise_for_status()
-        except requests.exceptions.HTTPError as e:
-            print(e.response.reason)
-            print(e.response.content)
-            exit()
-
-        issuetypes: dict[str, Any] = response.json()
-        assert isinstance(issuetypes, dict), f'issuetypes is not a dict: {issuetypes}'
-        assert 'issueTypes' in issuetypes, f"'issueTypes' not in issuetypes. Got: {issuetypes}"
-        assert isinstance(issuetypes['issueTypes'], list), "issuetypes['issueTypes'] is not a list. Got: {issuetypes}"
-
-        self.cache.write_issuetypes_to_system_cache(issuetypes)
-        return issuetypes
-
-    def get_issuetypes(self) -> dict[str, Any]:
-        if not self.client._no_read_cache:
+    def get_issuetypes(self, force_skip_cache: bool = False) -> dict[str, Any]:
+        if not self.client._no_read_cache or force_skip_cache:
             from_cache = self.cache.get_issuetypes_from_system_cache()
             if from_cache:
                 return from_cache
-        return self.update_issuetypes_cache()
+        issuetypes = self.client.get_issuetypes()
+        self.cache.write_issuetypes_to_system_cache(issuetypes)
+        return issuetypes
 
     def get_issuetypes_for_project(self) -> dict[str, Any]:
         data = self.get_issuetypes()
         self.cache.write_issuetypes_to_system_cache(data)
-        try:
-            assert len(data)
-        except AssertionError as e:
+        if len(data) == 0:
             raise ValueError(
-                'List of issuetypes has length of zero. '
-                'Something is probably very wrong.'
-            ) from e
+                'List of issuetypes has length of zero. Something is probably very wrong.')
         return data
 
     def update_project_field_keys(self) -> list[str]:
@@ -203,9 +171,7 @@ class JiraSystemConfigLoader:
             assert 'id' in issuetype.keys()
             issuetype_name = issuetype['name']
             issuetype_id = issuetype['id']
-            response = self.client.get_createmeta(self.client.project_name, issuetype_id)
-            response.raise_for_status()
-            data: list[dict[str, Any]] = response.json()
+            data: list[dict[str, Any]] = self.client.get_createmeta(self.client.project_name, issuetype_id)
             self.cache.write_createmeta(issuetype_name, data)
         return self.client.issues.load_allowed_types()
 

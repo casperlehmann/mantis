@@ -18,7 +18,7 @@ def test_config_loader_update_issuetypes_writes_to_cache(
     assert len(list(fake_jira.cache.system.iterdir())) == 1, (
         f"Not empty: {fake_jira.cache.system}")
 
-    config_loader.update_issuetypes_cache()
+    config_loader.get_issuetypes(force_skip_cache = True) 
     assert len(list(fake_jira.cache.system.iterdir())) == 2, (
         f"Not empty: {fake_jira.cache.system}")
 
@@ -71,7 +71,7 @@ def test_update_project_field_keys(mock_get, fake_jira: JiraClient):
     assert fake_jira._project_id == None
 
     # Fetch and cache projects data (without updating the object)
-    got_projects = config_loader.update_projects_cache()
+    got_projects = config_loader.get_projects(force_skip_cache = True)
     assert isinstance(got_projects, list)
     assert len(got_projects) == 2
     assert {_['id'] for _ in got_projects} == {'10000', '10001'}

@@ -1,6 +1,6 @@
-from typing import TYPE_CHECKING, Any
+from pprint import pprint
 
-from requests.models import HTTPError
+from typing import TYPE_CHECKING, Any
 
 from mantis.drafts import Draft
 
@@ -79,8 +79,8 @@ class JiraIssues:
                 raise ValueError('Loading allowed_types failed.')
         return self._allowed_types
 
-    def get(self, key: str) -> JiraIssue:
-        if not self.client._no_read_cache:
+    def get(self, key: str, force_skip_cache: bool = False) -> JiraIssue:
+        if not self.client._no_read_cache or force_skip_cache:
             issue_data_from_cache = self.client.cache.get_issue(key)
             if issue_data_from_cache:
                 return JiraIssue(self.client, issue_data_from_cache)
@@ -95,9 +95,5 @@ class JiraIssues:
         print(f"Create issue ({issuetype}): {title}")
 
         response = self.client.post_issue(data)
-        from pprint import pprint
-
-        pprint(response.json())
-        response.raise_for_status()
-        response_data: dict = response.json()
-        return response_data
+        pprint(response)
+        return response

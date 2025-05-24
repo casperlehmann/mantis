@@ -98,14 +98,26 @@ class JiraClient:
         url = f"{self.api_url}/{uri}"
         return requests.put(url, json=data, **self.requests_kwargs)  # type: ignore
 
-    def get_createmeta(self, project_name: str, issuetype_id: str) -> requests.Response:
-        url = (
-            "issue/createmeta"
-            f"/{project_name}"
-            "/issuetypes/"
-            f"{issuetype_id}"
-        )
-        return self._get(url)
+    def get_issuetypes(self) -> dict[str, Any]:
+        url = f'issue/createmeta/{self.project_name}/issuetypes'
+        response = self._get(url)
+        try:
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            print(e.response.reason)
+            print(e.response.content)
+            exit()
+        issuetypes: dict[str, Any] = response.json()
+        assert isinstance(issuetypes, dict), f'issuetypes is not a dict: {issuetypes}'
+        assert 'issueTypes' in issuetypes, f"'issueTypes' not in issuetypes. Got: {issuetypes}"
+        assert isinstance(issuetypes['issueTypes'], list), "issuetypes['issueTypes'] is not a list. Got: {issuetypes}"
+        return issuetypes
+
+    def get_createmeta(self, project_name: str, issuetype_id: str) -> list[dict[str, Any]]:
+        url = f"issue/createmeta/{project_name}/issuetypes/{issuetype_id}"
+        response = self._get(url)
+        response.raise_for_status()
+        return response.json()
 
     def get_issue(self, key: str) -> dict[str, dict]:
         response = self._get(f"issue/{key}")
@@ -116,24 +128,32 @@ class JiraClient:
         issue_data: dict[str, dict] = response.json()
         return issue_data
 
-
-    def post_issue(self, data: dict) -> requests.Response:
-        return self._post("issue", data=data)
+    def post_issue(self, data: dict) -> dict:
+        response = self._post("issue", data=data)
+        response.raise_for_status()
+        return response.json()
 
     def warmup(self) -> None:
         self.cache.invalidate()
-        self.system_config_loader.update_projects_cache()
+        self.system_config_loader.get_projects(force_skip_cache = True)
         assert not self.cache.get_issuetypes_from_system_cache()
-        self.system_config_loader.update_issuetypes_cache()
+        self.system_config_loader.get_issuetypes(force_skip_cache = True)
         self.system_config_loader.get_issuetypes()
         assert self.cache.get_issuetypes_from_system_cache()
         resp = self.system_config_loader.update_project_field_keys()
         pprint(resp)
 
-    def get_projects(self) -> None:
-        projects = self.cache.get_projects_from_system_cache()
-        if not projects:
-            raise ValueError('Projects not initialized')
+    def get_projects(self) -> list[dict[str, Any]]:
+        url = 'project'
+        response = self._get(url)
+        try:
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            print(e.response.reason)
+            print(e.response.content)
+            exit()
+        payload: list[dict[str, Any]] = response.json()
+        return payload
 
     def get_current_user(self) -> dict[str, str]:
         response = self._get("myself")
