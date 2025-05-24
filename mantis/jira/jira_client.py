@@ -118,6 +118,13 @@ class JiraClient:
         response = self._get(url)
         response.raise_for_status()
         return response.json()
+    
+    def get_editmeta(self, issue_key: str) -> list[dict[str, Any]]:
+        # url = f"issue/{issue_key}?expand=editmeta"
+        url = f"issue/{issue_key}/editmeta"
+        response = self._get(url)
+        response.raise_for_status()
+        return response.json()
 
     def get_issue(self, key: str) -> dict[str, dict]:
         response = self._get(f"issue/{key}")
