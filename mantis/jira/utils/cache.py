@@ -63,7 +63,7 @@ class Cache:
         if self.client._no_read_cache:
             raise LookupError('Attempted to access cache when _no_read_cache is set')
         return self._get(self.issues, f"{key}.json")
-    
+
     def get_from_system_cache(self, filename: str) -> dict[str, Any] | list[dict[str, Any]] | None:
         if self.client._no_read_cache:
             raise LookupError('Attempted to access cache when _no_read_cache is set')
@@ -95,10 +95,13 @@ class Cache:
         assert isinstance(contents, dict), f'Expected createmeta to be dict. Got: {type(contents)}: {contents}'
         return contents
 
-
-    # def get_editmeta_from_createmeta_cache(self, issuetype_name: str) -> dict[str, Any] | None:
-    #     filename = f"editmeta_{issuetype_name.lower()}.json"
-    #     return self.get_from_createmeta_cache(filename)
+    def get_editmeta_from_cache(self, issue_key: str) -> dict[str, Any] | None:
+        filename = f"editmeta_{issue_key.lower()}.json"
+        contents = self._get(self.editmeta, filename)
+        if not contents:
+            return None
+        assert isinstance(contents, dict), f'Expected editmeta to be dict. Got: {type(contents)}: {contents}'
+        return contents
 
     def _write(self, path: Path, filename: str, contents: str) -> int:
         with open(path / filename, "w") as f:
@@ -116,6 +119,10 @@ class Cache:
     def write_createmeta(self, issuetype_name: str, createmeta: list[dict[str, Any]]) -> None:
         filename = f"createmeta_{issuetype_name.lower()}.json"
         self._write(self.createmeta, filename, json.dumps(createmeta))
+
+    def write_editemeta(self, issue_key: str, editmeta: list[dict[str, Any]]) -> None:
+        filename = f"editmeta_{issue_key.lower()}.json"
+        self._write(self.editmeta, filename, json.dumps(editmeta))
 
     def remove(self, filename: str) -> bool:
         if not (self.root / filename).exists():
