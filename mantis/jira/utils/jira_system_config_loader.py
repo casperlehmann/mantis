@@ -1,5 +1,4 @@
 import json
-import requests
 
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, Generator, KeysView, Optional
