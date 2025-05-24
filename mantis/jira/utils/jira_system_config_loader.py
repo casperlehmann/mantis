@@ -153,13 +153,9 @@ class JiraSystemConfigLoader:
     def get_issuetypes_for_project(self) -> dict[str, Any]:
         data = self.get_issuetypes()
         self.cache.write_issuetypes_to_system_cache(data)
-        try:
-            assert len(data)
-        except AssertionError as e:
+        if len(data) == 0:
             raise ValueError(
-                'List of issuetypes has length of zero. '
-                'Something is probably very wrong.'
-            ) from e
+                'List of issuetypes has length of zero. Something is probably very wrong.')
         return data
 
     def update_project_field_keys(self) -> list[str]:
