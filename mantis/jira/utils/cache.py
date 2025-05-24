@@ -81,16 +81,14 @@ class Cache:
         assert isinstance(issuetypes, dict), f'{issuetypes} should be of type dict. Got: {type(issuetypes)}: {issuetypes}'
         return issuetypes
 
-    def get_from_createmeta_cache(self, filename: str) -> dict[str, Any] | None:
+    def get_createmeta_from_cache(self, issuetype_name: str) -> dict[str, Any] | None:
+        filename = f"createmeta_{issuetype_name.lower()}.json"
         contents = self._get(self.createmeta, filename)
         if not contents:
             return None
-        assert isinstance(contents, dict), f'Got: {type(contents)}: {contents}'
+        assert isinstance(contents, dict), f'Expected createmeta to be dict. Got: {type(contents)}: {contents}'
         return contents
 
-    def get_createmeta_from_cache(self, issuetype_name: str) -> dict[str, Any] | None:
-        filename = f"createmeta_{issuetype_name.lower()}.json"
-        return self.get_from_createmeta_cache(filename)
 
     # def get_editmeta_from_createmeta_cache(self, issuetype_name: str) -> dict[str, Any] | None:
     #     filename = f"editmeta_{issuetype_name.lower()}.json"
