@@ -98,6 +98,21 @@ class JiraClient:
         url = f"{self.api_url}/{uri}"
         return requests.put(url, json=data, **self.requests_kwargs)  # type: ignore
 
+    def get_issuetypes(self) -> dict[str, Any]:
+        url = f'issue/createmeta/{self.project_name}/issuetypes'
+        response = self._get(url)
+        try:
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            print(e.response.reason)
+            print(e.response.content)
+            exit()
+        issuetypes: dict[str, Any] = response.json()
+        assert isinstance(issuetypes, dict), f'issuetypes is not a dict: {issuetypes}'
+        assert 'issueTypes' in issuetypes, f"'issueTypes' not in issuetypes. Got: {issuetypes}"
+        assert isinstance(issuetypes['issueTypes'], list), "issuetypes['issueTypes'] is not a list. Got: {issuetypes}"
+        return issuetypes
+
     def get_createmeta(self, project_name: str, issuetype_id: str) -> requests.Response:
         url = (
             "issue/createmeta"

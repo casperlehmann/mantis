@@ -154,20 +154,7 @@ class JiraSystemConfigLoader:
         return self.update_projects_cache()
 
     def update_issuetypes_cache(self) -> dict[str, Any]:
-        url = f'issue/createmeta/{self.client.project_name}/issuetypes'
-        response = self.client._get(url)
-        try:
-            response.raise_for_status()
-        except requests.exceptions.HTTPError as e:
-            print(e.response.reason)
-            print(e.response.content)
-            exit()
-
-        issuetypes: dict[str, Any] = response.json()
-        assert isinstance(issuetypes, dict), f'issuetypes is not a dict: {issuetypes}'
-        assert 'issueTypes' in issuetypes, f"'issueTypes' not in issuetypes. Got: {issuetypes}"
-        assert isinstance(issuetypes['issueTypes'], list), "issuetypes['issueTypes'] is not a list. Got: {issuetypes}"
-
+        issuetypes = self.client.get_issuetypes()
         self.cache.write_issuetypes_to_system_cache(issuetypes)
         return issuetypes
 
