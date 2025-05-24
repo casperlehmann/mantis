@@ -128,9 +128,10 @@ class JiraClient:
         issue_data: dict[str, dict] = response.json()
         return issue_data
 
-
-    def post_issue(self, data: dict) -> requests.Response:
-        return self._post("issue", data=data)
+    def post_issue(self, data: dict) -> dict:
+        response = self._post("issue", data=data)
+        response.raise_for_status()
+        return response.json()
 
     def warmup(self) -> None:
         self.cache.invalidate()

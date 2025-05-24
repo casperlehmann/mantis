@@ -1,3 +1,5 @@
+from pprint import pprint
+
 from typing import TYPE_CHECKING, Any
 
 from requests.models import HTTPError
@@ -95,9 +97,5 @@ class JiraIssues:
         print(f"Create issue ({issuetype}): {title}")
 
         response = self.client.post_issue(data)
-        from pprint import pprint
-
-        pprint(response.json())
-        response.raise_for_status()
-        response_data: dict = response.json()
-        return response_data
+        pprint(response)
+        return response
