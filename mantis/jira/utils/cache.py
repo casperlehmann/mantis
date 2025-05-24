@@ -92,9 +92,9 @@ class Cache:
         filename = f"createmeta_{issuetype_name.lower()}.json"
         return self.get_from_createmeta_cache(filename)
 
-    def get_editmeta_from_createmeta_cache(self, issuetype_name: str) -> dict[str, Any] | None:
-        filename = f"editmeta_{issuetype_name.lower()}.json"
-        return self.get_from_createmeta_cache(filename)
+    # def get_editmeta_from_createmeta_cache(self, issuetype_name: str) -> dict[str, Any] | None:
+    #     filename = f"editmeta_{issuetype_name.lower()}.json"
+    #     return self.get_from_createmeta_cache(filename)
 
     def _write(self, path: Path, filename: str, contents: str) -> int:
         with open(path / filename, "w") as f:
