@@ -131,27 +131,16 @@ class JiraSystemConfigLoader:
     def loop_issuetype_fields(self) -> Generator[Path, Any, None]:
         for file in self.cache.issuetype_fields.iterdir():
             yield file
-
-    def update_projects_cache(self) -> list[dict[str, Any]]:
-        url = 'project'
-        response = self.client._get(url)
-        try:
-            response.raise_for_status()
-        except requests.exceptions.HTTPError as e:
-            print(e.response.reason)
-            print(e.response.content)
-            exit()
-        payload: list[dict[str, Any]] = response.json()
-        self.cache.write_to_system_cache("projects.json", json.dumps(payload))
-        return payload
     
-    def get_projects(self) -> list[dict[str, Any]]:
-        if not self.client._no_read_cache:
+    def get_projects(self, force_skip_cache: bool = False) -> list[dict[str, Any]]:
+        if not self.client._no_read_cache or force_skip_cache:
             projects = self.cache.get_projects_from_system_cache()
             if projects:
                 assert isinstance(projects, list), f"To satisfy the type checker. Got: {projects}"
                 return projects
-        return self.update_projects_cache()
+        projects = self.client.get_projects()
+        self.cache.write_to_system_cache("projects.json", json.dumps(projects))
+        return projects
 
     def update_issuetypes_cache(self) -> dict[str, Any]:
         issuetypes = self.client.get_issuetypes()

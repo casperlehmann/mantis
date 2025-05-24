@@ -71,7 +71,7 @@ def test_update_project_field_keys(mock_get, fake_jira: JiraClient):
     assert fake_jira._project_id == None
 
     # Fetch and cache projects data (without updating the object)
-    got_projects = config_loader.update_projects_cache()
+    got_projects = config_loader.get_projects(force_skip_cache = True)
     assert isinstance(got_projects, list)
     assert len(got_projects) == 2
     assert {_['id'] for _ in got_projects} == {'10000', '10001'}

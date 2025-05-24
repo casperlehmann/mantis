@@ -137,7 +137,7 @@ class JiraClient:
 
     def warmup(self) -> None:
         self.cache.invalidate()
-        self.system_config_loader.update_projects_cache()
+        self.system_config_loader.get_projects(force_skip_cache = True)
         assert not self.cache.get_issuetypes_from_system_cache()
         self.system_config_loader.update_issuetypes_cache()
         self.system_config_loader.get_issuetypes()
@@ -145,10 +145,17 @@ class JiraClient:
         resp = self.system_config_loader.update_project_field_keys()
         pprint(resp)
 
-    def get_projects(self) -> None:
-        projects = self.cache.get_projects_from_system_cache()
-        if not projects:
-            raise ValueError('Projects not initialized')
+    def get_projects(self) -> list[dict[str, Any]]:
+        url = 'project'
+        response = self._get(url)
+        try:
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            print(e.response.reason)
+            print(e.response.content)
+            exit()
+        payload: list[dict[str, Any]] = response.json()
+        return payload
 
     def get_current_user(self) -> dict[str, str]:
         response = self._get("myself")
