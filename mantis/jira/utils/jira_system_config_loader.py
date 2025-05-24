@@ -147,19 +147,14 @@ class JiraSystemConfigLoader:
             if from_cache:
                 return from_cache
         issuetypes = self.client.get_issuetypes()
+        if len(issuetypes) == 0:
+            raise ValueError(
+                'List of issuetypes has length of zero. Something is probably very wrong.')
         self.cache.write_issuetypes_to_system_cache(issuetypes)
         return issuetypes
 
-    def get_issuetypes_for_project(self) -> dict[str, Any]:
-        data = self.get_issuetypes()
-        self.cache.write_issuetypes_to_system_cache(data)
-        if len(data) == 0:
-            raise ValueError(
-                'List of issuetypes has length of zero. Something is probably very wrong.')
-        return data
-
     def update_project_field_keys(self) -> list[str]:
-        issuetypes: dict[str, Any] = self.get_issuetypes_for_project()
+        issuetypes: dict[str, Any] = self.get_issuetypes()
 
         assert isinstance(issuetypes, dict)
         assert 'issueTypes' in issuetypes, f'issueTypes has no issueTypes {issuetypes}'

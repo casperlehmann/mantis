@@ -58,7 +58,7 @@ class JiraIssues:
 
     def load_allowed_types(self) -> list[str]:
         issuetypes = (
-            self.client.system_config_loader.get_issuetypes_for_project()
+            self.client.system_config_loader.get_issuetypes()
         )
         if not issuetypes:
             raise ValueError('No values retrieved for issuetypes')
