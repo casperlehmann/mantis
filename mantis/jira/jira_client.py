@@ -138,9 +138,8 @@ class JiraClient:
         self.system_config_loader.get_projects(force_skip_cache = True)
         assert not self.cache.get_issuetypes_from_system_cache()
         self.system_config_loader.get_issuetypes(force_skip_cache = True)
-        self.system_config_loader.get_issuetypes()
         assert self.cache.get_issuetypes_from_system_cache()
-        resp = self.system_config_loader.update_project_field_keys()
+        resp = self.system_config_loader.update_createmeta()
         pprint(resp)
 
     def get_projects(self) -> list[dict[str, Any]]:

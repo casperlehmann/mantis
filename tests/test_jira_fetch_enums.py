@@ -116,7 +116,7 @@ def test_update_project_field_keys(mock_get, fake_jira: JiraClient):
 
     if (fake_jira.cache.createmeta / 'createmeta_story.json').exists():
         raise FileExistsError('File "createmeta_story.json" should not exist yet')
-    allowed_types = config_loader.update_project_field_keys()
+    allowed_types = config_loader.update_createmeta()
     assert set(allowed_types) == set(['Epic', 'Subtask', 'Task', 'Story', 'Bug'])
     if not (fake_jira.cache.createmeta / 'createmeta_story.json').exists():
         raise FileNotFoundError('File "createmeta_story.json" should have been created')
