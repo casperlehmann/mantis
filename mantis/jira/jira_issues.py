@@ -2,8 +2,6 @@ from pprint import pprint
 
 from typing import TYPE_CHECKING, Any
 
-from requests.models import HTTPError
-
 from mantis.drafts import Draft
 
 if TYPE_CHECKING:
