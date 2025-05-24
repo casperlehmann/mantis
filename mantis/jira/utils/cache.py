@@ -107,11 +107,9 @@ class Cache:
     def write_issuetypes_to_system_cache(self, issuetypes: dict[str, Any]) -> None:
         self.write_to_system_cache("issuetypes.json", json.dumps(issuetypes))
 
-    def write_to_createmeta(self, filename: str, createmeta: list[dict[str, Any]]) -> None:
-        self._write(self.createmeta, filename, json.dumps(createmeta))
-
     def write_createmeta(self, issuetype_name: str, createmeta: list[dict[str, Any]]) -> None:
-        self.write_to_createmeta(f"createmeta_{issuetype_name.lower()}.json", createmeta)
+        filename = f"createmeta_{issuetype_name.lower()}.json"
+        self._write(self.createmeta, filename, json.dumps(createmeta))
 
     def remove(self, filename: str) -> bool:
         if not (self.root / filename).exists():
