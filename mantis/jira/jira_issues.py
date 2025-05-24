@@ -39,6 +39,7 @@ class JiraIssue:
         # Guarding against non-existing fields in the source data. This allows us to do only
         # a single None-check below.
         if key not in self.fields:
+            # return default
             raise ValueError(f"key '{key}' not in self.fields (i.e. not present upstream)")
         # Note that the key can exist and the value can still be None.
         # We only want to fall back on the default value when the value is actually None.
