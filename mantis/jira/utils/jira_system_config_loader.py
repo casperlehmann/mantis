@@ -31,7 +31,7 @@ class CreatemetaModelFactory:
         self.out_fields: dict[str, Any] = {}
         self.getters: dict[str, str] = {}
         self.attributes: list[str] = []
-        self.createmeta = self.jira.cache.get_createmeta_from_createmeta_cache(self.type_name)
+        self.createmeta = self.jira.cache.get_createmeta_from_cache(self.type_name)
         if not self.createmeta:
             raise CacheMissException(f"{self.type_name}")
         self.createmeta_fields: list[dict[str, Any]] = self.createmeta["fields"]

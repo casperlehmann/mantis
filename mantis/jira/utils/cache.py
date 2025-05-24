@@ -88,7 +88,7 @@ class Cache:
         assert isinstance(contents, dict), f'Got: {type(contents)}: {contents}'
         return contents
 
-    def get_createmeta_from_createmeta_cache(self, issuetype_name: str) -> dict[str, Any] | None:
+    def get_createmeta_from_cache(self, issuetype_name: str) -> dict[str, Any] | None:
         filename = f"createmeta_{issuetype_name.lower()}.json"
         return self.get_from_createmeta_cache(filename)
 
