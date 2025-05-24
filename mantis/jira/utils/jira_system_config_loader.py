@@ -31,7 +31,7 @@ class CreatemetaModelFactory:
         self.out_fields: dict[str, Any] = {}
         self.getters: dict[str, str] = {}
         self.attributes: list[str] = []
-        self.createmeta = self.jira.cache.get_createmeta_from_issuetype_fields_cache(self.type_name)
+        self.createmeta = self.jira.cache.get_createmeta_from_createmeta_cache(self.type_name)
         if not self.createmeta:
             raise CacheMissException(f"{self.type_name}")
         self.createmeta_fields: list[dict[str, Any]] = self.createmeta["fields"]
@@ -127,8 +127,8 @@ class JiraSystemConfigLoader:
     def cache(self) -> 'Cache':
         return self.client.cache
 
-    def loop_issuetype_fields(self) -> Generator[Path, Any, None]:
-        for file in self.cache.issuetype_fields.iterdir():
+    def loop_createmeta(self) -> Generator[Path, Any, None]:
+        for file in self.cache.createmeta.iterdir():
             yield file
     
     def get_projects(self, force_skip_cache: bool = False) -> list[dict[str, Any]]:
@@ -176,7 +176,7 @@ class JiraSystemConfigLoader:
         return self.client.issues.load_allowed_types()
 
     def compile_plugins(self) -> None:
-        for input_file in self.cache.iter_dir("issuetype_fields"):
+        for input_file in self.cache.iter_dir("createmeta"):
             with open(input_file, "r") as f:
                 content = f.read()
             # Remove the .json extension
