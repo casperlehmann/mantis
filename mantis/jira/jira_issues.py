@@ -20,7 +20,7 @@ class JiraIssue:
         return self.data.get(key, default) or default
 
     @property
-    def key(self):
+    def key(self) -> str:
         key = self.data.get('key')
         if not key:
             raise ValueError('No key')
