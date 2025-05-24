@@ -47,6 +47,9 @@ if __name__ == '__main__':
         for issue_key in jira_options.issues:
             issue = jira.issues.get(key=issue_key)
             draft_data = issue.draft.read_draft()
+            # print (f'draft_data: {draft_data}'.strip())
+            # print()
+
             local_vars = ('ignore', 'header')
             for field in draft_data.keys():
                 from_cache = issue.get_field(field, 'N/A')
@@ -54,6 +57,7 @@ if __name__ == '__main__':
                 if field in local_vars:  # E.g. Local custom fields
                     continue
                 print (f"# {issue_key} ", end="")
+                # print ([field, type(value), value])
                 extracted_from_cache = from_cache if isinstance(from_cache, str) else from_cache.get('displayName') or from_cache.get('name')
                 if not value:  # E.g. parent not set
                     print(f'# Not set   ({field}) is None')
@@ -73,7 +77,12 @@ if __name__ == '__main__':
                     print(f"# Different: {field}:")
                     print(f"{value}")
                     pprint(from_cache)
+                    # print ([field])
+                    # print ([value])
+                    # print ([from_cache])
                     input()
+                # print([value, from_cache])
+                # print()
             assert draft_data.content == f'{draft_data.to_dict().get('content', '')}'
             assert not draft_data.content.startswith(f'# {draft_data.get('summary', '')}\n\n')
     elif jira_options.action == 'get-project-keys':
