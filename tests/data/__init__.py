@@ -47,25 +47,25 @@ class CacheData:
 
     @property
     def createmeta_bug(self) -> Any:
-        with open('tests/data/jira_cache/system/issuetype_fields/createmeta_bug.json', 'r') as f:
+        with open('tests/data/jira_cache/system/createmeta/createmeta_bug.json', 'r') as f:
             return json.load(f)
 
     @property
     def createmeta_epic(self) -> Any:
-        with open('tests/data/jira_cache/system/issuetype_fields/createmeta_epic.json', 'r') as f:
+        with open('tests/data/jira_cache/system/createmeta/createmeta_epic.json', 'r') as f:
             return json.load(f)
 
     @property
     def createmeta_story(self) -> Any:
-        with open('tests/data/jira_cache/system/issuetype_fields/createmeta_story.json', 'r') as f:
+        with open('tests/data/jira_cache/system/createmeta/createmeta_story.json', 'r') as f:
             return json.load(f)
 
     @property
     def createmeta_subtask(self) -> Any:
-        with open('tests/data/jira_cache/system/issuetype_fields/createmeta_subtask.json', 'r') as f:
+        with open('tests/data/jira_cache/system/createmeta/createmeta_subtask.json', 'r') as f:
             return json.load(f)
 
     @property
     def createmeta_task(self) -> Any:
-        with open('tests/data/jira_cache/system/issuetype_fields/createmeta_task.json', 'r') as f:
+        with open('tests/data/jira_cache/system/createmeta/createmeta_task.json', 'r') as f:
             return json.load(f)

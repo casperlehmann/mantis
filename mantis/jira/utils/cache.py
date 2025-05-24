@@ -18,7 +18,8 @@ class Cache:
         self.root.mkdir(exist_ok=True)
         self.issues.mkdir(exist_ok=True)
         self.system.mkdir(exist_ok=True)
-        self.issuetype_fields.mkdir(exist_ok=True)
+        self.createmeta.mkdir(exist_ok=True)
+        self.editmeta.mkdir(exist_ok=True)
 
     def invalidate(self) -> None:
         if self.root.exists():
@@ -27,7 +28,8 @@ class Cache:
         self.root.mkdir(exist_ok=True)
         self.issues.mkdir(exist_ok=True)
         self.system.mkdir(exist_ok=True)
-        self.issuetype_fields.mkdir(exist_ok=True)
+        self.createmeta.mkdir(exist_ok=True)
+        self.editmeta.mkdir(exist_ok=True)
 
     @property
     def root(self) -> Path:
@@ -42,8 +44,12 @@ class Cache:
         return self.root / "system"
 
     @property
-    def issuetype_fields(self) -> Path:
-        return self.system / "issuetype_fields"
+    def createmeta(self) -> Path:
+        return self.system / "createmeta"
+
+    @property
+    def editmeta(self) -> Path:
+        return self.system / "editmeta"
 
     def _get(self, path: Path, filename: str) -> dict | None:
         if self.client._no_read_cache:
@@ -57,7 +63,7 @@ class Cache:
         if self.client._no_read_cache:
             raise LookupError('Attempted to access cache when _no_read_cache is set')
         return self._get(self.issues, f"{key}.json")
-    
+
     def get_from_system_cache(self, filename: str) -> dict[str, Any] | list[dict[str, Any]] | None:
         if self.client._no_read_cache:
             raise LookupError('Attempted to access cache when _no_read_cache is set')
@@ -81,20 +87,21 @@ class Cache:
         assert isinstance(issuetypes, dict), f'{issuetypes} should be of type dict. Got: {type(issuetypes)}: {issuetypes}'
         return issuetypes
 
-    def get_from_issuetype_fields_cache(self, filename: str) -> dict[str, Any] | None:
-        contents = self._get(self.issuetype_fields, filename)
+    def get_createmeta_from_cache(self, issuetype_name: str) -> dict[str, Any] | None:
+        filename = f"createmeta_{issuetype_name.lower()}.json"
+        contents = self._get(self.createmeta, filename)
         if not contents:
             return None
-        assert isinstance(contents, dict), f'Got: {type(contents)}: {contents}'
+        assert isinstance(contents, dict), f'Expected createmeta to be dict. Got: {type(contents)}: {contents}'
         return contents
 
-    def get_createmeta_from_issuetype_fields_cache(self, issuetype_name: str) -> dict[str, Any] | None:
-        filename = f"createmeta_{issuetype_name.lower()}.json"
-        return self.get_from_issuetype_fields_cache(filename)
-
-    def get_editmeta_from_issuetype_fields_cache(self, issuetype_name: str) -> dict[str, Any] | None:
-        filename = f"editmeta_{issuetype_name.lower()}.json"
-        return self.get_from_issuetype_fields_cache(filename)
+    def get_editmeta_from_cache(self, issue_key: str) -> dict[str, Any] | None:
+        filename = f"editmeta_{issue_key.lower()}.json"
+        contents = self._get(self.editmeta, filename)
+        if not contents:
+            return None
+        assert isinstance(contents, dict), f'Expected editmeta to be dict. Got: {type(contents)}: {contents}'
+        return contents
 
     def _write(self, path: Path, filename: str, contents: str) -> int:
         with open(path / filename, "w") as f:
@@ -109,11 +116,13 @@ class Cache:
     def write_issuetypes_to_system_cache(self, issuetypes: dict[str, Any]) -> None:
         self.write_to_system_cache("issuetypes.json", json.dumps(issuetypes))
 
-    def write_to_issuetype_fields(self, filename: str, issuetype_fields: list[dict[str, Any]]) -> None:
-        self._write(self.issuetype_fields, filename, json.dumps(issuetype_fields))
+    def write_createmeta(self, issuetype_name: str, createmeta: list[dict[str, Any]]) -> None:
+        filename = f"createmeta_{issuetype_name.lower()}.json"
+        self._write(self.createmeta, filename, json.dumps(createmeta))
 
-    def write_createmeta(self, issuetype_name: str, issuetype_fields: list[dict[str, Any]]) -> None:
-        self.write_to_issuetype_fields(f"createmeta_{issuetype_name.lower()}.json", issuetype_fields)
+    def write_editemeta(self, issue_key: str, editmeta: list[dict[str, Any]]) -> None:
+        filename = f"editmeta_{issue_key.lower()}.json"
+        self._write(self.editmeta, filename, json.dumps(editmeta))
 
     def remove(self, filename: str) -> bool:
         if not (self.root / filename).exists():
@@ -125,8 +134,8 @@ class Cache:
         return self.remove(f"issues/{key}.json")
 
     def iter_dir(self, identifier: str) -> Generator[Path, None, None]:
-        if identifier == "issuetype_fields":
-            for file in self.issuetype_fields.iterdir():
+        if identifier == "createmeta":
+            for file in self.createmeta.iterdir():
                 yield file
         if identifier == "issues":
             for file in self.issues.iterdir():

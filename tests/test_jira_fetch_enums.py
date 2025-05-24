@@ -15,13 +15,14 @@ def test_config_loader_update_issuetypes_writes_to_cache(
 ):
     mock_get.return_value.json.return_value = get_issuetypes_response
     config_loader = fake_jira.system_config_loader
-    assert len(list(fake_jira.cache.system.iterdir())) == 1, (
-        f"Not empty: {fake_jira.cache.system}")
+    set_with_no_issuetypes = {str(_).split('/')[-1] for _ in fake_jira.cache.system.iterdir()}
+    assert set_with_no_issuetypes == {'createmeta', 'editmeta'}, (
+        f"System cache expected 2 values. Got: {set_with_no_issuetypes}")
 
-    config_loader.get_issuetypes(force_skip_cache = True) 
-    assert len(list(fake_jira.cache.system.iterdir())) == 2, (
-        f"Not empty: {fake_jira.cache.system}")
-
+    config_loader.get_issuetypes(force_skip_cache = True)
+    set_with_issuetypes = {str(_).split('/')[-1] for _ in fake_jira.cache.system.iterdir()}
+    assert set_with_issuetypes == {'createmeta', 'editmeta', 'issuetypes.json'}, (
+        f"System cache expected 3 values. Got: {fake_jira.cache.system}")
 
 def test_persisted_issuetypes_data():
     cache_data = CacheData()
@@ -51,11 +52,11 @@ def test_cache_get_issuetypes_from_system_cache(mock_get, fake_jira: JiraClient)
 def test_config_loader_loop_yields_files(mock_get, fake_jira: JiraClient):
     mock_get.return_value.json.return_value = get_issuetypes_response
     config_loader = fake_jira.system_config_loader
-    assert len(list(config_loader.loop_issuetype_fields())) == 0
+    assert len(list(config_loader.loop_createmeta())) == 0
     # cache something
-    with open(fake_jira.cache.issuetype_fields / f"some_file.json", "w") as f:
+    with open(fake_jira.cache.createmeta / f"some_file.json", "w") as f:
         f.write("{}")
-    assert len(list(config_loader.loop_issuetype_fields())) == 1
+    assert len(list(config_loader.loop_createmeta())) == 1
 
 
 @patch("mantis.jira.jira_client.requests.get")
@@ -113,14 +114,14 @@ def test_update_project_field_keys(mock_get, fake_jira: JiraClient):
 
     mock_get.return_value.json.return_value = {'issueTypes': {"name": "Testtype"}}
 
-    if (fake_jira.cache.issuetype_fields / 'createmeta_story.json').exists():
+    if (fake_jira.cache.createmeta / 'createmeta_story.json').exists():
         raise FileExistsError('File "createmeta_story.json" should not exist yet')
     allowed_types = config_loader.update_project_field_keys()
     assert set(allowed_types) == set(['Epic', 'Subtask', 'Task', 'Story', 'Bug'])
-    if not (fake_jira.cache.issuetype_fields / 'createmeta_story.json').exists():
+    if not (fake_jira.cache.createmeta / 'createmeta_story.json').exists():
         raise FileNotFoundError('File "createmeta_story.json" should have been created')
     assert 'Story' in allowed_types, f"Testtype not in allowed_types: {allowed_types}"
-    with open(fake_jira.cache.issuetype_fields / "createmeta_story.json", "r") as f:
+    with open(fake_jira.cache.createmeta / "createmeta_story.json", "r") as f:
         assert f.read() == '{"issueTypes": {"name": "Testtype"}}'
 
 
@@ -131,7 +132,7 @@ def test_compile_plugins(mock_get, fake_jira: JiraClient):
 
     config_loader = fake_jira.system_config_loader
 
-    with open(fake_jira.cache.issuetype_fields / "Testtype.json", "w") as f:
+    with open(fake_jira.cache.createmeta / "Testtype.json", "w") as f:
         f.write('{"name": "Testtype"}')
 
     assert (
@@ -176,7 +177,7 @@ def test_get_project_field_keys_from_cache(fake_jira: "JiraClient", with_fake_al
     fake_jira.issues._allowed_types = ["test"]
     from tests.data import CacheData
     data = CacheData().createmeta_epic
-    with open(fake_jira.cache.issuetype_fields / "createmeta_test.json", "w") as f:
+    with open(fake_jira.cache.createmeta / "createmeta_test.json", "w") as f:
         json.dump(data, f)
     from_cache = config_loader.get_project_field_keys_from_cache()
     assert from_cache

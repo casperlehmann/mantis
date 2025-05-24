@@ -64,7 +64,7 @@ def test_cache_remove_issue_does_removals(fake_jira: JiraClient, minimal_issue_p
 @pytest.mark.parametrize(
     "identifier",
     [
-        ("issuetype_fields"),
+        ("createmeta"),
     ],
 )
 def test_cache_iter_dir_yields_files(fake_jira: JiraClient, identifier: str):
