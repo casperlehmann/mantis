@@ -20,6 +20,13 @@ class JiraIssue:
         return self.data.get(key, default) or default
 
     @property
+    def key(self) -> str:
+        key = self.data.get('key')
+        if not key:
+            raise ValueError('No key')
+        return key
+
+    @property
     def fields(self) -> dict[str, Any]:
         fields = self.data.get("fields")
         if not fields:
@@ -40,10 +47,7 @@ class JiraIssue:
         return default if value is None else value
 
     def update_field(self, data: dict[str, Any]) -> None:
-        key = self.data.get('key')
-        if not key:
-            raise ValueError('No key')
-        self.client.update_field(key, data)
+        self.client.update_field(self.key, data)
     
 
 class JiraIssues:
