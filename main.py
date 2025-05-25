@@ -64,8 +64,10 @@ if __name__ == '__main__':
             for draft_field_key in draft_data.keys():
                 if draft_field_key in local_vars:  # E.g. Local custom fields
                     continue
-                from_cache = issue.get_field(draft_field_key, 'N/A')
-                if from_cache == 'N/A':
+                value_from_draft = draft_data.get(draft_field_key)
+                value_from_cache = issue.get_field(draft_field_key, 'N/A')
+                
+                if value_from_cache == 'N/A':
                     # https://caspertestaccount.atlassian.net/rest/api/latest/issue/ecs-1?expand=editmeta
                     # https://caspertestaccount.atlassian.net/rest/api/latest/issue/ecs-1/editmeta
                     # return default
@@ -81,28 +83,28 @@ if __name__ == '__main__':
                     #     'schema': {'system': 'parent', 'type': 'issuelink'}}
                     print(f'draft_field_key {draft_field_key} in editmeta: {draft_field_key in issue.editmeta['fields']}')
                 
-                value = draft_data.get(draft_field_key)
+
                 print (f"# {issue_key} ", end="")
                 # print ([field, type(value), value])
-                extracted_from_cache = from_cache if isinstance(from_cache, str) else from_cache.get('displayName') or from_cache.get('name')
-                if not value:  # E.g. parent not set
+                extracted_from_cache = value_from_cache if isinstance(value_from_cache, str) else value_from_cache.get('displayName') or value_from_cache.get('name')
+                if not value_from_draft:  # E.g. parent not set
                     print(f'# Not set   ({draft_field_key}) is None')
-                elif not value or value == 'None' or value == {draft_field_key: None}:
+                elif not value_from_draft or value_from_draft == 'None' or value_from_draft == {draft_field_key: None}:
                     print(f'# None      ({draft_field_key}) is None')
-                elif from_cache == 'N/A':
+                elif value_from_cache == 'N/A':
                     print(f'# Miss      ({draft_field_key}) not found in cache')
-                elif not from_cache:
+                elif not value_from_cache:
                     print(f'# Null      ({draft_field_key}) in cache but None')
-                elif from_cache == 'None':
+                elif value_from_cache == 'None':
                     print(f'# Field     ({draft_field_key}) not found in cache')
-                elif value == from_cache:
-                    print(f"# Same      ({draft_field_key}): {value}")
-                elif value == extracted_from_cache:
-                    print(f"# Extracted ({draft_field_key}): {value}")
+                elif value_from_draft == value_from_cache:
+                    print(f"# Same      ({draft_field_key}): {value_from_draft}")
+                elif value_from_draft == extracted_from_cache:
+                    print(f"# Extracted ({draft_field_key}): {value_from_draft}")
                 else:
                     print(f"# Different: {draft_field_key}:")
-                    print(f"{value}")
-                    pprint(from_cache)
+                    print(f"{value_from_draft}")
+                    pprint(value_from_cache)
                     # print ([field])
                     # print ([value])
                     # print ([from_cache])
