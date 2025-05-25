@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from mantis.jira.utils import Cache
 
 
-class CreatemetaModelFactory:
+class MetaModelFactory:
     # Fields created by Jira that are present in the issue json, but cannot
     # be set by the user.
     ignored_non_meta_field = {
@@ -25,18 +25,13 @@ class CreatemetaModelFactory:
         # "environment"
     }
 
-    def __init__(self, jira: "JiraClient", type_name: str):
-        self.jira = jira
-        self.type_name = type_name.lower()
+    def __init__(self, metadata: dict[str, Any]):
         self.out_fields: dict[str, Any] = {}
         self.getters: dict[str, str] = {}
         self.attributes: list[str] = []
-        self.createmeta = self.jira.cache.get_createmeta_from_cache(self.type_name)
-        if not self.createmeta:
-            raise CacheMissException(f"{self.type_name}")
-        assert "fields" in self.createmeta.keys(), f"'fields' not in createmeta.keys: {self.createmeta.keys()}"
-        self.createmeta_fields: list[dict[str, Any]] = self.createmeta["fields"]
-        self.create_model()
+        self.metadata = metadata
+        assert "fields" in metadata.keys(), f"'fields' not in createmeta.keys: {metadata.keys()}"
+        self.meta_fields: list[dict[str, Any]] | dict[str, dict[str, Any]] = metadata["fields"]
 
     def keys(self) -> KeysView[str]:
         return self.out_fields.keys()
@@ -67,11 +62,27 @@ class CreatemetaModelFactory:
         else:
             self.attributes.append(meta_field_key)
 
+    @property
+    def _iter_meta_fields(self) -> Generator[dict[str, Any], Any, None]:
+        """Iterate through meta object.
+        
+        Unified interface for createmeta (list[dict]) and editmeta (dict[str, dict])."""
+        for _meta_field_value in self.meta_fields:
+            if isinstance(_meta_field_value, dict):
+                assert isinstance(self.meta_fields, list)
+                yield _meta_field_value
+            elif isinstance(_meta_field_value, str):
+                assert isinstance(self.meta_fields, dict)
+                yield self.meta_fields[_meta_field_value]
+            else:
+                raise ValueError('Meta object has an unexpected schema.')
+    
     def _create_fields_model(self) -> type[BaseModel]:
-        for meta_field_value in self.createmeta_fields:
+        for meta_field_value in self._iter_meta_fields:
+
             assert isinstance(meta_field_value, dict), (
                 f"meta_field_value is type {type(meta_field_value)}, should be dict. "
-                f"Got: {meta_field_value}. From {self.createmeta_fields}"
+                f"Got: {meta_field_value}. From {self.meta_fields}"
             )
             try:
                 meta_field_key: str = meta_field_value["key"]
@@ -110,14 +121,49 @@ class CreatemetaModelFactory:
         return self.model.model_validate(issue_payload)
 
 
+class CreatemetaModelFactory(MetaModelFactory):
+    ignored_non_meta_field = {
+        "statuscategorychangedate",
+        "components",
+        "timespent",
+    }
+
+    def __init__(self, metadata: Dict[str, Any]):
+        super().__init__(metadata)
+        self.process = 'createmeta'
+        assert isinstance(self.meta_fields, list), f'CreatemetaModelFactory.meta_fields should be of type list. Got: {type(self.meta_fields)}'
+        self.create_model()
+
+
+class EditmetaModelFactory(MetaModelFactory):
+    ignored_non_meta_field = {
+        "statuscategorychangedate",
+        "components",
+        "timespent",
+        # 'environment' is a legacy field (and only relevant in editmeta)
+        "environment"
+    }
+
+    def __init__(self, metadata: Dict[str, Any]):
+        super().__init__(metadata)
+        self.process = 'editmeta'
+        assert isinstance(self.meta_fields, dict), f'EditmetaModelFactory.meta_fields should be of type dict. Got: {type(self.meta_fields)}'
+        self.create_model()
+
+
 class JiraSystemConfigLoader:
     def __init__(self, client: "JiraClient") -> None:
         self.client = client
 
-    def attempt(self, issue_id: str, issue_type: str) -> None:
+    def attempt(self, issue_id: str, issuetype_name: str) -> None:
         with open(f".jira_cache/issues/{issue_id}.json", "r") as f:
             data = json.load(f)
-        fields = CreatemetaModelFactory(self.client, issue_type)
+
+        metadata = self.client.cache.get_createmeta_from_cache(issuetype_name)
+        if not metadata:
+            raise CacheMissException(f"{issuetype_name}")
+        assert isinstance(metadata, dict)
+        fields = CreatemetaModelFactory(metadata)
         loaded = fields.make(data)
         assert loaded.key == issue_id  # type: ignore
         print(loaded.key)  # type: ignore
@@ -252,7 +298,11 @@ class JiraSystemConfigLoader:
     def get_project_field_keys_from_cache(self) -> Dict[str, CreatemetaModelFactory]:
         d: dict[str, CreatemetaModelFactory] = {}
         for issuetype in self.client.issues.allowed_types:
-            d[issuetype] = CreatemetaModelFactory(self.client, issuetype)
+            metadata = self.client.cache.get_createmeta_from_cache(issuetype)
+            if not metadata:
+                raise CacheMissException(f"{issuetype}")
+            assert isinstance(metadata, dict)
+            d[issuetype] = CreatemetaModelFactory(metadata)
         return d
 
     def inspect(self) -> None:
