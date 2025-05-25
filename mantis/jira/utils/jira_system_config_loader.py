@@ -159,7 +159,7 @@ class JiraSystemConfigLoader:
         nested_issuetypes = issuetypes['issueTypes']
 
         for issuetype in nested_issuetypes:
-            data: list[dict[str, Any]] = self.client.get_createmeta(self.client.project_name, issuetype_id)
+            data = self._update_single_createmeta(issuetype)
         return self.client.issues.load_allowed_types()
 
     def _update_single_createmeta(self, issuetype: dict[str, Any]) -> dict[str, Any]:

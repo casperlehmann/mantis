@@ -113,8 +113,9 @@ class JiraClient:
         assert isinstance(issuetypes['issueTypes'], list), "issuetypes['issueTypes'] is not a list. Got: {issuetypes}"
         return issuetypes
 
-    def get_createmeta(self, project_name: str, issuetype_id: str) -> list[dict[str, Any]]:
-        url = f"issue/createmeta/{project_name}/issuetypes/{issuetype_id}"
+    def get_createmeta(self, issuetype_id: str) -> dict[str, list[dict[str, Any]]]:
+        """Createmeta is a list of fields"""
+        url = f"issue/createmeta/{self.project_name}/issuetypes/{issuetype_id}"
         response = self._get(url)
         response.raise_for_status()
         return response.json()
