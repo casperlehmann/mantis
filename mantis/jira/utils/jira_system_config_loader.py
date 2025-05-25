@@ -47,13 +47,12 @@ class MetaModelFactory(ABC):
     def create_model(self) -> None:
         fields_model = self._create_fields_model()
         self._add_aliases_for_custom_fields(fields_model)
-        outer_schema_with_nested_fields: dict[str, Any]= {
-            "key": str,
-            "id": str,
-            "fields": fields_model,
-        }
-        issue_model = create_model("IssueModel", **outer_schema_with_nested_fields)
-        self.model = issue_model
+        class IssueModel(BaseModel):
+            key: str
+            id: str
+            fields: fields_model # type: ignore Variable not allowed in type expression
+
+        self.model = IssueModel
 
     def assign_python_type(self, meta: JiraIssueFieldSchema, meta_field_key: str) -> None:
         python_type = meta.schema_as_python_type
