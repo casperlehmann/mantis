@@ -43,6 +43,44 @@ if __name__ == '__main__':
             title = issue.get_field('summary')
             print(f'[{key}] {title}')
             jira._no_read_cache = False
+    elif jira_options.action == 'compare':
+        for issue_key in jira_options.issues:
+            issue = jira.issues.get(key=issue_key)
+            print(f'Type: {issue.issuetype}')
+            draft_data = issue.draft.read_draft()
+            made_create = issue.createmeta
+            made_edit = issue.editmeta
+
+            draft_keys = draft_data.keys()
+            create_keys = made_create.fields.model_fields_set  # type: ignore
+            edit_keys = made_edit.fields.model_fields_set  # type: ignore
+            issue_keys = set(issue.fields.keys())
+            set_of_all_field_names = set(draft_keys).union(edit_keys).union(create_keys).union(issue_keys)
+            # pprint(set_of_all_field_names)
+            print(20*' ', end=' ')
+            # print(f'{'create':<10} {'edit':<10} {'issue':<10} {'draft':<10}')
+            print(f'{'create':^10} {'edit':^10} {'issue':^10} {'draft':^10}')
+            for key in sorted(set_of_all_field_names):
+                try:
+                    from_create = '1' if made_create.fields.__getattribute__(key) else '0'  # type: ignore
+                except AttributeError:
+                    from_create = '----------'
+                try:
+                    from_edit = '1' if made_edit.fields.__getattribute__(key) else '0'  # type: ignore
+                except AttributeError:
+                    from_edit = '----------'
+                # from_edit = (made_edit.fields.__getattribute__(key) or '') == 'x'  # type: ignore
+                try:
+                    from_issue = '1' if issue.fields[key] else '0'
+                except KeyError:
+                    from_issue = '----------'
+                try:
+                    from_draft = '1' if draft_data[key] else '0'
+                except KeyError:
+                    from_draft = '----------'
+                # print(f'{key[:20]:<20} {from_create:<10} {from_edit:<10} {from_issue:<10} {from_draft:<10}')
+                print(f'{key[:20]:<20} {from_create:^10} {from_edit:^10} {from_issue:^10} {from_draft:^10}')
+
     elif jira_options.action == 'update-issue-from-draft':
         for issue_key in jira_options.issues:
             issue = jira.issues.get(key=issue_key)
