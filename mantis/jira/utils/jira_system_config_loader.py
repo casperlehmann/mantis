@@ -125,7 +125,11 @@ class CreatemetaModelFactory(MetaModelFactory):
     def __init__(self, metadata: Dict[str, Any]):
         super().__init__(metadata)
         self.process = 'createmeta'
-        assert isinstance(self.meta_fields, list), f'CreatemetaModelFactory.meta_fields should be of type list. Got: {type(self.meta_fields)}'
+        if isinstance(self.meta_fields, dict):
+            raise ValueError('CreatemetaModelFactory.meta_fields should be of type list. '
+                             'Got dict. Did you accidentally pass be an "editmeta"?')
+        assert isinstance(self.meta_fields, list), (
+            f'CreatemetaModelFactory.meta_fields should be of type list. Got: {type(self.meta_fields)}')
         self.create_model()
 
 
@@ -141,7 +145,11 @@ class EditmetaModelFactory(MetaModelFactory):
     def __init__(self, metadata: Dict[str, Any]):
         super().__init__(metadata)
         self.process = 'editmeta'
-        assert isinstance(self.meta_fields, dict), f'EditmetaModelFactory.meta_fields should be of type dict. Got: {type(self.meta_fields)}'
+        if isinstance(self.meta_fields, list):
+            raise ValueError('EditmetaModelFactory.meta_fields should be of type dict. '
+                             'Got list. Did you accidentally pass be a "createmeta"?')
+        assert isinstance(self.meta_fields, dict), (
+            f'EditmetaModelFactory.meta_fields should be of type dict. Got: {type(self.meta_fields)}')
         self.create_model()
 
 
