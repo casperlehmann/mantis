@@ -3,6 +3,7 @@ from pprint import pprint
 from typing import TYPE_CHECKING, Any
 
 from mantis.drafts import Draft
+from mantis.jira.utils.jira_system_config_loader import CreatemetaModelFactory
 
 if TYPE_CHECKING:
     from .jira_client import JiraClient
@@ -25,6 +26,16 @@ class JiraIssue:
         if not key:
             raise ValueError('No key')
         return key
+
+    @property
+    def createmeta_data(self) -> dict[str, list[dict[str, Any]]]:
+        self._createmeta_data = self.client.system_config_loader.get_createmeta(self.issuetype)
+        return self._createmeta_data
+
+    @property
+    def createmeta(self) -> CreatemetaModelFactory:
+        self.createmeta_object = CreatemetaModelFactory(self.createmeta_data)
+        return self.createmeta_object
 
     @property
     def editmeta(self) -> dict[str, Any]:
