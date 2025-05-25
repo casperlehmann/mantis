@@ -27,6 +27,7 @@ class JiraIssue:
         self.data = raw_data
         # Only writes if not exists.
         self.draft = Draft(self.client, self)
+        self._createmeta_factory: CreatemetaModelFactory | None = None
 
     def get(self, key: str, default: Any = None) -> Any:
         return self.data.get(key, default) or default
@@ -51,8 +52,11 @@ class JiraIssue:
 
     @property
     def createmeta(self) -> BaseModel:
-        self.createmeta_factory = CreatemetaModelFactory(self.createmeta_data)
-        return self.createmeta_factory.make(self.data)
+        # TODO: Createmeta is shared for all issues of the same type.
+        #       Should be loaded into a shared object, not one per Issue
+        if self._createmeta_factory is None:
+            self._createmeta_factory = CreatemetaModelFactory(self.createmeta_data)
+        return self._createmeta_factory.make(self.data)
 
     @property
     def editmeta(self) -> dict[str, Any]:
