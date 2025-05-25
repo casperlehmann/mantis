@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 class MetaModelFactory:
     # Fields created by Jira that are present in the issue json, but cannot
     # be set by the user. These are overwritten in sub-classes.
-    ignored_non_meta_field = {}
+    ignored_non_meta_field: set[str] = set()
 
     def __init__(self, metadata: dict[str, Any]):
         self.out_fields: dict[str, Any] = {}
