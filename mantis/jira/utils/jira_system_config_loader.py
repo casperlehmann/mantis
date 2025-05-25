@@ -304,9 +304,25 @@ class Inspector:
             d[issuetype] = CreatemetaModelFactory(metadata)
         return d
 
+    @staticmethod
+    def get_editmeta_models(client: 'JiraClient', issue_keys: list[str]) -> dict[str, EditmetaModelFactory]:    
+        d: dict[str, EditmetaModelFactory] = {}
+        for issue_key in issue_keys:
+            # metadata = client.cache.get_editmeta_from_cache(issue_key)
+            metadata = client.issues.get(issue_key).editmeta
+            if not metadata:
+                raise CacheMissException(f"{issue_key}")
+            assert isinstance(metadata, dict)
+            assert 'fields' in metadata.keys()
+            d[issue_key] = EditmetaModelFactory(metadata)
+        return d
 
     @classmethod
     def inspect(cls, client: 'JiraClient') -> None:
         createmeta_model_data = cls.get_createmeta_models(client)
         createmeta_all_keys = cls.get_field_names_from_all_types(createmeta_model_data)
         cls.print_table(client.issues.allowed_types, createmeta_all_keys, createmeta_model_data)
+        print()
+        editmeta_model_data = cls.get_editmeta_models(client, ['ECS-1', 'ECS-2', 'ECS-3', 'ECS-4', 'ECS-5'])
+        editmeta_all_keys = cls.get_field_names_from_all_types(editmeta_model_data)
+        cls.print_table(['ECS-1', 'ECS-2', 'ECS-3', 'ECS-4', 'ECS-5'], editmeta_all_keys, editmeta_model_data)
