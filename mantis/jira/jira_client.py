@@ -128,7 +128,7 @@ class JiraClient:
         return issuetype_id
 
     def get_createmeta(self, issuetype_id: str) -> dict[str, list[dict[str, Any]]]:
-        """Createmeta is a list of fields"""
+        """Createmeta dict with a list of fields called 'fields'"""
         url = f"issue/createmeta/{self.project_name}/issuetypes/{issuetype_id}"
         response = self._get(url)
         response.raise_for_status()

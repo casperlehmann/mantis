@@ -10,6 +10,16 @@ if TYPE_CHECKING:
 
 
 class JiraIssue:
+    """Represents data reflecting an issue in Jira.
+    
+    An issue may be read, written or editing.
+    - Reading means instantiating from the (cached) upstream data.
+    - Creating means instantiating based on entered data, ensuring
+      conformity with createmeta and pushing upstream.
+    - Editing means instantiating from the (cached) upstream data,
+      then comparing with entered data while ensuring conformity
+      with editmeta before pushing to upstream.
+    """
     def __init__(self, client: "JiraClient", raw_data: dict[str, Any]) -> None:
         self.client = client
         self.data = raw_data
