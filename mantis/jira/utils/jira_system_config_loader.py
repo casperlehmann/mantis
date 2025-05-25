@@ -147,7 +147,8 @@ class JiraSystemConfigLoader:
             if from_cache:
                 return from_cache
         issuetypes = self.client.get_issuetypes()
-        if len(issuetypes) == 0:
+        assert isinstance(issuetypes, dict)
+        if len(issuetypes.keys()) == 0:
             raise ValueError(
                 'List of issuetypes has length of zero. Something is probably very wrong.')
         self.cache.write_issuetypes_to_system_cache(issuetypes)
