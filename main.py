@@ -50,31 +50,57 @@ if __name__ == '__main__':
             # print (f'draft_data: {draft_data}'.strip())
             # print()
 
+            print('# issue.issuetype:')
+            pprint(issue.issuetype)
+            print('# issue.editmeta:')
+            # pprint(issue.editmeta)
+            print('# issue.createmeta:')
+            # pprint(issue.createmeta.createmeta_fields)
+            made_create = issue.createmeta.make(issue.data)
+            print("made_create")
+            # pprint(made_create)
+            print(made_create)
+
             local_vars = ('ignore', 'header')
-            for field in draft_data.keys():
-                from_cache = issue.get_field(field, 'N/A')
-                value = draft_data.get(field)
-                if field in local_vars:  # E.g. Local custom fields
+            for draft_field_key in draft_data.keys():
+                if draft_field_key in local_vars:  # E.g. Local custom fields
                     continue
+                from_cache = issue.get_field(draft_field_key, 'N/A')
+                if from_cache == 'N/A':
+                    # https://caspertestaccount.atlassian.net/rest/api/latest/issue/ecs-1?expand=editmeta
+                    # https://caspertestaccount.atlassian.net/rest/api/latest/issue/ecs-1/editmeta
+                    # return default
+                    # check editmeta
+                    target_editmeta = issue.editmeta['fields'][draft_field_key]
+                    pprint(target_editmeta)
+                    # {'hasDefaultValue': False,
+                    #     'key': 'parent',
+                    #     'name': 'Parent',
+                    #     'operations': ['set'],
+                    #     'required': False,
+                    #     'schema': {'system': 'parent', 'type': 'issuelink'}}
+                    print(f'draft_field_key {draft_field_key} in editmeta: {draft_field_key in issue.editmeta['fields']}')
+                
+                value = draft_data.get(draft_field_key)
                 print (f"# {issue_key} ", end="")
                 # print ([field, type(value), value])
                 extracted_from_cache = from_cache if isinstance(from_cache, str) else from_cache.get('displayName') or from_cache.get('name')
                 if not value:  # E.g. parent not set
-                    print(f'# Not set   ({field}) is None')
-                elif not value or value == 'None' or value == {field: None}:
-                    print(f'# None      ({field}) is None')
+                    print(f'# Not set   ({draft_field_key}) is None')
+                elif not value or value == 'None' or value == {draft_field_key: None}:
+                    print(f'# None      ({draft_field_key}) is None')
                 elif from_cache == 'N/A':
-                    print(f'# Miss      ({field}) not found in cache')
+                    print(f'# Miss      ({draft_field_key}) not found in cache')
                 elif not from_cache:
-                    print(f'# Null      ({field}) in cache but None')
+                    print(f'# Null      ({draft_field_key}) in cache but None')
                 elif from_cache == 'None':
-                    print(f'# Field     ({field}) not found in cache')
+                    print(f'# Field     ({draft_field_key}) not found in cache')
                 elif value == from_cache:
-                    print(f"# Same      ({field}): {value}")
+                    print(f"# Same      ({draft_field_key}): {value}")
                 elif value == extracted_from_cache:
-                    print(f"# Extracted ({field}): {value}")
+                    print(f"# Extracted ({draft_field_key}): {value}")
                 else:
-                    print(f"# Different: {field}:")
+                    print(f"# Different: {draft_field_key}:")
                     print(f"{value}")
                     pprint(from_cache)
                     # print ([field])
