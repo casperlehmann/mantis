@@ -124,7 +124,10 @@ class JiraClient:
         url = f"issue/createmeta/{self.project_name}/issuetypes/{issuetype_id}"
         response = self._get(url)
         response.raise_for_status()
-        return response.json()
+        data = response.json()
+        assert isinstance(data, dict)
+        assert 'fields' in data.keys(), f'Key "fields" not in data.keys(). Got: {data.keys()} ... {data}'
+        return data
 
     def get_issue(self, key: str) -> dict[str, dict]:
         response = self._get(f"issue/{key}")
