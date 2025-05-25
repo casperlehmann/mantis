@@ -119,6 +119,14 @@ class JiraClient:
                 assert z is not None, f"key {y} is None"
         return issuetypes
 
+    def issuetype_name_to_id(self, issuetype_name: str) -> str:
+        nested_issuetypes = self.system_config_loader.get_issuetypes().get('issueTypes', [{}])
+        some_issuetypes = [t for t in nested_issuetypes if t.get('name', '').lower() == issuetype_name.lower()]
+        assert len(some_issuetypes) > 0, f"No issuetypes found named {issuetype_name}"
+        one_issuetype = some_issuetypes[0]
+        issuetype_id = one_issuetype['id']
+        return issuetype_id
+
     def get_createmeta(self, issuetype_id: str) -> dict[str, list[dict[str, Any]]]:
         """Createmeta is a list of fields"""
         url = f"issue/createmeta/{self.project_name}/issuetypes/{issuetype_id}"

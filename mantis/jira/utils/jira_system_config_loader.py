@@ -196,6 +196,21 @@ class JiraSystemConfigLoader:
         self.cache.write_issuetypes_to_system_cache(issuetypes)
         return issuetypes
 
+    def get_createmeta(self, issuetype_name: str, force_skip_cache: bool = False) -> dict[str, list[dict[str, Any]]]:
+        if not self.client._no_read_cache or force_skip_cache:
+            from_cache = self.cache.get_createmeta_from_cache(issuetype_name)
+            if from_cache:
+                return from_cache
+        issuetype_id = self.client.issuetype_name_to_id(issuetype_name)
+        issuetypes = self.client.get_createmeta(issuetype_id)
+        assert isinstance(issuetypes, dict)
+        if len(issuetypes.keys()) == 0:
+            raise ValueError(
+                'List of issuetypes has length of zero. Something is probably very wrong.')
+        assert 'issueTypes' in issuetypes, f'issueTypes has no issueTypes {issuetypes}'
+        self.cache.write_issuetypes_to_system_cache(issuetypes)
+        return issuetypes
+
     def fetch_and_update_all_createmeta(self) -> list[str]:
         """Updates all createmate from upstream, returns updated list of allowed types"""
         issuetypes: dict[str, list[dict[str, Any]]] = self.get_issuetypes(force_skip_cache = False)
