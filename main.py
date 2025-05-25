@@ -51,15 +51,14 @@ if __name__ == '__main__':
             # print()
 
             print('# issue.issuetype:')
-            pprint(issue.issuetype)
+            # pprint(issue.issuetype)
             print('# issue.editmeta:')
             # pprint(issue.editmeta)
             print('# issue.createmeta:')
             # pprint(issue.createmeta.createmeta_fields)
             made_create = issue.createmeta.make(issue.data)
-            print("made_create")
+            # print("# made_create")
             # pprint(made_create)
-            print(made_create)
 
             local_vars = ('ignore', 'header')
             for draft_field_key in draft_data.keys():
@@ -72,7 +71,8 @@ if __name__ == '__main__':
                     # return default
                     # check editmeta
                     target_editmeta = issue.editmeta['fields'][draft_field_key]
-                    pprint(target_editmeta)
+                    # print('# target_editmeta')
+                    # pprint(target_editmeta)
                     # {'hasDefaultValue': False,
                     #     'key': 'parent',
                     #     'name': 'Parent',
