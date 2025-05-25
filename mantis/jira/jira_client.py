@@ -107,7 +107,7 @@ class JiraClient:
             print(e.response.reason)
             print(e.response.content)
             exit()
-        issuetypes: dict[str, Any] = response.json()
+        issuetypes: dict[str, list[dict[str, Any]]] = response.json()
         assert isinstance(issuetypes, dict), f'issuetypes is not a dict: {issuetypes}'
         assert 'issueTypes' in issuetypes, f"'issueTypes' not in issuetypes. Got: {issuetypes}"
         assert isinstance(issuetypes['issueTypes'], list), "issuetypes['issueTypes'] is not a list. Got: {issuetypes}"
