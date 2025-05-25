@@ -60,8 +60,6 @@ class JiraIssue:
         If a key is not present in the cached data, a ValueError will be raised.
         If a key is present, put its value is null, the default parameter will
         be returned."""
-        if key in {'ignore', 'header'}:
-            return default
         # Guarding against non-existing fields in the source data. This allows us to do only
         # a single None-check below.
         if key not in self.fields:
