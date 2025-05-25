@@ -34,6 +34,7 @@ class CreatemetaModelFactory:
         self.createmeta = self.jira.cache.get_createmeta_from_cache(self.type_name)
         if not self.createmeta:
             raise CacheMissException(f"{self.type_name}")
+        assert "fields" in self.createmeta.keys(), f"'fields' not in createmeta.keys: {self.createmeta.keys()}"
         self.createmeta_fields: list[dict[str, Any]] = self.createmeta["fields"]
         self.create_model()
 
