@@ -55,16 +55,20 @@ class JiraIssue:
         return fields
 
     def get_field(self, key: str, default: Any = None) -> Any:
-        if key in {'ignore', 'header'}:
-            return default
-        # Guarding against non-existing fields in the source data. This allows us to do only
-        # a single None-check below.
+        """Gets the target field of a cached issue.
+        
+        If a key is not present in the cached data, this means that the field is not set in
+        upstream Jira. The field might exist or it might not. In both cases we return the
+        default value (or None if not specified).
+        Whether a field is available in Jira or not can be found by looking at the createmeta
+        or editmeta endpoints.
+        """
         if key not in self.fields:
-            raise ValueError(f"key '{key}' not in self.fields (i.e. not present upstream)")
-        # Note that the key can exist and the value can still be None.
-        # We only want to fall back on the default value when the value is actually None.
-        # Boolean values would break if we relied on Truthiness.
+            print(f"key '{key}' not in self.fields (i.e. not present upstream)")
+            return default
+        # Field is sure to exist, but it might still have value None.
         value = self.fields[key]
+        # Boolean values would break if we relied on Truthiness. Using None identity check instead.
         return default if value is None else value
 
     def update_field(self, data: dict[str, Any]) -> None:
