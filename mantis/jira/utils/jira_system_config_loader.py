@@ -17,13 +17,13 @@ if TYPE_CHECKING:
 class CreatemetaModelFactory:
     # Fields created by Jira that are present in the issue json, but cannot
     # be set by the user.
-    ignored_non_meta_field = (
+    ignored_non_meta_field = {
         "statuscategorychangedate",
         "components",
         "timespent",
         # 'environment' is a legacy field (and only relevant in editmeta)
         # "environment"
-    )
+    }
 
     def __init__(self, jira: "JiraClient", type_name: str):
         self.jira = jira
