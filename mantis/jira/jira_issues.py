@@ -28,6 +28,12 @@ class JiraIssue:
         return key
 
     @property
+    def issuetype(self) -> str:
+        if not 'issuetype' in self.fields.keys():
+            raise ValueError(f'Field "issuetype" not in JiraIssue.data. Available keys: {list(self.data.keys())}')
+        return self.data['fields']['issuetype']['name']
+
+    @property
     def createmeta_data(self) -> dict[str, list[dict[str, Any]]]:
         self._createmeta_data = self.client.system_config_loader.get_createmeta(self.issuetype)
         return self._createmeta_data
