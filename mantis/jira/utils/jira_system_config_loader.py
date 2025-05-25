@@ -229,8 +229,6 @@ class JiraSystemConfigLoader:
         assert isinstance(issuetype_id, str)
         data: dict[str, Any] = self.client.get_createmeta(issuetype_id)
         assert isinstance(data, dict)
-        # assert set(['x']) == set(data), f'{data}'
-        # assert set(data[0].keys()) == set()
         self.cache.write_createmeta(issuetype_name, data)
         return data        
         fields = CreatemetaModelFactory(self.client, issuetype_name)#, f'issuetype_name: {issuetype_name}'
