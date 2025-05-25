@@ -151,6 +151,7 @@ class JiraSystemConfigLoader:
         if len(issuetypes.keys()) == 0:
             raise ValueError(
                 'List of issuetypes has length of zero. Something is probably very wrong.')
+        assert 'issueTypes' in issuetypes, f'issueTypes has no issueTypes {issuetypes}'
         self.cache.write_issuetypes_to_system_cache(issuetypes)
         return issuetypes
 
