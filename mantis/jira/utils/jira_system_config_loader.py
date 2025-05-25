@@ -166,11 +166,21 @@ class JiraSystemConfigLoader:
         return self.client.issues.load_allowed_types()
 
     def _update_single_createmeta(self, issuetype: dict[str, Any]) -> dict[str, Any]:
+        assert 'name' in issuetype.keys()
+        assert 'id' in issuetype.keys()
         issuetype_name: str = issuetype['name']
         issuetype_id: str = issuetype['id']
+        assert isinstance(issuetype_name, str)
+        assert isinstance(issuetype_id, str)
         data: dict[str, Any] = self.client.get_createmeta(issuetype_id)
+        assert isinstance(data, dict)
+        # assert set(['x']) == set(data), f'{data}'
+        # assert set(data[0].keys()) == set()
         self.cache.write_createmeta(issuetype_name, data)
         return data        
+        fields = CreatemetaModelFactory(self.client, issuetype_name)#, f'issuetype_name: {issuetype_name}'
+        return fields.make(data)
+
 
     def compile_plugins(self) -> None:
         for input_file in self.cache.iter_dir("createmeta"):
