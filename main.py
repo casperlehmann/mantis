@@ -57,6 +57,7 @@ if __name__ == '__main__':
             issue_keys = set(issue.fields.keys())
             set_of_all_field_names = set(draft_keys).union(edit_keys).union(create_keys).union(issue_keys)
             # pprint(set_of_all_field_names)
+            line = '----------'
             print(20*' ', end=' ')
             # print(f'{'create':<10} {'edit':<10} {'issue':<10} {'draft':<10}')
             print(f'{'create':^10} {'edit':^10} {'issue':^10} {'draft':^10}')
@@ -64,22 +65,24 @@ if __name__ == '__main__':
                 try:
                     from_create = '1' if made_create.fields.__getattribute__(key) else '0'  # type: ignore
                 except AttributeError:
-                    from_create = '----------'
+                    from_create = line
                 try:
                     from_edit = '1' if made_edit.fields.__getattribute__(key) else '0'  # type: ignore
                 except AttributeError:
-                    from_edit = '----------'
+                    from_edit = line
                 # from_edit = (made_edit.fields.__getattribute__(key) or '') == 'x'  # type: ignore
                 try:
                     from_issue = '1' if issue.fields[key] else '0'
                 except KeyError:
-                    from_issue = '----------'
+                    from_issue = line
                 try:
                     from_draft = '1' if draft_data[key] else '0'
                 except KeyError:
-                    from_draft = '----------'
+                    from_draft = line
                 # print(f'{key[:20]:<20} {from_create:<10} {from_edit:<10} {from_issue:<10} {from_draft:<10}')
                 print(f'{key[:20]:<20} {from_create:^10} {from_edit:^10} {from_issue:^10} {from_draft:^10}')
+            print(20*' ', end=' ')
+            print(f'{'create':^10} {'edit':^10} {'issue':^10} {'draft':^10}')
 
     elif jira_options.action == 'update-issue-from-draft':
         for issue_key in jira_options.issues:
