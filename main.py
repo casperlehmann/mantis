@@ -51,6 +51,10 @@ if __name__ == '__main__':
             made_create = issue.createmeta
             made_edit = issue.editmeta
 
+            editmeta_factory = issue._editmeta_factory.out_fields
+            # print(editmeta_factory)
+            createmeta_factory = issue._createmeta_factory.out_fields
+
             draft_keys = draft_data.keys()
             create_keys = made_create.fields.model_fields_set  # type: ignore
             edit_keys = made_edit.fields.model_fields_set  # type: ignore
@@ -60,7 +64,7 @@ if __name__ == '__main__':
             line = '----------'
             print(20*' ', end=' ')
             # print(f'{'create':<10} {'edit':<10} {'issue':<10} {'draft':<10}')
-            print(f'{'create':^10} {'edit':^10} {'issue':^10} {'draft':^10}')
+            print(f'{'create':^10} {'edit':^10} {'issue':^10} {'draft':^10} {'creat_fact':^10} {'edit_fact':^10}')
             for key in sorted(set_of_all_field_names):
                 try:
                     from_create = '1' if made_create.fields.__getattribute__(key) else '0'  # type: ignore
@@ -79,10 +83,21 @@ if __name__ == '__main__':
                     from_draft = '1' if draft_data[key] else '0'
                 except KeyError:
                     from_draft = line
+                try:
+                    from_edit_fact = '1' if editmeta_factory[key] else '0'  # type: ignore
+                except KeyError:
+                    from_edit_fact = line
+                try:
+                    from_create_fact = '1' if createmeta_factory[key] else '0'  # type: ignore
+                except KeyError:
+                    from_create_fact = line
+                if from_edit == from_create == line: continue
                 # print(f'{key[:20]:<20} {from_create:<10} {from_edit:<10} {from_issue:<10} {from_draft:<10}')
-                print(f'{key[:20]:<20} {from_create:^10} {from_edit:^10} {from_issue:^10} {from_draft:^10}')
+                print(f'{key[:20]:<20} {from_create:^10} {from_edit:^10} {from_issue:^10} {from_draft:^10} {from_create_fact:^10} {from_edit_fact:^10}')
+                # print(made_edit.fields.__getattribute__(key))
+                # print()
             print(20*' ', end=' ')
-            print(f'{'create':^10} {'edit':^10} {'issue':^10} {'draft':^10}')
+            print(f'{'create':^10} {'edit':^10} {'issue':^10} {'draft':^10} {'creat_fact':^10} {'edit_fact':^10}')
 
     elif jira_options.action == 'update-issue-from-draft':
         for issue_key in jira_options.issues:
