@@ -27,6 +27,10 @@ class JiraIssue:
         return key
 
     @property
+    def editmeta(self) -> dict[str, Any]:
+        return self.client.get_editmeta(self.key)
+
+    @property
     def fields(self) -> dict[str, Any]:
         fields = self.data.get("fields")
         if not fields:

@@ -128,6 +128,13 @@ class JiraClient:
         assert isinstance(data, dict)
         assert 'fields' in data.keys(), f'Key "fields" not in data.keys(). Got: {data.keys()} ... {data}'
         return data
+    
+    def get_editmeta(self, issue_key: str) -> dict[str, Any]:
+        # url = f"issue/{issue_key}?expand=editmeta"
+        url = f"issue/{issue_key}/editmeta"
+        response = self._get(url)
+        response.raise_for_status()
+        return response.json()
 
     def get_issue(self, key: str) -> dict[str, dict]:
         response = self._get(f"issue/{key}")
