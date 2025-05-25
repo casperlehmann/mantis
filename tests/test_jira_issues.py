@@ -131,7 +131,7 @@ def test_jira_issues_cached_issuetypes_parses_allowed_types(fake_jira: JiraClien
             {"id": '2', "name": "Task", 'scope': {'project': {'id': '10000'}}}
         ]
     }
-    fake_jira.system_config_loader.get_issuetypes_for_project = (
+    fake_jira.system_config_loader.get_issuetypes = (
         lambda *args, **kwargs: cached_issuetypes
     )
     fake_jira.issues = JiraIssues(fake_jira)

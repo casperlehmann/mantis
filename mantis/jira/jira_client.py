@@ -98,7 +98,7 @@ class JiraClient:
         url = f"{self.api_url}/{uri}"
         return requests.put(url, json=data, **self.requests_kwargs)  # type: ignore
 
-    def get_issuetypes(self) -> dict[str, Any]:
+    def get_issuetypes(self) -> dict[str, list[dict[str, Any]]]:
         url = f'issue/createmeta/{self.project_name}/issuetypes'
         response = self._get(url)
         try:
@@ -107,17 +107,27 @@ class JiraClient:
             print(e.response.reason)
             print(e.response.content)
             exit()
-        issuetypes: dict[str, Any] = response.json()
+        issuetypes: dict[str, list[dict[str, Any]]] = response.json()
         assert isinstance(issuetypes, dict), f'issuetypes is not a dict: {issuetypes}'
         assert 'issueTypes' in issuetypes, f"'issueTypes' not in issuetypes. Got: {issuetypes}"
         assert isinstance(issuetypes['issueTypes'], list), "issuetypes['issueTypes'] is not a list. Got: {issuetypes}"
+        li = issuetypes['issueTypes']
+        assert isinstance(li, list), f"issuetypes['issueTypes'] is not a list. Got: {issuetypes}"
+        for x in li:
+            for y,z in x.items():
+                assert isinstance(y, str)
+                assert z is not None, f"key {y} is None"
         return issuetypes
 
-    def get_createmeta(self, project_name: str, issuetype_id: str) -> list[dict[str, Any]]:
-        url = f"issue/createmeta/{project_name}/issuetypes/{issuetype_id}"
+    def get_createmeta(self, issuetype_id: str) -> dict[str, list[dict[str, Any]]]:
+        """Createmeta is a list of fields"""
+        url = f"issue/createmeta/{self.project_name}/issuetypes/{issuetype_id}"
         response = self._get(url)
         response.raise_for_status()
-        return response.json()
+        data = response.json()
+        assert isinstance(data, dict)
+        assert 'fields' in data.keys(), f'Key "fields" not in data.keys(). Got: {data.keys()} ... {data}'
+        return data
 
     def get_issue(self, key: str) -> dict[str, dict]:
         response = self._get(f"issue/{key}")
@@ -138,9 +148,8 @@ class JiraClient:
         self.system_config_loader.get_projects(force_skip_cache = True)
         assert not self.cache.get_issuetypes_from_system_cache()
         self.system_config_loader.get_issuetypes(force_skip_cache = True)
-        self.system_config_loader.get_issuetypes()
         assert self.cache.get_issuetypes_from_system_cache()
-        resp = self.system_config_loader.update_project_field_keys()
+        resp = self.system_config_loader.fetch_and_update_all_createmeta()
         pprint(resp)
 
     def get_projects(self) -> list[dict[str, Any]]:

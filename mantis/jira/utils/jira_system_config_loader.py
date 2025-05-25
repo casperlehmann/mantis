@@ -34,6 +34,7 @@ class CreatemetaModelFactory:
         self.createmeta = self.jira.cache.get_createmeta_from_cache(self.type_name)
         if not self.createmeta:
             raise CacheMissException(f"{self.type_name}")
+        assert "fields" in self.createmeta.keys(), f"'fields' not in createmeta.keys: {self.createmeta.keys()}"
         self.createmeta_fields: list[dict[str, Any]] = self.createmeta["fields"]
         self.create_model()
 
@@ -141,39 +142,45 @@ class JiraSystemConfigLoader:
         self.cache.write_to_system_cache("projects.json", json.dumps(projects))
         return projects
 
-    def get_issuetypes(self, force_skip_cache: bool = False) -> dict[str, Any]:
+    def get_issuetypes(self, force_skip_cache: bool = False) -> dict[str, list[dict[str, Any]]]:
         if not self.client._no_read_cache or force_skip_cache:
             from_cache = self.cache.get_issuetypes_from_system_cache()
             if from_cache:
                 return from_cache
         issuetypes = self.client.get_issuetypes()
+        assert isinstance(issuetypes, dict)
+        if len(issuetypes.keys()) == 0:
+            raise ValueError(
+                'List of issuetypes has length of zero. Something is probably very wrong.')
+        assert 'issueTypes' in issuetypes, f'issueTypes has no issueTypes {issuetypes}'
         self.cache.write_issuetypes_to_system_cache(issuetypes)
         return issuetypes
 
-    def get_issuetypes_for_project(self) -> dict[str, Any]:
-        data = self.get_issuetypes()
-        self.cache.write_issuetypes_to_system_cache(data)
-        if len(data) == 0:
-            raise ValueError(
-                'List of issuetypes has length of zero. Something is probably very wrong.')
-        return data
-
-    def update_project_field_keys(self) -> list[str]:
-        issuetypes: dict[str, Any] = self.get_issuetypes_for_project()
-
-        assert isinstance(issuetypes, dict)
-        assert 'issueTypes' in issuetypes, f'issueTypes has no issueTypes {issuetypes}'
-
-        nested_issuetypes: list[dict[str, Any]] = issuetypes['issueTypes']
+    def fetch_and_update_all_createmeta(self) -> list[str]:
+        """Updates all createmate from upstream, returns updated list of allowed types"""
+        issuetypes: dict[str, list[dict[str, Any]]] = self.get_issuetypes(force_skip_cache = False)
+        nested_issuetypes = issuetypes['issueTypes']
 
         for issuetype in nested_issuetypes:
-            assert 'name' in issuetype.keys()
-            assert 'id' in issuetype.keys()
-            issuetype_name = issuetype['name']
-            issuetype_id = issuetype['id']
-            data: list[dict[str, Any]] = self.client.get_createmeta(self.client.project_name, issuetype_id)
-            self.cache.write_createmeta(issuetype_name, data)
+            data = self._update_single_createmeta(issuetype)
         return self.client.issues.load_allowed_types()
+
+    def _update_single_createmeta(self, issuetype: dict[str, Any]) -> dict[str, Any]:
+        assert 'name' in issuetype.keys()
+        assert 'id' in issuetype.keys()
+        issuetype_name: str = issuetype['name']
+        issuetype_id: str = issuetype['id']
+        assert isinstance(issuetype_name, str)
+        assert isinstance(issuetype_id, str)
+        data: dict[str, Any] = self.client.get_createmeta(issuetype_id)
+        assert isinstance(data, dict)
+        # assert set(['x']) == set(data), f'{data}'
+        # assert set(data[0].keys()) == set()
+        self.cache.write_createmeta(issuetype_name, data)
+        return data        
+        fields = CreatemetaModelFactory(self.client, issuetype_name)#, f'issuetype_name: {issuetype_name}'
+        return fields.make(data)
+
 
     def compile_plugins(self) -> None:
         for input_file in self.cache.iter_dir("createmeta"):

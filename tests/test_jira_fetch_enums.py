@@ -112,17 +112,17 @@ def test_update_project_field_keys(mock_get, fake_jira: JiraClient):
     if not (fake_jira.cache.system / 'issuetypes.json').exists():
         raise FileNotFoundError('File "issuetypes.json" should have been created')
 
-    mock_get.return_value.json.return_value = {'issueTypes': {"name": "Testtype"}}
+    mock_get.return_value.json.return_value = {'fields': []}
 
     if (fake_jira.cache.createmeta / 'createmeta_story.json').exists():
         raise FileExistsError('File "createmeta_story.json" should not exist yet')
-    allowed_types = config_loader.update_project_field_keys()
+    allowed_types = config_loader.fetch_and_update_all_createmeta()
     assert set(allowed_types) == set(['Epic', 'Subtask', 'Task', 'Story', 'Bug'])
     if not (fake_jira.cache.createmeta / 'createmeta_story.json').exists():
         raise FileNotFoundError('File "createmeta_story.json" should have been created')
     assert 'Story' in allowed_types, f"Testtype not in allowed_types: {allowed_types}"
     with open(fake_jira.cache.createmeta / "createmeta_story.json", "r") as f:
-        assert f.read() == '{"issueTypes": {"name": "Testtype"}}'
+        assert f.read() == '{"fields": []}'
 
 
 @patch("mantis.jira.jira_client.requests.get")
