@@ -154,21 +154,20 @@ class JiraSystemConfigLoader:
         return issuetypes
 
     def fetch_and_update_all_createmeta(self) -> list[str]:
-        issuetypes: dict[str, Any] = self.get_issuetypes()
-
-        assert isinstance(issuetypes, dict)
-        assert 'issueTypes' in issuetypes, f'issueTypes has no issueTypes {issuetypes}'
-
-        nested_issuetypes: list[dict[str, Any]] = issuetypes['issueTypes']
+        """Updates all createmate from upstream, returns updated list of allowed types"""
+        issuetypes: dict[str, list[dict[str, Any]]] = self.get_issuetypes(force_skip_cache = False)
+        nested_issuetypes = issuetypes['issueTypes']
 
         for issuetype in nested_issuetypes:
-            assert 'name' in issuetype.keys()
-            assert 'id' in issuetype.keys()
-            issuetype_name = issuetype['name']
-            issuetype_id = issuetype['id']
             data: list[dict[str, Any]] = self.client.get_createmeta(self.client.project_name, issuetype_id)
-            self.cache.write_createmeta(issuetype_name, data)
         return self.client.issues.load_allowed_types()
+
+    def _update_single_createmeta(self, issuetype: dict[str, Any]) -> dict[str, Any]:
+        issuetype_name: str = issuetype['name']
+        issuetype_id: str = issuetype['id']
+        data: dict[str, Any] = self.client.get_createmeta(issuetype_id)
+        self.cache.write_createmeta(issuetype_name, data)
+        return data        
 
     def compile_plugins(self) -> None:
         for input_file in self.cache.iter_dir("createmeta"):
