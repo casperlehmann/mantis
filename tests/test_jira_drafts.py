@@ -9,7 +9,6 @@ def test_jira_draft(fake_jira: JiraClient, minimal_issue_payload):
     minimal_issue_payload['fields']['assignee'] = {"displayName": "Bobby Goodsky"}
     assert str(fake_jira.cache.root) != ".jira_cache_test"
     assert str(fake_jira.drafts_dir) != "drafts_test"
-    # assert str(fake_jira.cache.root) != str(fake_jira.drafts_dir)
     
     assert len(list(fake_jira.drafts_dir.iterdir())) == 0
     task_1 = fake_jira.issues.get("TASK-1")
