@@ -61,6 +61,16 @@ if __name__ == '__main__':
             # print("# made_create")
             # pprint(made_create)
 
+            print()
+            made_edit = issue.editmeta
+            print("# made_edit")
+            pprint(made_edit)
+            print()
+
+            print('dump editmeta')
+            pprint(made_edit.model_dump())
+            print()
+
             local_vars = ('ignore', 'header')
             for draft_field_key in draft_data.keys():
                 if draft_field_key in local_vars:  # E.g. Local custom fields
@@ -73,7 +83,8 @@ if __name__ == '__main__':
                     # https://caspertestaccount.atlassian.net/rest/api/latest/issue/ecs-1/editmeta
                     # return default
                     # check editmeta
-                    target_editmeta = issue.editmeta['fields'][draft_field_key]
+                    target_editmeta = issue.editmeta_data['fields'][draft_field_key]
+                    target_editmeta = issue.editmeta.fields.model_fields_set  # type: ignore
                     # print('# target_editmeta')
                     # pprint(target_editmeta)
                     # {'hasDefaultValue': False,
@@ -82,8 +93,9 @@ if __name__ == '__main__':
                     #     'operations': ['set'],
                     #     'required': False,
                     #     'schema': {'system': 'parent', 'type': 'issuelink'}}
-                    print(f'draft_field_key {draft_field_key} in editmeta: {draft_field_key in issue.editmeta['fields']}')
-                
+                    print(f'draft_field_key {draft_field_key} in editmeta: {draft_field_key in issue.editmeta_data['fields']}')
+                    print(f'draft_field_key {draft_field_key} in editmeta: {draft_field_key in issue.editmeta.fields.model_fields_set}')  # type: ignore
+
 
                 print (f"# {issue_key} ", end="")
                 # print ([field, type(value), value])
