@@ -45,7 +45,7 @@ if __name__ == '__main__':
             jira._no_read_cache = False
     elif jira_options.action == 'get-project-keys':
         print ('Fetching from Jira...')
-        resp = jira.system_config_loader.update_createmeta()
+        resp = jira.system_config_loader.fetch_and_update_all_createmeta()
         print('Dumped field values for:')
         pprint(resp)
     elif jira_options.action == 'inspect':

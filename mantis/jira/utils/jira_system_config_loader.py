@@ -153,7 +153,7 @@ class JiraSystemConfigLoader:
         self.cache.write_issuetypes_to_system_cache(issuetypes)
         return issuetypes
 
-    def update_createmeta(self) -> list[str]:
+    def fetch_and_update_all_createmeta(self) -> list[str]:
         issuetypes: dict[str, Any] = self.get_issuetypes()
 
         assert isinstance(issuetypes, dict)

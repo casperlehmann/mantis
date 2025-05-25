@@ -139,7 +139,7 @@ class JiraClient:
         assert not self.cache.get_issuetypes_from_system_cache()
         self.system_config_loader.get_issuetypes(force_skip_cache = True)
         assert self.cache.get_issuetypes_from_system_cache()
-        resp = self.system_config_loader.update_createmeta()
+        resp = self.system_config_loader.fetch_and_update_all_createmeta()
         pprint(resp)
 
     def get_projects(self) -> list[dict[str, Any]]:
