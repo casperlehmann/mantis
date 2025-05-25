@@ -56,7 +56,7 @@ if __name__ == '__main__':
             # pprint(issue.editmeta)
             print('# issue.createmeta:')
             # pprint(issue.createmeta.createmeta_fields)
-            made_create = issue.createmeta.make(issue.data)
+            made_create = issue.createmeta
             # print("# made_create")
             # pprint(made_create)
 

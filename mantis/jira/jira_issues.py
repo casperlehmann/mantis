@@ -2,6 +2,8 @@ from pprint import pprint
 
 from typing import TYPE_CHECKING, Any
 
+from pydantic import BaseModel
+
 from mantis.drafts import Draft
 from mantis.jira.utils.jira_system_config_loader import CreatemetaModelFactory
 
@@ -48,9 +50,9 @@ class JiraIssue:
         return self._createmeta_data
 
     @property
-    def createmeta(self) -> CreatemetaModelFactory:
-        self.createmeta_object = CreatemetaModelFactory(self.createmeta_data)
-        return self.createmeta_object
+    def createmeta(self) -> BaseModel:
+        self.createmeta_factory = CreatemetaModelFactory(self.createmeta_data)
+        return self.createmeta_factory.make(self.data)
 
     @property
     def editmeta(self) -> dict[str, Any]:
