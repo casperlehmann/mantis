@@ -1,7 +1,7 @@
 import json
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, Generator, KeysView, Optional
+from typing import TYPE_CHECKING, Any, Dict, Generator, KeysView, Mapping, Optional
 
 from datamodel_code_generator import DataModelType, InputFileType, generate
 from pydantic import BaseModel, create_model
@@ -251,21 +251,25 @@ class JiraSystemConfigLoader:
                 output_model_type=DataModelType.PydanticV2BaseModel,
             )
 
-    def get_key_names_from_all_types(self, data: dict[str, CreatemetaModelFactory]) -> set[str]:
-        d: dict[str, list[str]] = {}
+    def inspect(self) -> None:
+        Inspector.inspect(self.client)
+
+
+class Inspector:
+    @staticmethod
+    def get_field_names_from_all_types(data: Mapping[str, MetaModelFactory]) -> set[str]:
+        d: dict[str, set[str]] = {}
         all_field_keys: set[str] = set()
-        for issuetype, createmeta_factory in data.items():
-            assert isinstance(createmeta_factory, CreatemetaModelFactory)
-            field_keys = list(createmeta_factory.keys())
-            d[issuetype] = field_keys
-            all_field_keys = all_field_keys.union(set(d[issuetype]))
+        for issuetype, factory in data.items():
+            assert isinstance(factory, MetaModelFactory)
+            all_field_keys = all_field_keys.union(set(factory.keys()))
         return all_field_keys
 
+    @staticmethod
     def print_table(
-        self,
         column_order: list[str],
         all_field_keys: set[str],
-        issuetype_field_map: dict[str, CreatemetaModelFactory],
+        issuetype_field_map: Mapping[str, MetaModelFactory],
     ) -> None:
         def print_header_footer() -> None:
             print(f"{'':<20} - ", end="")
@@ -289,17 +293,20 @@ class JiraSystemConfigLoader:
             print()
         print_header_footer()
 
-    def get_project_field_keys_from_cache(self) -> Dict[str, CreatemetaModelFactory]:
+    @staticmethod
+    def get_createmeta_models(client: 'JiraClient') -> dict[str, CreatemetaModelFactory]:    
         d: dict[str, CreatemetaModelFactory] = {}
-        for issuetype in self.client.issues.allowed_types:
-            metadata = self.client.cache.get_createmeta_from_cache(issuetype)
+        for issuetype in client.issues.allowed_types:
+            metadata = client.cache.get_createmeta_from_cache(issuetype)
             if not metadata:
                 raise CacheMissException(f"{issuetype}")
             assert isinstance(metadata, dict)
             d[issuetype] = CreatemetaModelFactory(metadata)
         return d
 
-    def inspect(self) -> None:
-        data = self.get_project_field_keys_from_cache()
-        all_keys = self.get_key_names_from_all_types(data)
-        self.print_table(self.client.issues.allowed_types, all_keys, data)
+
+    @classmethod
+    def inspect(cls, client: 'JiraClient') -> None:
+        createmeta_model_data = cls.get_createmeta_models(client)
+        createmeta_all_keys = cls.get_field_names_from_all_types(createmeta_model_data)
+        cls.print_table(client.issues.allowed_types, createmeta_all_keys, createmeta_model_data)
