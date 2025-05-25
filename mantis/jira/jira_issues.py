@@ -25,6 +25,7 @@ class JiraIssue:
         self.data = raw_data
         # Only writes if not exists.
         self.draft = Draft(self.client, self)
+        self._exists_upstream = False
 
     def get(self, key: str, default: Any = None) -> Any:
         return self.data.get(key, default) or default
@@ -55,6 +56,10 @@ class JiraIssue:
     @property
     def editmeta(self) -> dict[str, Any]:
         return self.client.get_editmeta(self.key)
+
+    @property
+    def exists_upstream(self):
+        return self._exists_upstream
 
     @property
     def fields(self) -> dict[str, Any]:
