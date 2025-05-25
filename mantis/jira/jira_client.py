@@ -111,6 +111,12 @@ class JiraClient:
         assert isinstance(issuetypes, dict), f'issuetypes is not a dict: {issuetypes}'
         assert 'issueTypes' in issuetypes, f"'issueTypes' not in issuetypes. Got: {issuetypes}"
         assert isinstance(issuetypes['issueTypes'], list), "issuetypes['issueTypes'] is not a list. Got: {issuetypes}"
+        li = issuetypes['issueTypes']
+        assert isinstance(li, list), f"issuetypes['issueTypes'] is not a list. Got: {issuetypes}"
+        for x in li:
+            for y,z in x.items():
+                assert isinstance(y, str)
+                assert z is not None, f"key {y} is None"
         return issuetypes
 
     def get_createmeta(self, issuetype_id: str) -> dict[str, list[dict[str, Any]]]:
