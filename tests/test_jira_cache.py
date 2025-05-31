@@ -17,7 +17,6 @@ class TestCache:
         assert decoded
         assert decoded.get("key", '') == "TASK-1"
 
-
     def test_cache_get_issue_returns_none_when_no_read_cache_is_set(self, fake_jira: JiraClient, minimal_issue_payload):
         # Make sure nothing is cached
         assert not fake_jira._no_read_cache
@@ -35,7 +34,6 @@ class TestCache:
             nothing_2 = fake_jira.cache.get_issue("TASK-1")
             assert nothing_2 is None
 
-
     def test_cache_remove_does_removals(self, fake_jira: JiraClient, minimal_issue_payload):
         # cache something
         with open(fake_jira.cache.root / "issues/TASK-1.json", "w") as f:
@@ -49,7 +47,6 @@ class TestCache:
         nothing_1 = fake_jira.cache.get_issue("TASK-1")
         assert nothing_1 is None
 
-
     def test_cache_remove_issue_does_removals(self, fake_jira: JiraClient, minimal_issue_payload):
         # cache something
         with open(fake_jira.cache.root / "issues/TASK-1.json", "w") as f:
@@ -62,13 +59,7 @@ class TestCache:
         nothing_2 = fake_jira.cache.get_issue("TASK-1")
         assert nothing_2 is None
 
-
-    @pytest.mark.parametrize(
-        "identifier",
-        [
-            ("createmeta"),
-        ],
-    )
+    @pytest.mark.parametrize("identifier", [("createmeta")])
     def test_cache_iter_dir_yields_files(self, fake_jira: JiraClient, identifier: str):
         assert len(list(fake_jira.cache.iter_dir(identifier))) == 0
         # cache something
