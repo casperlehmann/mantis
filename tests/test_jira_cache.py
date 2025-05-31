@@ -2,7 +2,7 @@ import json
 import pytest
 
 from mantis.jira import JiraClient
-from tests.data import CacheData
+from tests.data import CacheData, get_issuetypes_response
 
 
 class TestCache:
