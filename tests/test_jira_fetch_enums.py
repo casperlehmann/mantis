@@ -126,20 +126,16 @@ def test_update_project_field_keys(fake_jira: JiraClient, requests_mock):
 
 
 @pytest.mark.slow
-@patch("mantis.jira.jira_client.requests.get")
-def test_compile_plugins(mock_get, fake_jira: JiraClient):
-    mock_get.return_value.json.return_value = {"name": "Testtype"}
+def test_compile_plugins(fake_jira: JiraClient, requests_mock):
+    api_url = fake_jira.options.url + "/rest/api/latest"
+    requests_mock.get(f'{api_url}/project', json={"name": "Testtype"})
     assert str(fake_jira.plugins_dir) != ".jira_cache_test"
-
-    config_loader = fake_jira.system_config_loader
 
     with open(fake_jira.cache.createmeta / "Testtype.json", "w") as f:
         f.write('{"name": "Testtype"}')
 
-    assert (
-        len(list(fake_jira.plugins_dir.iterdir())) == 0
-    ), f"Not empty: {fake_jira.plugins_dir}"
-    config_loader.compile_plugins()
+    assert (len(list(fake_jira.plugins_dir.iterdir())) == 0), f"Not empty: {fake_jira.plugins_dir}"
+    fake_jira.system_config_loader.compile_plugins()
     assert len(list(fake_jira.plugins_dir.iterdir())) == 1
 
 
