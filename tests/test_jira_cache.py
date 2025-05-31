@@ -72,9 +72,7 @@ class TestCache:
             json.dump(CacheData().issuetypes, f)
         retrieved = fake_jira.cache.get_issuetypes_from_system_cache()
         assert retrieved
-        assert retrieved['issueTypes'][0].get("description") in (
-                "Subtasks track small pieces of work that are part of a larger task.",
-                "Epics track collections of related bugs, stories, and tasks."
-            ), (
-                f'retrieved: {retrieved}'
-            )
+        assert len(retrieved['issueTypes']) == 5
+        subtask = [_type for _type in retrieved['issueTypes'] if _type['name'] == 'Subtask'][0]
+        assert subtask["description"] == "Subtasks track small pieces of work that are part of a larger task.", (
+                f'retrieved: {retrieved}')
