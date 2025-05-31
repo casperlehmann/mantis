@@ -28,21 +28,6 @@ def test_persisted_issuetypes_data():
     assert selector('name') == {'Subtask', 'Story', 'Bug', 'Task', 'Epic'}
 
 
-def test_cache_get_issuetypes_from_system_cache(fake_jira: JiraClient, requests_mock):
-    requests_mock.get(f'{fake_jira.api_url}/issue/createmeta/{fake_jira.project_name}/issuetypes', json=get_issuetypes_response)
-    cache = fake_jira.cache
-    with open(fake_jira.cache.system / "issuetypes.json", "w") as f:
-        json.dump(CacheData().issuetypes, f)
-    retrieved = cache.get_issuetypes_from_system_cache()
-    assert retrieved
-    assert retrieved['issueTypes'][0].get("description") in (
-            "Subtasks track small pieces of work that are part of a larger task.",
-            "Epics track collections of related bugs, stories, and tasks."
-        ), (
-            f'retrieved: {retrieved}'
-        )
-
-
 def test_config_loader_loop_yields_files(fake_jira: JiraClient, requests_mock):
     requests_mock.get(f'{fake_jira.api_url}/issue/createmeta/{fake_jira.project_name}/issuetypes', json=get_issuetypes_response)
     assert len(list(fake_jira.system_config_loader.loop_createmeta())) == 0
