@@ -28,14 +28,13 @@ class TestConfigLoader:
         assert len(cache_data.issuetypes.get("issueTypes", [])) == 5
         assert selector('name') == {'Subtask', 'Story', 'Bug', 'Task', 'Epic'}
 
-def test_config_loader_loop_yields_files(self, fake_jira: JiraClient, requests_mock):
-    requests_mock.get(f'{fake_jira.api_url}/issue/createmeta/{fake_jira.project_name}/issuetypes', json=get_issuetypes_response)
-    assert len(list(fake_jira.system_config_loader.loop_createmeta())) == 0
-    # cache something
-    with open(fake_jira.cache.createmeta / f"some_file.json", "w") as f:
-        f.write("{}")
-    assert len(list(fake_jira.system_config_loader.loop_createmeta())) == 1
-
+    def test_config_loader_loop_yields_files(self, fake_jira: JiraClient, requests_mock):
+        requests_mock.get(f'{fake_jira.api_url}/issue/createmeta/{fake_jira.project_name}/issuetypes', json=get_issuetypes_response)
+        assert len(list(fake_jira.system_config_loader.loop_createmeta())) == 0
+        # cache something
+        with open(fake_jira.cache.createmeta / f"some_file.json", "w") as f:
+            f.write("{}")
+        assert len(list(fake_jira.system_config_loader.loop_createmeta())) == 1
 
 def test_update_project_field_keys(fake_jira: JiraClient, requests_mock):
     requests_mock.get(f'{fake_jira.api_url}/project', json=update_projects_cache_response)
