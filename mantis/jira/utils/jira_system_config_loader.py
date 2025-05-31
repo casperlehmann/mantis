@@ -24,7 +24,7 @@ class MetaModelFactory:
         self.getters: dict[str, str] = {}
         self.attributes: list[str] = []
         self.metadata = metadata
-        assert "fields" in metadata.keys(), f"'fields' not in createmeta.keys: {metadata.keys()}"
+        assert "fields" in metadata.keys(), f"'fields' not in metadata.keys: {metadata.keys()}"
         self.meta_fields: list[dict[str, Any]] | dict[str, dict[str, Any]] = metadata["fields"]
 
     def keys(self) -> KeysView[str]:
@@ -33,13 +33,12 @@ class MetaModelFactory:
     def create_model(self) -> None:
         fields_model = self._create_fields_model()
         self._add_aliases_for_custom_fields(fields_model)
-        outer_schema_with_nested_fields: dict[str, Any]= {
-            "key": str,
-            "id": str,
-            "fields": fields_model,
-        }
-        issue_model = create_model("IssueModel", **outer_schema_with_nested_fields)
-        self.model = issue_model
+        class IssueModel(BaseModel):
+            key: str
+            id: str
+            fields: fields_model # type: ignore Variable not allowed in type expression
+        
+        self.model = IssueModel
 
     def assign_python_type(self, meta: JiraIssueFieldSchema, meta_field_key: str) -> None:
         python_type = meta.schema_as_python_type
@@ -94,7 +93,7 @@ class MetaModelFactory:
             )
             self.assign_python_type(meta, meta_field_key)
             self.assign_attributes_and_getters(meta, meta_field_key)
-        fields_model = create_model("CreatemetaModel", **self.out_fields)
+        fields_model = create_model("MetaModelFields", **self.out_fields)
         return fields_model
 
     def _add_aliases_for_custom_fields(self, fields_model: type[BaseModel]) -> None:
@@ -125,7 +124,11 @@ class CreatemetaModelFactory(MetaModelFactory):
     def __init__(self, metadata: Dict[str, Any]):
         super().__init__(metadata)
         self.process = 'createmeta'
-        assert isinstance(self.meta_fields, list), f'CreatemetaModelFactory.meta_fields should be of type list. Got: {type(self.meta_fields)}'
+        if isinstance(self.meta_fields, dict):
+            raise ValueError('CreatemetaModelFactory.meta_fields should be of type list. '
+                             'Got dict. Did you accidentally pass be an "editmeta"?')
+        assert isinstance(self.meta_fields, list), (
+            f'CreatemetaModelFactory.meta_fields should be of type list. Got: {type(self.meta_fields)}')
         self.create_model()
 
 
@@ -141,7 +144,11 @@ class EditmetaModelFactory(MetaModelFactory):
     def __init__(self, metadata: Dict[str, Any]):
         super().__init__(metadata)
         self.process = 'editmeta'
-        assert isinstance(self.meta_fields, dict), f'EditmetaModelFactory.meta_fields should be of type dict. Got: {type(self.meta_fields)}'
+        if isinstance(self.meta_fields, list):
+            raise ValueError('EditmetaModelFactory.meta_fields should be of type dict. '
+                             'Got list. Did you accidentally pass be a "createmeta"?')
+        assert isinstance(self.meta_fields, dict), (
+            f'EditmetaModelFactory.meta_fields should be of type dict. Got: {type(self.meta_fields)}')
         self.create_model()
 
 

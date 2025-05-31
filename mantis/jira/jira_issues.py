@@ -2,8 +2,10 @@ from pprint import pprint
 
 from typing import TYPE_CHECKING, Any
 
+from pydantic import BaseModel
+
 from mantis.drafts import Draft
-from mantis.jira.utils.jira_system_config_loader import CreatemetaModelFactory
+from mantis.jira.utils.jira_system_config_loader import CreatemetaModelFactory, EditmetaModelFactory
 
 if TYPE_CHECKING:
     from .jira_client import JiraClient
@@ -25,6 +27,8 @@ class JiraIssue:
         self.data = raw_data
         # Only writes if not exists.
         self.draft = Draft(self.client, self)
+        self._createmeta_factory: CreatemetaModelFactory | None = None
+        self._editmeta_factory: EditmetaModelFactory | None = None
 
     def get(self, key: str, default: Any = None) -> Any:
         return self.data.get(key, default) or default
@@ -48,13 +52,23 @@ class JiraIssue:
         return self._createmeta_data
 
     @property
-    def createmeta(self) -> CreatemetaModelFactory:
-        self.createmeta_object = CreatemetaModelFactory(self.createmeta_data)
-        return self.createmeta_object
+    def createmeta(self) -> BaseModel:
+        # TODO: Createmeta is shared for all issues of the same type.
+        #       Should be loaded into a shared object, not one per Issue
+        if self._createmeta_factory is None:
+            self._createmeta_factory = CreatemetaModelFactory(self.createmeta_data)
+        return self._createmeta_factory.make(self.data)
 
     @property
-    def editmeta(self) -> dict[str, Any]:
+    def editmeta_data(self) -> dict[str, Any]:
         return self.client.get_editmeta(self.key)
+
+    @property
+    def editmeta(self) -> BaseModel:
+        # TODO: Consider if editmeta itself should be cached insted.
+        if self._editmeta_factory is None:
+            self._editmeta_factory = EditmetaModelFactory(self.editmeta_data)
+        return self._editmeta_factory.make(self.data)
 
     @property
     def fields(self) -> dict[str, Any]:

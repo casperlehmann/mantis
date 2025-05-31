@@ -43,6 +43,178 @@ if __name__ == '__main__':
             title = issue.get_field('summary')
             print(f'[{key}] {title}')
             jira._no_read_cache = False
+    elif jira_options.action == 'compare':
+        for issue_key in jira_options.issues:
+            issue = jira.issues.get(key=issue_key)
+            print(f'Type: {issue.issuetype}')
+            draft_data = issue.draft.read_draft()
+            made_create = issue.createmeta
+            made_edit = issue.editmeta
+
+            editmeta_factory = issue._editmeta_factory.out_fields
+            # print(editmeta_factory)
+            createmeta_factory = issue._createmeta_factory.out_fields
+
+            draft_keys = draft_data.keys()
+            create_keys = made_create.fields.model_fields_set  # type: ignore
+            edit_keys = made_edit.fields.model_fields_set  # type: ignore
+            issue_keys = set(issue.fields.keys())
+            set_of_all_field_names = set(draft_keys).union(edit_keys).union(create_keys).union(issue_keys)
+            # pprint(set_of_all_field_names)
+            line = '----------'
+            print(20*' ', end=' ')
+            # print(f'{'create':<10} {'edit':<10} {'issue':<10} {'draft':<10}')
+            print(f'{'create':^10} {'edit':^10} {'issue':^10} {'draft':^10} {'creat_fact':^10} {'edit_fact':^10}')
+            for key in sorted(set_of_all_field_names):
+                try:
+                    from_create = '1' if made_create.fields.__getattribute__(key) else '0'  # type: ignore
+                except AttributeError:
+                    from_create = line
+                try:
+                    from_edit = '1' if made_edit.fields.__getattribute__(key) else '0'  # type: ignore
+                except AttributeError:
+                    from_edit = line
+                # from_edit = (made_edit.fields.__getattribute__(key) or '') == 'x'  # type: ignore
+                try:
+                    from_issue = '1' if issue.fields[key] else '0'
+                except KeyError:
+                    from_issue = line
+                try:
+                    from_draft = '1' if draft_data[key] else '0'
+                except KeyError:
+                    from_draft = line
+                try:
+                    from_edit_fact = '1' if editmeta_factory[key] else '0'  # type: ignore
+                except KeyError:
+                    from_edit_fact = line
+                try:
+                    from_create_fact = '1' if createmeta_factory[key] else '0'  # type: ignore
+                except KeyError:
+                    from_create_fact = line
+                if from_edit == from_create == line: continue
+                # print(f'{key[:20]:<20} {from_create:<10} {from_edit:<10} {from_issue:<10} {from_draft:<10}')
+                print(f'{key[:20]:<20} {from_create:^10} {from_edit:^10} {from_issue:^10} {from_draft:^10} {from_create_fact:^10} {from_edit_fact:^10}')
+                # print(made_edit.fields.__getattribute__(key))
+                # print()
+            print(20*' ', end=' ')
+            print(f'{'create':^10} {'edit':^10} {'issue':^10} {'draft':^10} {'creat_fact':^10} {'edit_fact':^10}')
+
+            key = 'reporter'
+            print(f'Field: {key}')
+            try:
+                print(f'{'create':<10}', end=' ')
+                print(made_create.fields.__getattribute__(key))  # type: ignore
+            except AttributeError:
+                print()
+            try:
+                print(f'{'edit':<10}', end=' ')
+                print(made_edit.fields.__getattribute__(key))  # type: ignore
+            except AttributeError:
+                print()
+            try:
+                print(f'{'issue':<10}', end=' ')
+                print(issue.fields[key])
+            except KeyError:
+                print()
+            try:
+                print(f'{'draft':<10}', end=' ')
+                print(draft_data[key])
+            except KeyError:
+                print()
+            try:
+                print(f'{'edit_fact':<10}', end=' ')
+                print(editmeta_factory[key])
+            except KeyError:
+                print()
+            try:
+                print(f'{'creat_fact':<10}', end=' ')
+                print(createmeta_factory[key])
+            except KeyError:
+                print()
+
+    elif jira_options.action == 'update-issue-from-draft':
+        for issue_key in jira_options.issues:
+            issue = jira.issues.get(key=issue_key)
+            draft_data = issue.draft.read_draft()
+            # print (f'draft_data: {draft_data}'.strip())
+            # print()
+
+            print('# issue.issuetype:')
+            # pprint(issue.issuetype)
+            print('# issue.editmeta:')
+            # pprint(issue.editmeta)
+            print('# issue.createmeta:')
+            # pprint(issue.createmeta.createmeta_fields)
+            made_create = issue.createmeta
+            # print()
+            # print("# made_create")
+            # pprint(made_create)
+
+            print()
+            made_edit = issue.editmeta
+            print("# made_edit")
+            pprint(made_edit)
+            print()
+
+            print('dump editmeta')
+            pprint(made_edit.model_dump())
+            print()
+
+            local_vars = ('ignore', 'header')
+            for draft_field_key in draft_data.keys():
+                if draft_field_key in local_vars:  # E.g. Local custom fields
+                    continue
+                value_from_draft = draft_data.get(draft_field_key)
+                value_from_cache = issue.get_field(draft_field_key, 'N/A')
+                
+                if value_from_cache == 'N/A':
+                    # https://caspertestaccount.atlassian.net/rest/api/latest/issue/ecs-1?expand=editmeta
+                    # https://caspertestaccount.atlassian.net/rest/api/latest/issue/ecs-1/editmeta
+                    # return default
+                    # check editmeta
+                    target_editmeta = issue.editmeta_data['fields'][draft_field_key]
+                    target_editmeta = issue.editmeta.fields.model_fields_set  # type: ignore
+                    # print('# target_editmeta')
+                    # pprint(target_editmeta)
+                    # {'hasDefaultValue': False,
+                    #     'key': 'parent',
+                    #     'name': 'Parent',
+                    #     'operations': ['set'],
+                    #     'required': False,
+                    #     'schema': {'system': 'parent', 'type': 'issuelink'}}
+                    print(f'draft_field_key {draft_field_key} in editmeta: {draft_field_key in issue.editmeta_data['fields']}')
+                    print(f'draft_field_key {draft_field_key} in editmeta: {draft_field_key in issue.editmeta.fields.model_fields_set}')  # type: ignore
+
+
+                print (f"# {issue_key} ", end="")
+                # print ([field, type(value), value])
+                extracted_from_cache = value_from_cache if isinstance(value_from_cache, str) else value_from_cache.get('displayName') or value_from_cache.get('name')
+                if not value_from_draft:  # E.g. parent not set
+                    print(f'# Not set   ({draft_field_key}) is None')
+                elif not value_from_draft or value_from_draft == 'None' or value_from_draft == {draft_field_key: None}:
+                    print(f'# None      ({draft_field_key}) is None')
+                elif value_from_cache == 'N/A':
+                    print(f'# Miss      ({draft_field_key}) not found in cache')
+                elif not value_from_cache:
+                    print(f'# Null      ({draft_field_key}) in cache but None')
+                elif value_from_cache == 'None':
+                    print(f'# Field     ({draft_field_key}) not found in cache')
+                elif value_from_draft == value_from_cache:
+                    print(f"# Same      ({draft_field_key}): {value_from_draft}")
+                elif value_from_draft == extracted_from_cache:
+                    print(f"# Extracted ({draft_field_key}): {value_from_draft}")
+                else:
+                    print(f"# Different: {draft_field_key}:")
+                    print(f"{value_from_draft}")
+                    pprint(value_from_cache)
+                    # print ([field])
+                    # print ([value])
+                    # print ([from_cache])
+                    input()
+                # print([value, from_cache])
+                # print()
+            assert draft_data.content == f'{draft_data.to_dict().get('content', '')}'
+            assert not draft_data.content.startswith(f'# {draft_data.get('summary', '')}\n\n')
     elif jira_options.action == 'get-project-keys':
         print ('Fetching from Jira...')
         resp = jira.system_config_loader.fetch_and_update_all_createmeta()
