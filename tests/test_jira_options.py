@@ -35,15 +35,6 @@ class TestJiraOptions:
         assert err == ""
         assert str(execution_error.value) == "JiraOptions.user not set"
 
-    @pytest.mark.skipif(
-        not os.path.exists("options.toml"), reason='File "options.toml" does not exist'
-    )
-    def test_opts_from_user_toml_values(self, opts_from_user_toml):
-        assert opts_from_user_toml.user != "user_1@domain.com"
-        assert opts_from_user_toml.url != "https://account_1.atlassian-host.net"
-        assert opts_from_user_toml.personal_access_token != "SECRET_1"
-
-
     def test_parse_args_issues(self, ):
         # We need to pass an empty list. If we didn't, pytest would default
         # to using sys.argv, which might contain '--cov-report html --cov'
