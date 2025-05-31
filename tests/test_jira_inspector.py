@@ -6,6 +6,7 @@ from typing import Any
 from mantis.jira import JiraClient
 from mantis.jira.utils.cache import CacheMissException
 from mantis.jira.utils.jira_system_config_loader import Inspector
+from tests.data import CacheData
 
 
 class TestInspector:
@@ -37,9 +38,7 @@ class TestInspector:
         with pytest.raises(CacheMissException):
             Inspector.get_createmeta_models(fake_jira)
 
-        from tests.data import CacheData
-        data = CacheData().createmeta_epic
         with open(fake_jira.cache.createmeta / "createmeta_test.json", "w") as f:
-            json.dump(data, f)
+            json.dump(CacheData().createmeta_epic, f)
         from_cache = Inspector.get_createmeta_models(fake_jira)
         assert from_cache
