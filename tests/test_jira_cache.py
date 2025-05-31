@@ -76,11 +76,9 @@ def test_cache_iter_dir_yields_files(fake_jira: JiraClient, identifier: str):
     assert len(list(fake_jira.cache.iter_dir(identifier))) == 1
 
 def test_cache_get_issuetypes_from_system_cache(fake_jira: JiraClient, requests_mock):
-    requests_mock.get(f'{fake_jira.api_url}/issue/createmeta/{fake_jira.project_name}/issuetypes', json=get_issuetypes_response)
-    cache = fake_jira.cache
     with open(fake_jira.cache.system / "issuetypes.json", "w") as f:
         json.dump(CacheData().issuetypes, f)
-    retrieved = cache.get_issuetypes_from_system_cache()
+    retrieved = fake_jira.cache.get_issuetypes_from_system_cache()
     assert retrieved
     assert retrieved['issueTypes'][0].get("description") in (
             "Subtasks track small pieces of work that are part of a larger task.",
