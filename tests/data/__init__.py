@@ -69,3 +69,11 @@ class CacheData:
     def createmeta_task(self) -> Any:
         with open('tests/data/jira_cache/system/createmeta/createmeta_task.json', 'r') as f:
             return json.load(f)
+
+    @property
+    def placeholder_account(self) -> dict[str, str]:
+        return {
+            "accountId": "492581:638245r0-3d02-ki30-kchs-3kjd92hafjmz",
+            "emailAddress": "marcus@rome.gov",
+            "displayName": "Marcus Aurelius",
+        }
