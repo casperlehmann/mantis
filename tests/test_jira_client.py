@@ -35,16 +35,16 @@ def test_cache_exists(fake_jira: JiraClient):
         assert item.name in ("createmeta", "editmeta")
 
 
-@pytest.fixture
-def json_response_account_id(mock_get_request):
-    mock_get_request.return_value.json.return_value = {
-        "accountId": "492581:638245r0-3d02-ki30-kchs-3kjd92hafjmz",
-        "emailAddress": "user@domain.com",
-        "displayName": "Marcus Aurelius",
-    }
+json_response_account = {
+    "accountId": "492581:638245r0-3d02-ki30-kchs-3kjd92hafjmz",
+    "emailAddress": "user@domain.com",
+    "displayName": "Marcus Aurelius",
+}
 
 
-def test_get_current_user(fake_jira: JiraClient, json_response_account_id):
+def test_get_current_user(fake_jira: JiraClient, requests_mock):
+    api_url = fake_jira.options.url + "/rest/api/latest"
+    requests_mock.get(f'{api_url}/myself', json=json_response_account)
     assert fake_jira.get_current_user() == {
         "accountId": "492581:638245r0-3d02-ki30-kchs-3kjd92hafjmz",
         "emailAddress": "user@domain.com",
@@ -52,20 +52,26 @@ def test_get_current_user(fake_jira: JiraClient, json_response_account_id):
     }
 
 
-def test_get_current_user_account_id(fake_jira: JiraClient, json_response_account_id):
+def test_get_current_user_account_id(fake_jira: JiraClient, requests_mock):
+    api_url = fake_jira.options.url + "/rest/api/latest"
+    requests_mock.get(f'{api_url}/myself', json=json_response_account)
     assert (
         fake_jira.get_current_user_account_id()
         == "492581:638245r0-3d02-ki30-kchs-3kjd92hafjmz"
     )
 
 
-def test_get_current_user_as_assignee(fake_jira: JiraClient, json_response_account_id):
+def test_get_current_user_as_assignee(fake_jira: JiraClient, requests_mock):
+    api_url = fake_jira.options.url + "/rest/api/latest"
+    requests_mock.get(f'{api_url}/myself', json=json_response_account)
     assert fake_jira.get_current_user_as_assignee() == {
         "assignee": {"accountId": "492581:638245r0-3d02-ki30-kchs-3kjd92hafjmz"}
     }
 
 
-def test_get_test_auth_success(fake_jira: JiraClient, json_response_account_id, capsys):
+def test_get_test_auth_success(fake_jira: JiraClient, capsys, requests_mock):
+    api_url = fake_jira.options.url + "/rest/api/latest"
+    requests_mock.get(f'{api_url}/myself', json=json_response_account)
     assert fake_jira.test_auth()
     captured = capsys.readouterr()
     assert captured.out == "Connected as user: Marcus Aurelius\n"
