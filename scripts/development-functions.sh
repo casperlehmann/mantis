@@ -15,6 +15,10 @@ run_coverage() {
   pytest --cov
 }
 
+run_tests() {
+  pytest -f -m "not slow"
+}
+
 run_mypy() {
   mypy --disallow-untyped-calls --disallow-untyped-defs --disallow-incomplete-defs mantis
 }

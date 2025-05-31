@@ -113,6 +113,9 @@ $ pytest
 # Run tests every time a file changes (using `pytest-xdist`):
 $ pytest -f
 
+# Skip slow tests:
+$ pytest -m "not slow"
+
 # Show test coverage for each file
 $ pytest --cov
 

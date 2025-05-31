@@ -126,6 +126,7 @@ def test_update_project_field_keys(mock_get, fake_jira: JiraClient):
         assert f.read() == '{"fields": []}'
 
 
+@pytest.mark.slow
 @patch("mantis.jira.jira_client.requests.get")
 def test_compile_plugins(mock_get, fake_jira: JiraClient):
     mock_get.return_value.json.return_value = {"name": "Testtype"}
