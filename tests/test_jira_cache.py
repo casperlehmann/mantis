@@ -76,3 +76,8 @@ class TestCache:
         subtask = [_type for _type in retrieved['issueTypes'] if _type['name'] == 'Subtask'][0]
         assert subtask["description"] == "Subtasks track small pieces of work that are part of a larger task.", (
                 f'retrieved: {retrieved}')
+
+    def test_persisted_issuetypes_data(self):
+        selector = lambda field_name: {_[field_name] for _ in CacheData().issuetypes.get("issueTypes", {field_name: ''})}
+        assert len(CacheData().issuetypes.get("issueTypes", [])) == 5
+        assert selector('name') == {'Subtask', 'Story', 'Bug', 'Task', 'Epic'}
