@@ -32,11 +32,11 @@ class TestInspector:
         with pytest.raises(ValueError):
             Inspector.print_table(["non-existent"], {"placeholder"}, issuetype_field_map)
 
-    def test_get_project_field_keys_from_cache(self, fake_jira: "JiraClient", with_fake_allowed_types):
+    def test_get_project_field_keys_from_cache(self, fake_jira: JiraClient):
+        fake_jira.issues._allowed_types = ["Test"] # To avoid calling load_allowed_types
         with pytest.raises(CacheMissException):
             Inspector.get_createmeta_models(fake_jira)
 
-        fake_jira.issues._allowed_types = ["test"]
         from tests.data import CacheData
         data = CacheData().createmeta_epic
         with open(fake_jira.cache.createmeta / "createmeta_test.json", "w") as f:

@@ -74,7 +74,8 @@ class TestJiraIssues:
                 fake_jira.issues.get("PROJ-1 ")
 
 
-    def test_jira_issues_create(self, fake_jira: JiraClient, with_fake_allowed_types, minimal_issue_payload, requests_mock):
+    def test_jira_issues_create(self, fake_jira: JiraClient, minimal_issue_payload, requests_mock):
+        fake_jira.issues._allowed_types = ["Story", "Subtask", "Epic", "Bug", "Task"]
         requests_mock.post(f'{fake_jira.api_url}/issue', json={})
         with pytest.raises(ValueError):
             issue = fake_jira.issues.create(issuetype="Bug", title="Tester", data={})
