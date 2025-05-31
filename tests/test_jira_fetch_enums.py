@@ -11,7 +11,7 @@ from tests.data import get_issuetypes_response, update_projects_cache_response, 
 
 class TestConfigLoader:
     def test_config_loader_update_issuetypes_writes_to_cache(self, fake_jira: JiraClient, requests_mock):
-        requests_mock.get(f'{fake_jira.api_url}/issue/createmeta/{fake_jira.project_name}/issuetypes', json=get_issuetypes_response)
+        requests_mock.get(f'{fake_jira.api_url}/issue/createmeta/TEST/issuetypes', json=get_issuetypes_response)
         set_with_no_issuetypes = {str(_).split('/')[-1] for _ in fake_jira.cache.system.iterdir()}
         assert set_with_no_issuetypes == {'createmeta', 'editmeta'}, (
             f"System cache expected 2 values. Got: {set_with_no_issuetypes}")
@@ -29,7 +29,7 @@ class TestConfigLoader:
         assert selector('name') == {'Subtask', 'Story', 'Bug', 'Task', 'Epic'}
 
     def test_config_loader_loop_yields_files(self, fake_jira: JiraClient, requests_mock):
-        requests_mock.get(f'{fake_jira.api_url}/issue/createmeta/{fake_jira.project_name}/issuetypes', json=get_issuetypes_response)
+        requests_mock.get(f'{fake_jira.api_url}/issue/createmeta/TEST/issuetypes', json=get_issuetypes_response)
         assert len(list(fake_jira.system_config_loader.loop_createmeta())) == 0
         # cache something
         with open(fake_jira.cache.createmeta / f"some_file.json", "w") as f:
