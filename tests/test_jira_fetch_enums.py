@@ -30,9 +30,9 @@ def test_persisted_issuetypes_data():
     assert selector('name') == {'Subtask', 'Story', 'Bug', 'Task', 'Epic'}
 
 
-@patch("mantis.jira.jira_client.requests.get")
-def test_cache_get_issuetypes_from_system_cache(mock_get, fake_jira: JiraClient):
-    mock_get.return_value.json.return_value = get_issuetypes_response
+def test_cache_get_issuetypes_from_system_cache(fake_jira: JiraClient, requests_mock):
+    api_url = fake_jira.options.url + "/rest/api/latest"
+    requests_mock.get(f'{api_url}/issue/createmeta/{fake_jira.project_name}/issuetypes', json=get_issuetypes_response)
     cache = fake_jira.cache
     with open(fake_jira.cache.system / "issuetypes.json", "w") as f:
         json.dump(CacheData().issuetypes, f)
@@ -46,23 +46,20 @@ def test_cache_get_issuetypes_from_system_cache(mock_get, fake_jira: JiraClient)
         )
 
 
-@patch("mantis.jira.jira_client.requests.get")
-def test_config_loader_loop_yields_files(mock_get, fake_jira: JiraClient):
-    mock_get.return_value.json.return_value = get_issuetypes_response
-    config_loader = fake_jira.system_config_loader
-    assert len(list(config_loader.loop_createmeta())) == 0
+def test_config_loader_loop_yields_files(fake_jira: JiraClient, requests_mock):
+    api_url = fake_jira.options.url + "/rest/api/latest"
+    requests_mock.get(f'{api_url}/issue/createmeta/{fake_jira.project_name}/issuetypes', json=get_issuetypes_response)
+    assert len(list(fake_jira.system_config_loader.loop_createmeta())) == 0
     # cache something
     with open(fake_jira.cache.createmeta / f"some_file.json", "w") as f:
         f.write("{}")
-    assert len(list(config_loader.loop_createmeta())) == 1
+    assert len(list(fake_jira.system_config_loader.loop_createmeta())) == 1
 
 
-@patch("mantis.jira.jira_client.requests.get")
-def test_update_project_field_keys(mock_get, fake_jira: JiraClient):
-    config_loader = fake_jira.system_config_loader
-
+def test_update_project_field_keys(fake_jira: JiraClient, requests_mock):
+    api_url = fake_jira.options.url + "/rest/api/latest"
     # Mock projects response
-    mock_get.return_value.json.return_value = update_projects_cache_response
+    requests_mock.get(f'{api_url}/project', json=update_projects_cache_response)
 
     # Test initial state
     if (fake_jira.cache.system / 'projects.json').exists():
@@ -70,7 +67,7 @@ def test_update_project_field_keys(mock_get, fake_jira: JiraClient):
     assert fake_jira._project_id == None
 
     # Fetch and cache projects data (without updating the object)
-    got_projects = config_loader.get_projects(force_skip_cache = True)
+    got_projects = fake_jira.system_config_loader.get_projects(force_skip_cache = True)
     assert isinstance(got_projects, list)
     assert len(got_projects) == 2
     assert {_['id'] for _ in got_projects} == {'10000', '10001'}
@@ -92,12 +89,12 @@ def test_update_project_field_keys(mock_get, fake_jira: JiraClient):
         f'{len(update_projects_cache_response)} Got {got_project_ids_as_ints}')
     
     # Mock issuetypes response
-    mock_get.return_value.json.return_value = CacheData().issuetypes
+    requests_mock.get(f'{api_url}/issue/createmeta/{fake_jira.project_name}/issuetypes', json=CacheData().issuetypes)
 
     # Fetch and cache issuetypes data
     if (fake_jira.cache.system / 'issuetypes.json').exists():
         raise FileExistsError('File "issuetypes.json" should not exist yet')
-    got_issue_types = config_loader.get_issuetypes()
+    got_issue_types = fake_jira.system_config_loader.get_issuetypes()
     assert isinstance(got_issue_types, dict)
     assert 'issueTypes' in got_issue_types
     assert isinstance(got_issue_types['issueTypes'], list)
@@ -110,11 +107,16 @@ def test_update_project_field_keys(mock_get, fake_jira: JiraClient):
     if not (fake_jira.cache.system / 'issuetypes.json').exists():
         raise FileNotFoundError('File "issuetypes.json" should have been created')
 
-    mock_get.return_value.json.return_value = {'fields': []}
+    # Mock createmeta response
+    requests_mock.get(f'{api_url}/issue/createmeta/TEST/issuetypes/10001', json={'fields': []})
+    requests_mock.get(f'{api_url}/issue/createmeta/TEST/issuetypes/10002', json={'fields': []})
+    requests_mock.get(f'{api_url}/issue/createmeta/TEST/issuetypes/10003', json={'fields': []})
+    requests_mock.get(f'{api_url}/issue/createmeta/TEST/issuetypes/10004', json={'fields': []})
+    requests_mock.get(f'{api_url}/issue/createmeta/TEST/issuetypes/10005', json={'fields': []})
 
     if (fake_jira.cache.createmeta / 'createmeta_story.json').exists():
         raise FileExistsError('File "createmeta_story.json" should not exist yet')
-    allowed_types = config_loader.fetch_and_update_all_createmeta()
+    allowed_types = fake_jira.system_config_loader.fetch_and_update_all_createmeta()
     assert set(allowed_types) == set(['Epic', 'Subtask', 'Task', 'Story', 'Bug'])
     if not (fake_jira.cache.createmeta / 'createmeta_story.json').exists():
         raise FileNotFoundError('File "createmeta_story.json" should have been created')
