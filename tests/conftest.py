@@ -52,17 +52,6 @@ def opts_from_fake_cli(fake_cli):
 
 
 @pytest.fixture
-def opts_from_user_toml():
-    return JiraOptions()
-
-
-@pytest.fixture
-def jira_client_from_user_toml(opts_from_user_toml):
-    auth = JiraAuth(opts_from_user_toml)
-    return JiraClient(opts_from_user_toml, auth)
-
-
-@pytest.fixture
 def jira_client_from_fake_cli(opts_from_fake_cli):
     auth = JiraAuth(opts_from_fake_cli)
     return JiraClient(opts_from_fake_cli, auth)
