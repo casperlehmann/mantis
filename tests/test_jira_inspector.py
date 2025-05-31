@@ -9,7 +9,7 @@ from mantis.jira.utils.jira_system_config_loader import Inspector
 
 
 class TestInspector:
-    def test_print_table(self, fake_jira: "JiraClient", capsys):
+    def test_print_table(self, capsys):
         column_order: list[str] = ["a"]
         all_field_keys: set[str] = {"placeholder"}
         issuetype_field_map: dict[str, Any] = {'a': {'placeholder':''}}
@@ -24,7 +24,7 @@ class TestInspector:
         for actual_line, expected_line in zip(captured.out.split("\n"), expected):
             assert actual_line.strip() == expected_line.strip()
 
-    def test_print_table_raises_on_non_existent_key(self, fake_jira: "JiraClient", capsys):
+    def test_print_table_raises_on_non_existent_key(self, capsys):
         column_order: list[str] = ["a"]
         all_field_keys: set[str] = {"placeholder"}
         issuetype_field_map: dict[str, Any] = {'a': {'placeholder':''}}
