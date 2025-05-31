@@ -205,6 +205,8 @@ class JiraClient:
     def test_auth(self) -> bool:
         try:
             user = self.get_current_user()
+            if not isinstance(user, dict):
+                raise ValueError(f"User is should be type dict. Got: {type(user)}")
             print(
                 f"Connected as user: {user.get('displayName', 'ERROR: No displayName')}"
             )
