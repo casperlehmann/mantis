@@ -1,58 +1,65 @@
 import pytest
 
-from mantis.drafts import Draft
 from mantis.jira import JiraClient
 from mantis.jira.jira_issues import JiraIssue
+from tests.data import CacheData
 
 
-def test_jira_draft(fake_jira: JiraClient, minimal_issue_payload):
+def test_jira_draft(fake_jira: JiraClient, minimal_issue_payload, requests_mock):
+    ecs_1 = CacheData().ecs_1
+    ecs_1['fields']['assignee'] = {"displayName": "Bobby Goodsky"}
+    requests_mock.get(f'{fake_jira.api_url}/issue/ECS-1', json=ecs_1)
+    requests_mock.get(f'{fake_jira.api_url}/issue/ECS-2', json=CacheData().ecs_2)
+
     minimal_issue_payload['fields']['assignee'] = {"displayName": "Bobby Goodsky"}
     assert str(fake_jira.cache.root) != ".jira_cache_test"
     assert str(fake_jira.drafts_dir) != "drafts_test"
     
     assert len(list(fake_jira.drafts_dir.iterdir())) == 0
-    task_1 = fake_jira.issues.get("TASK-1")
+    task_1 = fake_jira.issues.get("ECS-1")
     assert len([*fake_jira.drafts_dir.iterdir()]) == 1
     assert isinstance(task_1, JiraIssue)
 
-    minimal_issue_payload['key'] = "TASK-2"
-    task_2 = fake_jira.issues.get("TASK-2")
+    minimal_issue_payload['key'] = "ECS-2"
+    task_2 = fake_jira.issues.get("ECS-2")
     assert len([*fake_jira.drafts_dir.iterdir()]) == 2
 
-    with open(fake_jira.drafts_dir / "TASK-1.md", "r") as f:
+    with open(fake_jira.drafts_dir / "ECS-1.md", "r") as f:
         content = f.read()
     assert "assignee: Bobby Goodsky" in content
-    assert "Bobby Goodsky" == fake_jira.issues.get('TASK-1').draft.issue.get_field("assignee", {}).get(
+    assert "Bobby Goodsky" == fake_jira.issues.get('ECS-1').draft.issue.get_field("assignee", {}).get(
         "displayName", ""
     )
     expectations = (
         "---",
-        "header: '[TASK-1] redacted'",
+        "header: '[ECS-1] (Sample) User Authentication'",
         "ignore: true",
-        "parent: redacted",
-        "summary: redacted",
+        "parent: null",
+        "summary: (Sample) User Authentication",
         "issuetype:",
-        "issuetype: Task",
-        "project: redacted",
-        "reporter: redacted",
+        "issuetype: Epic",
+        "project: E-Commerce Checkout System",
+        "reporter: Casper Lehmann",
         "description: redacted",
         "assignee: Bobby Goodsky",
-        "status: resolved",
+        "status: In Progress",
         "---",
-        "# redacted",
+        "# (Sample) User Authentication",
         "",
-        "redacted",
+        "Implement user authentication for the checkout system.",
     )
-    with open(fake_jira.drafts_dir / "TASK-1.md", "r") as f:
+    with open(fake_jira.drafts_dir / "ECS-1.md", "r") as f:
         for content in f.readlines():
             assert content.strip() in expectations, f"content.strip() ({content.strip()}) not in expectations in: {expectations}"
 
-def test_read_draft(fake_jira: JiraClient):
-    issue_key = 'TEST-1'
+def test_read_draft(fake_jira: JiraClient, requests_mock):
+    requests_mock.get(f'{fake_jira.api_url}/issue/ECS-1', json=CacheData().ecs_1)
+
+    issue_key = 'ECS-1'
     issue = fake_jira.issues.get(key=issue_key)
     draft_data = issue.draft.read_draft()
     assert draft_data
-    assert draft_data.content == "redacted"
+    assert draft_data.content == "Implement user authentication for the checkout system."
     assert set(draft_data.keys()) == {
         'assignee',
         'header',

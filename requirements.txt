@@ -1,5 +1,6 @@
 pytest
 requests
+requests-mock
 types-requests
 requests.auth
 pytest-xdist

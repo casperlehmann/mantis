@@ -4,12 +4,23 @@ import pytest
 import requests
 
 from mantis.jira import JiraClient
+from tests.data import CacheData
 
 
-@patch("mantis.jira.jira_client.requests.get")
-def test_jira_options_override(mock_get, fake_jira: JiraClient):
-    mock_get.return_value.json.return_value = {}
+def test_test_auth_complains_with_bad_input(requests_mock, fake_jira: JiraClient, capsys):
+    requests_mock.get(f'{fake_jira.api_url}/myself', json={})
     fake_jira.test_auth()
+    captured = capsys.readouterr()
+    assert captured.out == ("Connected as user: ERROR: No displayName\n")
+    assert captured.err == ""
+
+
+def test_test_auth_informs_login(requests_mock, fake_jira: JiraClient, capsys):
+    requests_mock.get(f'{fake_jira.api_url}/myself', json={'displayName': 'Buddy'})
+    fake_jira.test_auth()
+    captured = capsys.readouterr()
+    assert captured.out == ("Connected as user: Buddy\n")
+    assert captured.err == ""
 
 
 def test_cache_exists(fake_jira: JiraClient):
@@ -23,44 +34,39 @@ def test_cache_exists(fake_jira: JiraClient):
         assert item.name in ("createmeta", "editmeta")
 
 
-@pytest.fixture
-def json_response_account_id(mock_get_request):
-    mock_get_request.return_value.json.return_value = {
-        "accountId": "492581:638245r0-3d02-ki30-kchs-3kjd92hafjmz",
-        "emailAddress": "user@domain.com",
-        "displayName": "Marcus Aurelius",
-    }
-
-
-def test_get_current_user(fake_jira: JiraClient, json_response_account_id):
+def test_get_current_user(fake_jira: JiraClient, requests_mock):
+    requests_mock.get(f'{fake_jira.api_url}/myself', json=CacheData().placeholder_account)
     assert fake_jira.get_current_user() == {
         "accountId": "492581:638245r0-3d02-ki30-kchs-3kjd92hafjmz",
-        "emailAddress": "user@domain.com",
+        "emailAddress": "marcus@rome.gov",
         "displayName": "Marcus Aurelius",
     }
 
 
-def test_get_current_user_account_id(fake_jira: JiraClient, json_response_account_id):
+def test_get_current_user_account_id(fake_jira: JiraClient, requests_mock):
+    requests_mock.get(f'{fake_jira.api_url}/myself', json=CacheData().placeholder_account)
     assert (
         fake_jira.get_current_user_account_id()
         == "492581:638245r0-3d02-ki30-kchs-3kjd92hafjmz"
     )
 
 
-def test_get_current_user_as_assignee(fake_jira: JiraClient, json_response_account_id):
+def test_get_current_user_as_assignee(fake_jira: JiraClient, requests_mock):
+    requests_mock.get(f'{fake_jira.api_url}/myself', json=CacheData().placeholder_account)
     assert fake_jira.get_current_user_as_assignee() == {
         "assignee": {"accountId": "492581:638245r0-3d02-ki30-kchs-3kjd92hafjmz"}
     }
 
 
-def test_get_test_auth_success(fake_jira: JiraClient, json_response_account_id, capsys):
+def test_get_test_auth_success(fake_jira: JiraClient, capsys, requests_mock):
+    requests_mock.get(f'{fake_jira.api_url}/myself', json=CacheData().placeholder_account)
     assert fake_jira.test_auth()
     captured = capsys.readouterr()
     assert captured.out == "Connected as user: Marcus Aurelius\n"
     assert captured.err == ""
 
 
-def test_get_test_auth_connection_error(fake_jira: JiraClient, json_response_account_id, capsys):
+def test_get_test_auth_connection_error(fake_jira: JiraClient, capsys):
     with patch(
         "mantis.jira.jira_client.requests.get",
         side_effect=requests.exceptions.ConnectionError,
@@ -78,7 +84,7 @@ def test_get_test_auth_connection_error(fake_jira: JiraClient, json_response_acc
     assert captured.err == ""
 
 
-def test_get_test_auth_generic_exception(fake_jira: JiraClient, json_response_account_id, capsys):
+def test_get_test_auth_generic_exception(fake_jira: JiraClient, capsys):
     with patch(
         "mantis.jira.jira_client.requests.get",
         side_effect=requests.exceptions.RequestException,

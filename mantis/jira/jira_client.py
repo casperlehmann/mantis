@@ -109,7 +109,7 @@ class JiraClient:
             exit()
         issuetypes: dict[str, list[dict[str, Any]]] = response.json()
         assert isinstance(issuetypes, dict), f'issuetypes is not a dict: {issuetypes}'
-        assert 'issueTypes' in issuetypes, f"'issueTypes' not in issuetypes. Got: {issuetypes}"
+        assert 'issueTypes' in issuetypes, f"'issueTypes' not in issuetypes. Got keys: {list(issuetypes.keys())}"
         assert isinstance(issuetypes['issueTypes'], list), "issuetypes['issueTypes'] is not a list. Got: {issuetypes}"
         li = issuetypes['issueTypes']
         assert isinstance(li, list), f"issuetypes['issueTypes'] is not a list. Got: {issuetypes}"
@@ -205,6 +205,8 @@ class JiraClient:
     def test_auth(self) -> bool:
         try:
             user = self.get_current_user()
+            if not isinstance(user, dict):
+                raise ValueError(f"User is should be type dict. Got: {type(user)}")
             print(
                 f"Connected as user: {user.get('displayName', 'ERROR: No displayName')}"
             )
