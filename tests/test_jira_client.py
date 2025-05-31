@@ -6,10 +6,22 @@ import requests
 from mantis.jira import JiraClient
 
 
-@patch("mantis.jira.jira_client.requests.get")
-def test_jira_options_override(mock_get, fake_jira: JiraClient):
-    mock_get.return_value.json.return_value = {}
+def test_test_auth_complains_with_bad_input(requests_mock, fake_jira: JiraClient, capsys):
+    api_url = fake_jira.options.url + "/rest/api/latest"
+    requests_mock.get(f'{api_url}/myself', json={})
     fake_jira.test_auth()
+    captured = capsys.readouterr()
+    assert captured.out == ("Connected as user: ERROR: No displayName\n")
+    assert captured.err == ""
+
+
+def test_test_auth_informs_login(requests_mock, fake_jira: JiraClient, capsys):
+    api_url = fake_jira.options.url + "/rest/api/latest"
+    requests_mock.get(f'{api_url}/myself', json={'displayName': 'Buddy'})
+    fake_jira.test_auth()
+    captured = capsys.readouterr()
+    assert captured.out == ("Connected as user: Buddy\n")
+    assert captured.err == ""
 
 
 def test_cache_exists(fake_jira: JiraClient):
