@@ -25,8 +25,8 @@ def test_config_loader_update_issuetypes_writes_to_cache(fake_jira: JiraClient, 
 def test_persisted_issuetypes_data():
     cache_data = CacheData()
     assert hasattr(cache_data, 'issuetypes')
-    selector = lambda field_name: {_[field_name] for _ in cache_data.issuetypes.get("issueTypes")}
-    assert len(cache_data.issuetypes.get("issueTypes")) == 5
+    selector = lambda field_name: {_[field_name] for _ in cache_data.issuetypes.get("issueTypes", {field_name: ''})}
+    assert len(cache_data.issuetypes.get("issueTypes", [])) == 5
     assert selector('name') == {'Subtask', 'Story', 'Bug', 'Task', 'Epic'}
 
 
