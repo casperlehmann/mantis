@@ -2,6 +2,7 @@ import json
 import pytest
 
 from mantis.jira import JiraClient
+from tests.data import CacheData
 
 
 def test_cache_get_caches_jira_issue(fake_jira: JiraClient, minimal_issue_payload):
