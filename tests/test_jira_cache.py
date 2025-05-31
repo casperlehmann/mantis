@@ -6,25 +6,29 @@ from tests.data import CacheData
 
 
 class TestCache:
-    def test_cache_get_caches_jira_issue(self, fake_jira: JiraClient, minimal_issue_payload):
+    @pytest.fixture(autouse=True)
+    def _request_minimal_issue_payload(self, minimal_issue_payload: dict):
+        self.issue_payload = minimal_issue_payload
+
+    def test_cache_get_caches_jira_issue(self, fake_jira: JiraClient):
         assert not fake_jira._no_read_cache
         assert fake_jira.cache._get(fake_jira.cache.issues, "TASK-1.json") is None
 
         with open(fake_jira.cache.root / "issues/TASK-1.json", "w") as f:
-            json.dump(minimal_issue_payload, f)
+            json.dump(self.issue_payload, f)
 
         decoded = fake_jira.cache._get(fake_jira.cache.issues, "TASK-1.json")
         assert decoded
         assert decoded.get("key", '') == "TASK-1"
 
-    def test_cache_get_issue_returns_none_when_no_read_cache_is_set(self, fake_jira: JiraClient, minimal_issue_payload):
+    def test_cache_get_issue_returns_none_when_no_read_cache_is_set(self, fake_jira: JiraClient):
         # Make sure nothing is cached
         assert not fake_jira._no_read_cache
         assert fake_jira.cache.get_issue("TASK-1") is None
 
         # cache something
         with open(fake_jira.cache.root / "issues/TASK-1.json", "w") as f:
-            json.dump(minimal_issue_payload, f)
+            json.dump(self.issue_payload, f)
         something = fake_jira.cache.get_issue("TASK-1")
         assert something is not None
 
@@ -34,10 +38,10 @@ class TestCache:
             nothing_2 = fake_jira.cache.get_issue("TASK-1")
             assert nothing_2 is None
 
-    def test_cache_remove_does_removals(self, fake_jira: JiraClient, minimal_issue_payload):
+    def test_cache_remove_does_removals(self, fake_jira: JiraClient):
         # cache something
         with open(fake_jira.cache.root / "issues/TASK-1.json", "w") as f:
-            json.dump(minimal_issue_payload, f)
+            json.dump(self.issue_payload, f)
         something_1 = fake_jira.cache.get_issue("TASK-1")
         assert something_1 is not None
 
@@ -47,10 +51,10 @@ class TestCache:
         nothing_1 = fake_jira.cache.get_issue("TASK-1")
         assert nothing_1 is None
 
-    def test_cache_remove_issue_does_removals(self, fake_jira: JiraClient, minimal_issue_payload):
+    def test_cache_remove_issue_does_removals(self, fake_jira: JiraClient):
         # cache something
         with open(fake_jira.cache.root / "issues/TASK-1.json", "w") as f:
-            json.dump(minimal_issue_payload, f)
+            json.dump(self.issue_payload, f)
         something_2 = fake_jira.cache.get_issue("TASK-1")
         assert something_2 is not None
 
