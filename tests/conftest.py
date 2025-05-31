@@ -52,17 +52,6 @@ def opts_from_fake_cli(fake_cli):
 
 
 @pytest.fixture
-def opts_from_user_toml():
-    return JiraOptions()
-
-
-@pytest.fixture
-def jira_client_from_user_toml(opts_from_user_toml):
-    auth = JiraAuth(opts_from_user_toml)
-    return JiraClient(opts_from_user_toml, auth)
-
-
-@pytest.fixture
 def jira_client_from_fake_cli(opts_from_fake_cli):
     auth = JiraAuth(opts_from_fake_cli)
     return JiraClient(opts_from_fake_cli, auth)
@@ -90,9 +79,6 @@ def with_fake_plugins_dir(opts_from_fake_cli, tmp_path: Path):
     (tmp_path / "plugins").mkdir(exist_ok=True)
     opts_from_fake_cli.plugins_dir = tmp_path / "plugins"
 
-@pytest.fixture
-def with_fake_allowed_types(fake_jira: JiraClient):
-    fake_jira.issues._allowed_types = ["Story", "Subtask", "Epic", "Bug", "Task", "Testtype"]
 
 @pytest.fixture
 def minimal_issue_payload():
