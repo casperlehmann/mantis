@@ -75,18 +75,18 @@ def test_jira_issues_get_non_existent(with_no_read_cache, fake_jira: JiraClient)
             fake_jira.issues.get("PROJ-1 ")
 
 
-@patch("mantis.jira.jira_client.requests.post")
-def test_jira_issues_create(mock_post, fake_jira: JiraClient, with_fake_allowed_types, minimal_issue_payload):
-    mock_post.return_value.json.return_value = {}
+def test_jira_issues_create(fake_jira: JiraClient, with_fake_allowed_types, minimal_issue_payload, requests_mock):
+    api_url = fake_jira.options.url + "/rest/api/latest"
+    requests_mock.post(f'{api_url}/issue', json={})
     with pytest.raises(ValueError):
         issue = fake_jira.issues.create(issuetype="Bug", title="Tester", data={})
     minimal_issue_payload['fields']['issuetype']['name'] = 'Bug'
-    mock_post.return_value.json.return_value = minimal_issue_payload
+    requests_mock.post(f'{api_url}/issue', json=minimal_issue_payload)
     issue = fake_jira.issues.create(
         issuetype="Bug", title="Tester", data={"Summary": "a"}
     )
     fields = issue.get("fields", {})
-    assert fields != {}, "Object 'fields' is empty"
+    assert fields != {}, f"Object 'fields' is empty. Got: '{fields}' of type {type(fields)}"
     issuetype = fields.get("issuetype", {})
     assert issuetype != {}, "Object 'issuetype' is empty"
     name = issuetype.get("name")
