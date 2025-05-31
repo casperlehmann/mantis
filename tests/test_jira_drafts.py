@@ -7,11 +7,10 @@ from tests.data import CacheData
 
 
 def test_jira_draft(fake_jira: JiraClient, minimal_issue_payload, requests_mock):
-    api_url = fake_jira.options.url + "/rest/api/latest"
     ecs_1 = CacheData().ecs_1
     ecs_1['fields']['assignee'] = {"displayName": "Bobby Goodsky"}
-    requests_mock.get(f'{api_url}/issue/ECS-1', json=ecs_1)
-    requests_mock.get(f'{api_url}/issue/ECS-2', json=CacheData().ecs_2)
+    requests_mock.get(f'{fake_jira.api_url}/issue/ECS-1', json=ecs_1)
+    requests_mock.get(f'{fake_jira.api_url}/issue/ECS-2', json=CacheData().ecs_2)
 
     minimal_issue_payload['fields']['assignee'] = {"displayName": "Bobby Goodsky"}
     assert str(fake_jira.cache.root) != ".jira_cache_test"
@@ -55,8 +54,7 @@ def test_jira_draft(fake_jira: JiraClient, minimal_issue_payload, requests_mock)
             assert content.strip() in expectations, f"content.strip() ({content.strip()}) not in expectations in: {expectations}"
 
 def test_read_draft(fake_jira: JiraClient, requests_mock):
-    api_url = fake_jira.options.url + "/rest/api/latest"
-    requests_mock.get(f'{api_url}/issue/ECS-1', json=CacheData().ecs_1)
+    requests_mock.get(f'{fake_jira.api_url}/issue/ECS-1', json=CacheData().ecs_1)
 
     issue_key = 'ECS-1'
     issue = fake_jira.issues.get(key=issue_key)

@@ -11,8 +11,7 @@ from tests.data import get_issuetypes_response, update_projects_cache_response, 
 
 
 def test_config_loader_update_issuetypes_writes_to_cache(fake_jira: JiraClient, requests_mock):
-    api_url = fake_jira.options.url + "/rest/api/latest"
-    requests_mock.get(f'{api_url}/issue/createmeta/{fake_jira.project_name}/issuetypes', json=get_issuetypes_response)
+    requests_mock.get(f'{fake_jira.api_url}/issue/createmeta/{fake_jira.project_name}/issuetypes', json=get_issuetypes_response)
     set_with_no_issuetypes = {str(_).split('/')[-1] for _ in fake_jira.cache.system.iterdir()}
     assert set_with_no_issuetypes == {'createmeta', 'editmeta'}, (
         f"System cache expected 2 values. Got: {set_with_no_issuetypes}")
@@ -31,8 +30,7 @@ def test_persisted_issuetypes_data():
 
 
 def test_cache_get_issuetypes_from_system_cache(fake_jira: JiraClient, requests_mock):
-    api_url = fake_jira.options.url + "/rest/api/latest"
-    requests_mock.get(f'{api_url}/issue/createmeta/{fake_jira.project_name}/issuetypes', json=get_issuetypes_response)
+    requests_mock.get(f'{fake_jira.api_url}/issue/createmeta/{fake_jira.project_name}/issuetypes', json=get_issuetypes_response)
     cache = fake_jira.cache
     with open(fake_jira.cache.system / "issuetypes.json", "w") as f:
         json.dump(CacheData().issuetypes, f)
@@ -47,8 +45,7 @@ def test_cache_get_issuetypes_from_system_cache(fake_jira: JiraClient, requests_
 
 
 def test_config_loader_loop_yields_files(fake_jira: JiraClient, requests_mock):
-    api_url = fake_jira.options.url + "/rest/api/latest"
-    requests_mock.get(f'{api_url}/issue/createmeta/{fake_jira.project_name}/issuetypes', json=get_issuetypes_response)
+    requests_mock.get(f'{fake_jira.api_url}/issue/createmeta/{fake_jira.project_name}/issuetypes', json=get_issuetypes_response)
     assert len(list(fake_jira.system_config_loader.loop_createmeta())) == 0
     # cache something
     with open(fake_jira.cache.createmeta / f"some_file.json", "w") as f:
@@ -57,9 +54,7 @@ def test_config_loader_loop_yields_files(fake_jira: JiraClient, requests_mock):
 
 
 def test_update_project_field_keys(fake_jira: JiraClient, requests_mock):
-    api_url = fake_jira.options.url + "/rest/api/latest"
-    # Mock projects response
-    requests_mock.get(f'{api_url}/project', json=update_projects_cache_response)
+    requests_mock.get(f'{fake_jira.api_url}/project', json=update_projects_cache_response)
 
     # Test initial state
     if (fake_jira.cache.system / 'projects.json').exists():
@@ -88,8 +83,7 @@ def test_update_project_field_keys(fake_jira: JiraClient, requests_mock):
         'We expect two projects in len(update_projects_cache_response): '
         f'{len(update_projects_cache_response)} Got {got_project_ids_as_ints}')
     
-    # Mock issuetypes response
-    requests_mock.get(f'{api_url}/issue/createmeta/{fake_jira.project_name}/issuetypes', json=CacheData().issuetypes)
+    requests_mock.get(f'{fake_jira.api_url}/issue/createmeta/{fake_jira.project_name}/issuetypes', json=CacheData().issuetypes)
 
     # Fetch and cache issuetypes data
     if (fake_jira.cache.system / 'issuetypes.json').exists():
@@ -108,11 +102,11 @@ def test_update_project_field_keys(fake_jira: JiraClient, requests_mock):
         raise FileNotFoundError('File "issuetypes.json" should have been created')
 
     # Mock createmeta response
-    requests_mock.get(f'{api_url}/issue/createmeta/TEST/issuetypes/10001', json={'fields': []})
-    requests_mock.get(f'{api_url}/issue/createmeta/TEST/issuetypes/10002', json={'fields': []})
-    requests_mock.get(f'{api_url}/issue/createmeta/TEST/issuetypes/10003', json={'fields': []})
-    requests_mock.get(f'{api_url}/issue/createmeta/TEST/issuetypes/10004', json={'fields': []})
-    requests_mock.get(f'{api_url}/issue/createmeta/TEST/issuetypes/10005', json={'fields': []})
+    requests_mock.get(f'{fake_jira.api_url}/issue/createmeta/TEST/issuetypes/10001', json={'fields': []})
+    requests_mock.get(f'{fake_jira.api_url}/issue/createmeta/TEST/issuetypes/10002', json={'fields': []})
+    requests_mock.get(f'{fake_jira.api_url}/issue/createmeta/TEST/issuetypes/10003', json={'fields': []})
+    requests_mock.get(f'{fake_jira.api_url}/issue/createmeta/TEST/issuetypes/10004', json={'fields': []})
+    requests_mock.get(f'{fake_jira.api_url}/issue/createmeta/TEST/issuetypes/10005', json={'fields': []})
 
     if (fake_jira.cache.createmeta / 'createmeta_story.json').exists():
         raise FileExistsError('File "createmeta_story.json" should not exist yet')
@@ -127,8 +121,7 @@ def test_update_project_field_keys(fake_jira: JiraClient, requests_mock):
 
 @pytest.mark.slow
 def test_compile_plugins(fake_jira: JiraClient, requests_mock):
-    api_url = fake_jira.options.url + "/rest/api/latest"
-    requests_mock.get(f'{api_url}/project', json={"name": "Testtype"})
+    requests_mock.get(f'{fake_jira.api_url}/project', json={"name": "Testtype"})
     assert str(fake_jira.plugins_dir) != ".jira_cache_test"
 
     with open(fake_jira.cache.createmeta / "Testtype.json", "w") as f:
