@@ -72,7 +72,7 @@ def test_get_test_auth_success(fake_jira: JiraClient, json_response_account_id, 
     assert captured.err == ""
 
 
-def test_get_test_auth_connection_error(fake_jira: JiraClient, json_response_account_id, capsys):
+def test_get_test_auth_connection_error(fake_jira: JiraClient, capsys):
     with patch(
         "mantis.jira.jira_client.requests.get",
         side_effect=requests.exceptions.ConnectionError,
@@ -90,7 +90,7 @@ def test_get_test_auth_connection_error(fake_jira: JiraClient, json_response_acc
     assert captured.err == ""
 
 
-def test_get_test_auth_generic_exception(fake_jira: JiraClient, json_response_account_id, capsys):
+def test_get_test_auth_generic_exception(fake_jira: JiraClient, capsys):
     with patch(
         "mantis.jira.jira_client.requests.get",
         side_effect=requests.exceptions.RequestException,
