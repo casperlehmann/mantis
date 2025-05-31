@@ -10,17 +10,14 @@ from mantis.jira.utils.jira_system_config_loader import Inspector
 from tests.data import get_issuetypes_response, update_projects_cache_response, CacheData
 
 
-@patch("mantis.jira.jira_client.requests.get")
-def test_config_loader_update_issuetypes_writes_to_cache(
-    mock_get, fake_jira: JiraClient
-):
-    mock_get.return_value.json.return_value = get_issuetypes_response
-    config_loader = fake_jira.system_config_loader
+def test_config_loader_update_issuetypes_writes_to_cache(fake_jira: JiraClient, requests_mock):
+    api_url = fake_jira.options.url + "/rest/api/latest"
+    requests_mock.get(f'{api_url}/issue/createmeta/{fake_jira.project_name}/issuetypes', json=get_issuetypes_response)
     set_with_no_issuetypes = {str(_).split('/')[-1] for _ in fake_jira.cache.system.iterdir()}
     assert set_with_no_issuetypes == {'createmeta', 'editmeta'}, (
         f"System cache expected 2 values. Got: {set_with_no_issuetypes}")
 
-    config_loader.get_issuetypes(force_skip_cache = True)
+    fake_jira.system_config_loader.get_issuetypes(force_skip_cache = True)
     set_with_issuetypes = {str(_).split('/')[-1] for _ in fake_jira.cache.system.iterdir()}
     assert set_with_issuetypes == {'createmeta', 'editmeta', 'issuetypes.json'}, (
         f"System cache expected 3 values. Got: {fake_jira.cache.system}")
