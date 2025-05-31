@@ -1,6 +1,5 @@
 import pytest
 
-from mantis.drafts import Draft
 from mantis.jira import JiraClient
 from mantis.jira.jira_issues import JiraIssue
 from tests.data import CacheData

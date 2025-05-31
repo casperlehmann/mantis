@@ -1,11 +1,9 @@
 from dataclasses import dataclass
 from pathlib import Path
-from unittest.mock import patch
 
 import pytest
 
-from mantis.jira import JiraAuth, JiraClient, JiraIssues, JiraOptions
-from mantis.jira.utils.cache import Cache
+from mantis.jira import JiraAuth, JiraClient, JiraOptions
 
 
 @dataclass
