@@ -114,18 +114,17 @@ class TestConfigLoader:
         assert get_allowed_issuetype_name("createmeta_story.json") == 'Story'
         assert get_allowed_issuetype_name("createmeta_bug.json") == 'Bug'
 
+    @pytest.mark.slow
+    def test_compile_plugins(self, fake_jira: JiraClient, requests_mock):
+        requests_mock.get(f'{fake_jira.api_url}/project', json={"name": "Testtype"})
+        assert str(fake_jira.plugins_dir) != ".jira_cache_test"
 
-@pytest.mark.slow
-def test_compile_plugins(fake_jira: JiraClient, requests_mock):
-    requests_mock.get(f'{fake_jira.api_url}/project', json={"name": "Testtype"})
-    assert str(fake_jira.plugins_dir) != ".jira_cache_test"
+        with open(fake_jira.cache.createmeta / "Testtype.json", "w") as f:
+            f.write('{"name": "Testtype"}')
 
-    with open(fake_jira.cache.createmeta / "Testtype.json", "w") as f:
-        f.write('{"name": "Testtype"}')
-
-    assert (len(list(fake_jira.plugins_dir.iterdir())) == 0), f"Not empty: {fake_jira.plugins_dir}"
-    fake_jira.system_config_loader.compile_plugins()
-    assert len(list(fake_jira.plugins_dir.iterdir())) == 1
+        assert (len(list(fake_jira.plugins_dir.iterdir())) == 0), f"Not empty: {fake_jira.plugins_dir}"
+        fake_jira.system_config_loader.compile_plugins()
+        assert len(list(fake_jira.plugins_dir.iterdir())) == 1
 
 
 def test_print_table(fake_jira: "JiraClient", capsys):
