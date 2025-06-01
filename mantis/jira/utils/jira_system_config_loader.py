@@ -32,7 +32,10 @@ class MetaModelFactory(ABC):
         if "fields" not in metadata.keys():
             raise ValueError(
                 f'The provided data "metadata" does not contain a keys named "fields". Got: {metadata.keys()}')
-        self.meta_fields: list[dict[str, Any]] | dict[str, dict[str, Any]] = metadata["fields"]
+    
+    @property
+    def meta_fields(self) -> list[dict[str, Any]] | dict[str, dict[str, Any]]:
+        return self.metadata["fields"]
 
     def keys(self) -> KeysView[str]:
         return self.out_fields.keys()
