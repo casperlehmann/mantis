@@ -152,6 +152,10 @@ if __name__ == '__main__':
             # print (f'draft_data: {draft_data}'.strip()) # draft_data: Implement payment processing functionality for the checkout system.
             # print('# issue.issuetype:')
             # pprint(issue.issuetype) # 'Epic'
+
+            # print()
+            # print('# issue.editmeta:')
+            # pprint(issue.editmeta) # IssueModel(key='ECS-2', id='10000', fields=MetaModelFields(summary=...
             # print()
     elif jira_options.action == 'get-project-keys':
         print ('Fetching from Jira...')
