@@ -96,7 +96,7 @@ class MetaModelFactory(ABC):
             )
             self.assign_python_type(meta, meta_field_key)
             self.assign_attributes_and_getters(meta, meta_field_key)
-        fields_model = create_model("CreatemetaModel", **self.out_fields)
+        fields_model = create_model("MetaModelFields", **self.out_fields)
         return fields_model
 
     def _add_aliases_for_custom_fields(self, fields_model: type[BaseModel]) -> None:
