@@ -222,6 +222,7 @@ if __name__ == '__main__':
                     print(f"{value_from_draft}")
                     pprint(value_from_cache)
                     input()
+            assert draft_data.content == f'{draft_data.to_dict().get('content', '')}'
     elif jira_options.action == 'get-project-keys':
         print ('Fetching from Jira...')
         resp = jira.system_config_loader.fetch_and_update_all_createmeta()
