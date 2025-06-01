@@ -170,6 +170,10 @@ if __name__ == '__main__':
             # print()
             # print("# issue.editmeta")
             # pprint(issue.editmeta) # IssueModel(key='ECS-2', id='10000', fields=MetaModelFields(summary='
+
+            # print()
+            # print('dump editmeta')
+            # pprint(issue.editmeta.model_dump()) # {'fields': {'assignee': None,
     elif jira_options.action == 'get-project-keys':
         print ('Fetching from Jira...')
         resp = jira.system_config_loader.fetch_and_update_all_createmeta()
