@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 import json
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, Generator, KeysView, Mapping, Optional
+from typing import TYPE_CHECKING, Any, ClassVar, Dict, Generator, KeysView, Mapping, Optional
 
 from datamodel_code_generator import DataModelType, InputFileType, generate
 from pydantic import BaseModel, create_model
@@ -16,9 +16,12 @@ if TYPE_CHECKING:
 
 
 class MetaModelFactory(ABC):
+    # Required to be provided by concrete subclasses:
+    process: ClassVar[str]
+
     # Fields created by Jira that are present in the issue json, but cannot
     # be set by the user. These are overwritten in sub-classes.
-    ignored_non_meta_field: set[str] = set()
+    ignored_non_meta_field: ClassVar[set[str]]
 
     @abstractmethod
     def __init__(self, metadata: dict[str, Any]):
