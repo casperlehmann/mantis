@@ -149,7 +149,7 @@ if __name__ == '__main__':
         for issue_key in jira_options.issues:
             issue = jira.issues.get(key=issue_key)
             draft_data = issue.draft.read_draft()
-            print (f'draft_data: {draft_data}'.strip())
+            # print (f'draft_data: {draft_data}'.strip()) # draft_data: Implement payment processing functionality for the checkout system.
     elif jira_options.action == 'get-project-keys':
         print ('Fetching from Jira...')
         resp = jira.system_config_loader.fetch_and_update_all_createmeta()
