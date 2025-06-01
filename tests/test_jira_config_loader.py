@@ -67,15 +67,15 @@ class TestConfigLoader:
         if (fake_jira.cache.system / 'issuetypes.json').exists():
             raise FileExistsError('File "issuetypes.json" should not exist yet')
         
-        got_issue_types = fake_jira.system_config_loader.get_issuetypes()
-        assert isinstance(got_issue_types, dict)
-        assert 'issueTypes' in got_issue_types
-        assert isinstance(got_issue_types['issueTypes'], list)
+        got_issuetypes = fake_jira.system_config_loader.get_issuetypes()
+        assert isinstance(got_issuetypes, dict)
+        assert 'issueTypes' in got_issuetypes
+        assert isinstance(got_issuetypes['issueTypes'], list)
 
         expected_issue_ids: set[int] = set(map(str, list(range(10001, 10006))))
-        got_issue_ids_as_ints = {_['id'] for _ in got_issue_types['issueTypes']}
+        got_issue_ids_as_ints = {_['id'] for _ in got_issuetypes['issueTypes']}
 
-        assert len(got_issue_types['issueTypes']) == 5, f'Expected 5 issueTypes. Got {len(got_issue_types)}: {got_issue_types}'
+        assert len(got_issuetypes['issueTypes']) == 5, f'Expected 5 issueTypes. Got {len(got_issuetypes)}: {got_issuetypes}'
         assert got_issue_ids_as_ints == expected_issue_ids
         if not (fake_jira.cache.system / 'issuetypes.json').exists():
             raise FileNotFoundError('File "issuetypes.json" should have been created')

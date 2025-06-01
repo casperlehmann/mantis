@@ -158,7 +158,7 @@ if __name__ == '__main__':
     elif jira_options.action == 'reset':
         jira.warmup()
     elif jira_options.action == 'attempt':
-        jira.system_config_loader.attempt(issue_id = "ECS-1", issue_type = "epic")
+        jira.system_config_loader.attempt(issue_id = "ECS-1", issuetype_name = "epic")
     else:
         print(f'Action {jira_options.action} not recognized')
 
