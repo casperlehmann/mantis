@@ -225,11 +225,13 @@ class JiraSystemConfigLoader:
                 return from_cache
         issuetype_id = self.client.issuetype_name_to_id(issuetype_name)
         createmeta = self.client.get_createmeta(issuetype_id)
-        assert isinstance(createmeta, dict)
+        if not isinstance(createmeta, dict):
+            raise ValueError(f'The createmeta object should be a dict. Got: {type(createmeta)}')
         if len(createmeta.keys()) == 0:
             raise ValueError(
                 'No content in createmeta. Something is probably very wrong.')
-        assert 'fields' in createmeta, f'createmeta has no fields {createmeta.keys()}'
+        if not 'fields' in createmeta:
+            raise ValueError(f'The createmeta has no fields. Got: {createmeta.keys()}')
         self.cache.write_createmeta(issuetype_name, createmeta)
         return createmeta
 
