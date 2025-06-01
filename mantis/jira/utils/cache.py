@@ -116,7 +116,7 @@ class Cache:
     def write_issuetypes_to_system_cache(self, issuetypes: dict[str, Any]) -> None:
         self.write_to_system_cache("issuetypes.json", json.dumps(issuetypes))
 
-    def write_createmeta(self, issuetype_name: str, createmeta: dict[str, int | dict]) -> None:
+    def write_createmeta(self, issuetype_name: str, createmeta: dict[str, int | list[dict[str, Any]]]) -> None:
         filename = f"createmeta_{issuetype_name.lower()}.json"
         self._write(self.createmeta, filename, json.dumps(createmeta))
 

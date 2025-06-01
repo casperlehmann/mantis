@@ -218,7 +218,7 @@ class JiraSystemConfigLoader:
         self.cache.write_issuetypes_to_system_cache(issuetypes)
         return issuetypes
 
-    def get_createmeta(self, issuetype_name: str, force_skip_cache: bool = False) -> dict[str, list[dict[str, Any]]]:
+    def get_createmeta(self, issuetype_name: str, force_skip_cache: bool = False) -> dict[str, int | list[dict[str, Any]]]:
         if not self.client._no_read_cache or force_skip_cache:
             from_cache = self.cache.get_createmeta_from_cache(issuetype_name)
             if from_cache:
