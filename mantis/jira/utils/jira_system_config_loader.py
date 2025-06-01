@@ -120,6 +120,7 @@ class MetaModelFactory(ABC):
 
 
 class CreatemetaModelFactory(MetaModelFactory):
+    process = 'createmeta'
     ignored_non_meta_field = {
         "statuscategorychangedate",
         "components",
@@ -128,12 +129,12 @@ class CreatemetaModelFactory(MetaModelFactory):
 
     def __init__(self, metadata: Dict[str, Any]):
         super().__init__(metadata)
-        self.process = 'createmeta'
         assert isinstance(self.meta_fields, list), f'CreatemetaModelFactory.meta_fields should be of type list. Got: {type(self.meta_fields)}'
         self.create_model()
 
 
 class EditmetaModelFactory(MetaModelFactory):
+    process = 'editmeta'
     ignored_non_meta_field = {
         "statuscategorychangedate",
         "components",
@@ -144,7 +145,6 @@ class EditmetaModelFactory(MetaModelFactory):
 
     def __init__(self, metadata: Dict[str, Any]):
         super().__init__(metadata)
-        self.process = 'editmeta'
         assert isinstance(self.meta_fields, dict), f'EditmetaModelFactory.meta_fields should be of type dict. Got: {type(self.meta_fields)}'
         self.create_model()
 
