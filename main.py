@@ -160,6 +160,12 @@ if __name__ == '__main__':
             # print()
             # print("# issue.createmeta")
             # pprint(issue.createmeta) # IssueModel(key='ECS-2', id='10000', fields=MetaModelFields(assignee=...
+            
+            # print()
+            # print('# issue.createmeta (depends on issue.createmeta having been run):')
+            # pprint(issue._createmeta_factory.meta_fields)  # type: ignore
+            # [{'autoCompleteUrl': 'https://account.atlassian.net/rest/api/2/user/assignable/search?project=ECS&query=',
+            #  'fieldId': 'assignee', ...
     elif jira_options.action == 'get-project-keys':
         print ('Fetching from Jira...')
         resp = jira.system_config_loader.fetch_and_update_all_createmeta()
