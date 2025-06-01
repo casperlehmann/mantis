@@ -174,6 +174,12 @@ if __name__ == '__main__':
             # print()
             # print('dump editmeta')
             # pprint(issue.editmeta.model_dump()) # {'fields': {'assignee': None,
+
+            # print()
+            local_vars = ('ignore', 'header')
+            for draft_field_key in draft_data.keys():
+                if draft_field_key in local_vars:  # E.g. Local custom fields
+                    continue
     elif jira_options.action == 'get-project-keys':
         print ('Fetching from Jira...')
         resp = jira.system_config_loader.fetch_and_update_all_createmeta()
