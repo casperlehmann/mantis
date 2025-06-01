@@ -158,6 +158,8 @@ if __name__ == '__main__':
             # pprint(issue.editmeta) # IssueModel(key='ECS-2', id='10000', fields=MetaModelFields(summary=...
             
             # print()
+            # print("# issue.createmeta")
+            # pprint(issue.createmeta) # IssueModel(key='ECS-2', id='10000', fields=MetaModelFields(assignee=...
     elif jira_options.action == 'get-project-keys':
         print ('Fetching from Jira...')
         resp = jira.system_config_loader.fetch_and_update_all_createmeta()
