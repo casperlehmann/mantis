@@ -43,6 +43,52 @@ if __name__ == '__main__':
             title = issue.get_field('summary')
             print(f'[{key}] {title}')
             jira._no_read_cache = False
+    elif jira_options.action == 'compare':
+        for issue_key in jira_options.issues:
+            issue = jira.issues.get(key=issue_key)
+            print(f'Type: {issue.issuetype}')
+            draft_data = issue.draft.read_draft()
+
+            create_keys = issue.createmeta.fields.model_fields_set  # type: ignore
+            edit_keys = issue.editmeta.fields.model_fields_set  # type: ignore
+            editmeta_factory = issue._editmeta_factory.out_fields  # type: ignore
+            createmeta_factory = issue._createmeta_factory.out_fields  # type: ignore
+            issue_keys = set(issue.fields.keys())
+            draft_keys = draft_data.keys()
+            set_of_all_field_names = set(draft_keys).union(edit_keys).union(create_keys).union(issue_keys)
+            line = '----------'
+            print(20*' ', end=' ')
+            print(f'{'create':^10} {'edit':^10} {'issue':^10} {'draft':^10} {'creat_fact':^10} {'edit_fact':^10}')
+            for key in sorted(set_of_all_field_names):
+                try:
+                    from_create = '1' if issue.createmeta.fields.__getattribute__(key) else '0'  # type: ignore
+                except AttributeError:
+                    from_create = line
+                try:
+                    from_edit = '1' if issue.editmeta.fields.__getattribute__(key) else '0'  # type: ignore
+                except AttributeError:
+                    from_edit = line
+                try:
+                    from_issue = '1' if issue.fields[key] else '0'
+                except KeyError:
+                    from_issue = line
+                try:
+                    from_draft = '1' if draft_data[key] else '0'
+                except KeyError:
+                    from_draft = line
+                try:
+                    from_edit_fact = '1' if editmeta_factory[key] else '0'  # type: ignore
+                except KeyError:
+                    from_edit_fact = line
+                try:
+                    from_create_fact = '1' if createmeta_factory[key] else '0'  # type: ignore
+                except KeyError:
+                    from_create_fact = line
+                if from_edit == from_create == line: continue
+                print(f'{key[:20]:<20} {from_create:^10} {from_edit:^10} {from_issue:^10} {from_draft:^10} {from_create_fact:^10} {from_edit_fact:^10}')
+            print(20*' ', end=' ')
+            print(f'{'create':^10} {'edit':^10} {'issue':^10} {'draft':^10} {'creat_fact':^10} {'edit_fact':^10}')
+
     elif jira_options.action == 'get-project-keys':
         print ('Fetching from Jira...')
         resp = jira.system_config_loader.fetch_and_update_all_createmeta()
