@@ -180,6 +180,26 @@ if __name__ == '__main__':
             for draft_field_key in draft_data.keys():
                 if draft_field_key in local_vars:  # E.g. Local custom fields
                     continue
+                value_from_draft = draft_data.get(draft_field_key)
+                value_from_cache = issue.get_field(draft_field_key, 'N/A')
+                
+                if value_from_cache == 'N/A':
+                    # https://caspertestaccount.atlassian.net/rest/api/latest/issue/ecs-1?expand=editmeta
+                    # https://caspertestaccount.atlassian.net/rest/api/latest/issue/ecs-1/editmeta
+                    # return default
+                    # check editmeta
+                    target_editmeta = issue.editmeta_data['fields'][draft_field_key]
+                    target_editmeta_fields = issue.editmeta.fields.model_fields_set  # type: ignore
+                    # print('# target_editmeta_fields')
+                    # pprint(target_editmeta_fields)
+                    # {'hasDefaultValue': False,
+                    #     'key': 'parent',
+                    #     'name': 'Parent',
+                    #     'operations': ['set'],
+                    #     'required': False,
+                    #     'schema': {'system': 'parent', 'type': 'issuelink'}}
+                    # print(f'draft_field_key {draft_field_key} in editmeta: {draft_field_key in issue.editmeta_data['fields']}')  # True
+                    # print(f'draft_field_key {draft_field_key} in editmeta: {draft_field_key in issue.editmeta.fields.model_fields_set}')  # type: ignore  # True
     elif jira_options.action == 'get-project-keys':
         print ('Fetching from Jira...')
         resp = jira.system_config_loader.fetch_and_update_all_createmeta()
