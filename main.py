@@ -89,6 +89,51 @@ if __name__ == '__main__':
             print(20*' ', end=' ')
             print(f'{'create':^10} {'edit':^10} {'issue':^10} {'draft':^10} {'creat_fact':^10} {'edit_fact':^10}')
 
+    elif jira_options.action == 'view-key':
+        for issue_key in jira_options.issues:
+            issue = jira.issues.get(key=issue_key)
+            draft_data = issue.draft.read_draft()
+
+            create_keys = issue.createmeta.fields.model_fields_set  # type: ignore
+            edit_keys = issue.editmeta.fields.model_fields_set  # type: ignore
+            editmeta_factory = issue._editmeta_factory.out_fields  # type: ignore
+            createmeta_factory = issue._createmeta_factory.out_fields  # type: ignore
+
+            print(f'Type: {issue.issuetype}')
+
+            key = 'reporter'
+            print(f'Field: {key}')
+            try:
+                print(f'{'create':<10}', end=' ')
+                print(issue.createmeta.fields.__getattribute__(key))  # type: ignore
+            except AttributeError:
+                print()
+            try:
+                print(f'{'edit':<10}', end=' ')
+                print(issue.editmeta.fields.__getattribute__(key))  # type: ignore
+            except AttributeError:
+                print()
+            try:
+                print(f'{'issue':<10}', end=' ')
+                print(issue.fields[key])
+            except KeyError:
+                print()
+            try:
+                print(f'{'draft':<10}', end=' ')
+                print(draft_data[key])
+            except KeyError:
+                print()
+            try:
+                print(f'{'edit_fact':<10}', end=' ')
+                print(editmeta_factory[key])
+            except KeyError:
+                print()
+            try:
+                print(f'{'creat_fact':<10}', end=' ')
+                print(createmeta_factory[key])
+            except KeyError:
+                print()
+
     elif jira_options.action == 'get-project-keys':
         print ('Fetching from Jira...')
         resp = jira.system_config_loader.fetch_and_update_all_createmeta()
