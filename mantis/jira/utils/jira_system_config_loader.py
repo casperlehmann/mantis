@@ -71,15 +71,17 @@ class MetaModelFactory(ABC):
         """Iterate through meta object.
         
         Unified interface for createmeta (list[dict]) and editmeta (dict[str, dict])."""
-        for _meta_field_value in self.meta_fields:
-            if isinstance(_meta_field_value, dict):
-                assert isinstance(self.meta_fields, list)
-                yield _meta_field_value
-            elif isinstance(_meta_field_value, str):
-                assert isinstance(self.meta_fields, dict)
-                yield self.meta_fields[_meta_field_value]
-            else:
+        if isinstance(self.meta_fields, dict):
+            container = list(self.meta_fields.values())
+        elif isinstance(self.meta_fields, list):
+            container = self.meta_fields
+        else:
+            raise ValueError('Meta object has an unexpected schema.')
+                
+        for _meta_field_value in container:
+            if not isinstance(_meta_field_value, dict):
                 raise ValueError('Meta object has an unexpected schema.')
+            yield _meta_field_value
     
     def _create_fields_model(self) -> type[BaseModel]:
         for meta_field_value in self._iter_meta_fields:
