@@ -38,7 +38,7 @@ if __name__ == '__main__':
             }
             resp = issue.update_field(data)
             jira._no_read_cache = True
-            issue = jira.issues.get(key=issue_key)
+            issue = jira.issues.get(key=issue_key, force_skip_cache=True)
             key = issue.get('key', 'N/A')
             title = issue.get_field('summary')
             print(f'[{key}] {title}')
