@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 import json
 
 from pathlib import Path
@@ -14,11 +15,12 @@ if TYPE_CHECKING:
     from mantis.jira.utils import Cache
 
 
-class MetaModelFactory:
+class MetaModelFactory(ABC):
     # Fields created by Jira that are present in the issue json, but cannot
     # be set by the user. These are overwritten in sub-classes.
     ignored_non_meta_field: set[str] = set()
 
+    @abstractmethod
     def __init__(self, metadata: dict[str, Any]):
         self.out_fields: dict[str, Any] = {}
         self.getters: dict[str, str] = {}
