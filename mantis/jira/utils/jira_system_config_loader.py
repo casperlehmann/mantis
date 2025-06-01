@@ -26,7 +26,9 @@ class MetaModelFactory(ABC):
         self.getters: dict[str, str] = {}
         self.attributes: list[str] = []
         self.metadata = metadata
-        assert "fields" in metadata.keys(), f"'fields' not in createmeta.keys: {metadata.keys()}"
+        if "fields" not in metadata.keys():
+            raise ValueError(
+                f'The provided data "metadata" does not contain a keys named "fields". Got: {metadata.keys()}')
         self.meta_fields: list[dict[str, Any]] | dict[str, dict[str, Any]] = metadata["fields"]
 
     def keys(self) -> KeysView[str]:
