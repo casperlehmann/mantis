@@ -51,3 +51,6 @@ markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
     "serial",
 ]
+
+[tool.mypy]
+plugins = ['pydantic.mypy']
