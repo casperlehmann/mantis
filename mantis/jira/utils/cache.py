@@ -19,6 +19,7 @@ class Cache:
         self.issues.mkdir(exist_ok=True)
         self.system.mkdir(exist_ok=True)
         self.createmeta.mkdir(exist_ok=True)
+        self.createmeta_schemas.mkdir(exist_ok=True)
         self.editmeta.mkdir(exist_ok=True)
 
     def invalidate(self) -> None:
@@ -29,6 +30,7 @@ class Cache:
         self.issues.mkdir(exist_ok=True)
         self.system.mkdir(exist_ok=True)
         self.createmeta.mkdir(exist_ok=True)
+        self.createmeta_schemas.mkdir(exist_ok=True)
         self.editmeta.mkdir(exist_ok=True)
 
     @property
@@ -46,6 +48,10 @@ class Cache:
     @property
     def createmeta(self) -> Path:
         return self.system / "createmeta"
+
+    @property
+    def createmeta_schemas(self) -> Path:
+        return self.system / "createmeta_schemas"
 
     @property
     def editmeta(self) -> Path:
