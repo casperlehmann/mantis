@@ -255,8 +255,6 @@ class JiraSystemConfigLoader:
         assert isinstance(data, dict)
         self.cache.write_createmeta(issuetype_name, data)
         return data        
-        fields = CreatemetaModelFactory(self.client, issuetype_name)#, f'issuetype_name: {issuetype_name}'
-        return fields.make(data)
 
 
     def compile_plugins(self) -> None:
