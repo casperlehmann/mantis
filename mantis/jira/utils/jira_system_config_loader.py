@@ -272,6 +272,8 @@ class JiraSystemConfigLoader:
 
         for issuetype in nested_issuetypes:
             data = self._update_single_createmeta(issuetype)
+            # Run CreatemetaModelFactory to dump schemas
+            fields = CreatemetaModelFactory(data, issuetype['name'], self.client)
         return self.client.issues.load_allowed_types()
 
     def _update_single_createmeta(self, issuetype: dict[str, Any]) -> dict[str, Any]:
