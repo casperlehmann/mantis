@@ -139,8 +139,9 @@ class CreatemetaModelFactory(MetaModelFactory):
         "timespent",
     }
 
-    def __init__(self, metadata: Dict[str, Any]):
+    def __init__(self, metadata: Dict[str, Any], issuetype_name: str):
         super().__init__(metadata)
+        self.issuetype_name = issuetype_name
         if isinstance(self.meta_fields, dict):
             raise ValueError('CreatemetaModelFactory.meta_fields should be of type list. '
                              'Got dict. Did you accidentally pass be an "editmeta"?')
@@ -188,7 +189,7 @@ class JiraSystemConfigLoader:
         if not metadata:
             raise CacheMissException(f"{issuetype_name}")
         assert isinstance(metadata, dict)
-        fields = CreatemetaModelFactory(metadata)
+        fields = CreatemetaModelFactory(metadata, issuetype_name)
         loaded = fields.make(data)
         assert loaded.key == issue_id  # type: ignore
         print(loaded.key)  # type: ignore
@@ -344,7 +345,7 @@ class Inspector:
             if not metadata:
                 raise CacheMissException(f"{issuetype}")
             assert isinstance(metadata, dict)
-            d[issuetype] = CreatemetaModelFactory(metadata)
+            d[issuetype] = CreatemetaModelFactory(metadata, issuetype)
         return d
 
     @staticmethod
