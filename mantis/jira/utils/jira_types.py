@@ -121,6 +121,8 @@ class JiraIssueFieldSchema(BaseModel):
                 return list[Any]
         elif simple_type is SchemaType.array:
             return list[Any]
+        elif (isinstance(self.alias_schema, SchemaCustomCustomid)
+            and simple_type is SchemaType.array):
             return list[Any]
         elif simple_type in (
             SchemaType.issuetype,
