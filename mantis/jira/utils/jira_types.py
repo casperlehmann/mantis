@@ -37,35 +37,51 @@ class ItemsType(Enum):
 
 
 class _Schema(BaseModel):
+    """The data type of the field.
+     
+    A 'JsonTypeBean' object. See docs for details:
+    https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issue-fields/#api-rest-api-2-field-get
+    """
     type: SchemaType
 
 
 class _SchemaHasSystem(_Schema):
+    """Name of the field, if it is a system field.
+    
+    If the field is a system field, the name of the field.
+    https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issue-fields/#api-rest-api-2-field-get-response
+    """
     system: str
 
 
 class _SchemaHasItems(_Schema):
+    """When the data type is an array, this specifies the type of field items within the array."""
     items: ItemsType
 
 
 class _SchemaHasCustomCustomid(_Schema):
+    """If the field is a custom field, this holds the URI and custom ID (int64)."""
     custom: str
     customId: int
 
 
 class SchemaSystem(_SchemaHasSystem):
+    """A component of the SchemaUnion type."""
     pass
 
 
 class SchemaItemsSystem(_SchemaHasSystem, _SchemaHasItems):
+    """A component of the SchemaUnion type."""
     pass
 
 
 class SchemaCustomCustomid(_SchemaHasCustomCustomid):
+    """A component of the SchemaUnion type."""
     pass
 
 
 class SchemaItemsCustomCustomid(_SchemaHasCustomCustomid, _SchemaHasItems):
+    """A component of the SchemaUnion type."""
     pass
 
 
@@ -75,6 +91,7 @@ SchemaUnion = Union[
 
 
 class JiraIssueFieldSchema(BaseModel):
+    """The data schema for the field."""
     required: bool
     alias_schema: SchemaUnion = Field(alias="schema")
     name: str
