@@ -1,6 +1,6 @@
 import datetime
 from enum import Enum
-from typing import Any, Optional, Union
+from typing import Any, Optional
 from pydantic import BaseModel, Field
 from tests.data import CacheData
 data = CacheData().ecs_1
@@ -85,9 +85,9 @@ class SchemaItemsCustomCustomid(_SchemaHasCustomCustomid, _SchemaHasItems):
     pass
 
 
-SchemaUnion = Union[
-    SchemaSystem, SchemaItemsSystem, SchemaCustomCustomid, SchemaItemsCustomCustomid
-]
+
+# The union of all schema types.
+SchemaUnion = SchemaSystem | SchemaItemsSystem | SchemaCustomCustomid | SchemaItemsCustomCustomid
 
 
 class JiraIssueFieldSchema(BaseModel):
