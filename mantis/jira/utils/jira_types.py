@@ -26,6 +26,10 @@ class SchemaType(Enum):
     user = "user"
     # 'comments-page' is editmeta only:
     comments_page = "comments-page"
+    number = "number"
+    option = "option"
+    priority = "priority"
+    timetracking = "timetracking"
 
 
 class ItemsType(Enum):
@@ -128,6 +132,10 @@ class JiraIssueFieldSchema(BaseModel):
             SchemaType.user,
             SchemaType.team,
             SchemaType.comments_page,
+            SchemaType.number,
+            SchemaType.option,
+            SchemaType.priority,
+            SchemaType.timetracking,
         ):
             return Any
         raise ValueError(
