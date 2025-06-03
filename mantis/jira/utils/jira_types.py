@@ -119,6 +119,9 @@ class JiraIssueFieldSchema(BaseModel):
             else:
                 # Todo
                 return list[Any]
+        elif simple_type is SchemaType.array:
+            return list[Any]
+            return list[Any]
         elif simple_type in (
             SchemaType.issuetype,
             SchemaType.issuerestriction,
