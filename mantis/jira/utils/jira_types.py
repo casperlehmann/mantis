@@ -105,9 +105,9 @@ class JiraIssueFieldSchema(BaseModel):
     @property
     def schema_as_python_type(self) -> Any:
         simple_type = self.alias_schema.type
-        if simple_type is SchemaType.string:
+        if simple_type == SchemaType.string.value:
             return str
-        elif simple_type is SchemaType.date:
+        elif simple_type == SchemaType.date.value:
             return datetime.date
         elif (
             isinstance(self.alias_schema, _SchemaHasItems)
@@ -124,7 +124,7 @@ class JiraIssueFieldSchema(BaseModel):
         elif (isinstance(self.alias_schema, SchemaCustomCustomid)
             and simple_type is SchemaType.array):
             return list[Any]
-        elif simple_type in (
+        elif simple_type in ([_.value for _ in (
             SchemaType.issuetype,
             SchemaType.issuerestriction,
             SchemaType.issuelink,
@@ -133,7 +133,7 @@ class JiraIssueFieldSchema(BaseModel):
             SchemaType.user,
             SchemaType.team,
             SchemaType.comments_page,
-        ):
+        )]):
             return Any
         raise ValueError(
             f"No valid Python type implemented for {self.name} (type: {self.alias_schema.type})."
