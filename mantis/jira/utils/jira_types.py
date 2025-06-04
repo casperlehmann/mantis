@@ -16,16 +16,21 @@ class Operation(Enum):
 class SchemaType(Enum):
     any = "any"
     array = "array"
+    # 'comments-page' is editmeta only:
+    comments_page = "comments-page"
     date = "date"
     issuelink = "issuelink"
     issuerestriction = "issuerestriction"
     issuetype = "issuetype"
+    number = "number"
+    option = "option"
+    priority = "priority"
     project = "project"
     string = "string"
+    system = "system"
     team = "team"
+    timetracking = "timetracking"
     user = "user"
-    # 'comments-page' is editmeta only:
-    comments_page = "comments-page"
 
 
 class ItemsType(Enum):
@@ -125,14 +130,22 @@ class JiraIssueFieldSchema(BaseModel):
             and simple_type is SchemaType.array):
             return list[Any]
         elif simple_type in ([_.value for _ in (
-            SchemaType.issuetype,
-            SchemaType.issuerestriction,
-            SchemaType.issuelink,
             SchemaType.any,
-            SchemaType.project,
-            SchemaType.user,
-            SchemaType.team,
+            SchemaType.array,
             SchemaType.comments_page,
+            SchemaType.date,
+            SchemaType.issuelink,
+            SchemaType.issuerestriction,
+            SchemaType.issuetype,
+            SchemaType.number,
+            SchemaType.option,
+            SchemaType.priority,
+            SchemaType.project,
+            SchemaType.string,
+            SchemaType.system,
+            SchemaType.team,
+            SchemaType.timetracking,
+            SchemaType.user,
         )]):
             return Any
         raise ValueError(
