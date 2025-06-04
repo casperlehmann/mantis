@@ -148,6 +148,9 @@ class JiraIssueFieldSchema(BaseModel):
             SchemaType.user,
         )]):
             return Any
+        if isinstance(simple_type, str):
+            print (f'Unmatched simple_type: {[simple_type]}')
+            return Any
         raise ValueError(
             f"No valid Python type implemented for {self.name} (type: {self.alias_schema.type})."
         )
