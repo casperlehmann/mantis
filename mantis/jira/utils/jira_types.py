@@ -114,21 +114,25 @@ class JiraIssueFieldSchema(BaseModel):
             return str
         elif simple_type == SchemaType.date.value:
             return datetime.date
-        elif (
-            isinstance(self.alias_schema, _SchemaHasItems)
-            and simple_type is SchemaType.array
-        ):
-            item_type = self.alias_schema.items
-            if item_type is ItemsType.string:
-                return list[str]
+        elif simple_type == SchemaType.array.value:
+            if (isinstance(self.alias_schema, _SchemaHasItems)):
+                item_type = self.alias_schema.items
+                if item_type is ItemsType.string:
+                    return list[str]
+                else:
+                    # Todo
+                    return list[Any]
+            elif isinstance(self.alias_schema, SchemaCustomCustomid):
+                    return list[Any]
+            elif isinstance(self.alias_schema, SchemaSystem):
+                    return list[Any]
             else:
-                # Todo
-                return list[Any]
-        elif simple_type is SchemaType.array:
-            return list[Any]
-        elif (isinstance(self.alias_schema, SchemaCustomCustomid)
-            and simple_type is SchemaType.array):
-            return list[Any]
+                raise ValueError(f'Schema is an array, but has no items or custom: "{self.name}". Type: {self.alias_schema} | {type(self.alias_schema).__name__:<20}')
+        elif simple_type != SchemaType.array.value and isinstance(self.alias_schema, _SchemaHasItems):
+            raise ValueError(f'Schema has items, but is not an array: "{self.name}". Type: {self.alias_schema} | {SchemaType.array}')
+        elif isinstance(self.alias_schema, SchemaCustomCustomid):
+            return Any
+        
         elif simple_type in ([_.value for _ in (
             SchemaType.any,
             SchemaType.array,
