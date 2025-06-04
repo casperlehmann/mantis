@@ -42,7 +42,7 @@ class _Schema(BaseModel):
     A 'JsonTypeBean' object. See docs for details:
     https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issue-fields/#api-rest-api-2-field-get
     """
-    type: SchemaType
+    type: SchemaType | str
 
 
 class _SchemaHasSystem(_Schema):
