@@ -134,13 +134,11 @@ class TestJiraIssues:
                 {"id": '2', "name": "Task", 'scope': {'project': {'id': '10000'}}}
             ]
         }
-        fake_jira.system_config_loader.get_issuetypes = (
-            lambda *args, **kwargs: cached_issuetypes
-        )
-        fake_jira.issues = JiraIssues(fake_jira)
-        assert fake_jira.issues._allowed_types is None
-        assert fake_jira.issues.allowed_types == ["Bug", "Task"], f'Unexpected allowed types: {fake_jira.issues._allowed_types}'
-        assert fake_jira.issues._allowed_types
+        with patch('mantis.jira.utils.jira_system_config_loader.JiraSystemConfigLoader.get_issuetypes', return_value=cached_issuetypes):
+            fake_jira.issues = JiraIssues(fake_jira)
+            assert fake_jira.issues._allowed_types is None
+            assert fake_jira.issues.allowed_types == ["Bug", "Task"], f'Unexpected allowed types: {fake_jira.issues._allowed_types}'
+            assert fake_jira.issues._allowed_types
 
     def test_jira_issues_get_does_write_to_cache(self, fake_jira: JiraClient, requests_mock):
         assert fake_jira.cache.get_issue("ECS-1") is None
