@@ -1,6 +1,6 @@
 import datetime
 from enum import Enum
-from typing import Any, Optional, Union
+from typing import Any, Optional
 from pydantic import BaseModel, Field
 from tests.data import CacheData
 data = CacheData().ecs_1
@@ -16,16 +16,21 @@ class Operation(Enum):
 class SchemaType(Enum):
     any = "any"
     array = "array"
+    # 'comments-page' is editmeta only:
+    comments_page = "comments-page"
     date = "date"
     issuelink = "issuelink"
     issuerestriction = "issuerestriction"
     issuetype = "issuetype"
+    number = "number"
+    option = "option"
+    priority = "priority"
     project = "project"
     string = "string"
+    system = "system"
     team = "team"
+    timetracking = "timetracking"
     user = "user"
-    # 'comments-page' is editmeta only:
-    comments_page = "comments-page"
 
 
 class ItemsType(Enum):
@@ -42,7 +47,7 @@ class _Schema(BaseModel):
     A 'JsonTypeBean' object. See docs for details:
     https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issue-fields/#api-rest-api-2-field-get
     """
-    type: SchemaType
+    type: SchemaType | str
 
 
 class _SchemaHasSystem(_Schema):
@@ -85,9 +90,9 @@ class SchemaItemsCustomCustomid(_SchemaHasCustomCustomid, _SchemaHasItems):
     pass
 
 
-SchemaUnion = Union[
-    SchemaSystem, SchemaItemsSystem, SchemaCustomCustomid, SchemaItemsCustomCustomid
-]
+
+# The union of all schema types.
+SchemaUnion = SchemaSystem | SchemaItemsSystem | SchemaCustomCustomid | SchemaItemsCustomCustomid
 
 
 class JiraIssueFieldSchema(BaseModel):
@@ -105,30 +110,51 @@ class JiraIssueFieldSchema(BaseModel):
     @property
     def schema_as_python_type(self) -> Any:
         simple_type = self.alias_schema.type
-        if simple_type is SchemaType.string:
+        if simple_type == SchemaType.string.value:
             return str
-        elif simple_type is SchemaType.date:
+        elif simple_type == SchemaType.date.value:
             return datetime.date
-        elif (
-            isinstance(self.alias_schema, _SchemaHasItems)
-            and simple_type is SchemaType.array
-        ):
-            item_type = self.alias_schema.items
-            if item_type is ItemsType.string:
-                return list[str]
+        elif simple_type == SchemaType.array.value:
+            if (isinstance(self.alias_schema, _SchemaHasItems)):
+                item_type = self.alias_schema.items
+                if item_type is ItemsType.string:
+                    return list[str]
+                else:
+                    # Todo
+                    return list[Any]
+            elif isinstance(self.alias_schema, SchemaCustomCustomid):
+                    return list[Any]
+            elif isinstance(self.alias_schema, SchemaSystem):
+                    return list[Any]
             else:
-                # Todo
-                return list[Any]
-        elif simple_type in (
-            SchemaType.issuetype,
-            SchemaType.issuerestriction,
-            SchemaType.issuelink,
+                raise ValueError(f'Schema is an array, but has no items or custom: "{self.name}". Type: {self.alias_schema} | {type(self.alias_schema).__name__:<20}')
+        elif simple_type != SchemaType.array.value and isinstance(self.alias_schema, _SchemaHasItems):
+            raise ValueError(f'Schema has items, but is not an array: "{self.name}". Type: {self.alias_schema} | {SchemaType.array}')
+        elif isinstance(self.alias_schema, SchemaCustomCustomid):
+            return Any
+        
+        elif simple_type in ([_.value for _ in (
             SchemaType.any,
-            SchemaType.project,
-            SchemaType.user,
-            SchemaType.team,
+            SchemaType.array,
             SchemaType.comments_page,
-        ):
+            SchemaType.date,
+            SchemaType.issuelink,
+            SchemaType.issuerestriction,
+            SchemaType.issuetype,
+            SchemaType.number,
+            SchemaType.option,
+            SchemaType.priority,
+            SchemaType.project,
+            SchemaType.string,
+            SchemaType.system,
+            SchemaType.team,
+            SchemaType.timetracking,
+            SchemaType.user,
+        )]):
+            return Any
+
+        if isinstance(simple_type, str):
+            print (f'Unmatched simple_type: {[simple_type]}')
             return Any
         raise ValueError(
             f"No valid Python type implemented for {self.name} (type: {self.alias_schema.type})."
