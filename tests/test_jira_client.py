@@ -87,3 +87,11 @@ class TestJiraClient:
         captured = capsys.readouterr()
         assert captured.out == ("test_auth failed for unknown reasons.\n")
         assert captured.err == ""
+
+    def test_jql_auto_complete_returns_json(self, fake_jira: JiraClient, requests_mock):
+        url = f'{fake_jira.api_url}/jql/autocompletedata/suggestions?fieldName=reporter&fieldValue=Marcus'
+        accountId = CacheData().placeholder_account['accountId']
+        return_value = {'results': [{'value': accountId, 'displayName': '<b>Marcus</b> Aurelius - <b>marcus</b>@rome.gov'}]}
+        requests_mock.get(url, json=return_value)
+        raw_auto_complete = fake_jira.jql_auto_complete('reporter', 'Marcus')
+        assert raw_auto_complete == return_value
