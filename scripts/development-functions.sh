@@ -70,6 +70,7 @@ anonymize_test_data() {
 update_test_data() {
     cp -rf drafts/ tests/data/drafts
     cp -rf .jira_cache/* tests/data/jira_cache/
+    cp -rf plugins/ tests/data/plugins
     format_test_data
     anonymize_test_data
 }
