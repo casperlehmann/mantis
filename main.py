@@ -27,6 +27,14 @@ if __name__ == '__main__':
             title = issue.get_field('summary')
             print(f'[{key}] {title}')
         jira._no_read_cache = False
+    elif jira_options.action == 'validate-values':
+        search_name = 'Casper'
+        search_field = 'reporter'
+
+        search_name = 'Commerce'
+        search_field = 'cf[10001]' # 'team'
+
+        validated_input = jira.validate_input(search_field, search_name)
     elif jira_options.action == 'update-issue':
         for issue_key in jira_options.issues:
             issue = jira.issues.get(key=issue_key)
