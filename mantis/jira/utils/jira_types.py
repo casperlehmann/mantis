@@ -154,9 +154,6 @@ class JiraIssueFieldSchema(BaseModel):
             return Any
 
         if isinstance(simple_type, str):
-            raise ValueError(f"B string: {simple_type} | '{self.name:<20}' | {type(self.alias_schema).__name__:<20}) | alias_schema.type: {self.alias_schema.type:<20} | (self.alias_schema: {self.alias_schema}).")
-
-        if isinstance(simple_type, str):
             print (f'Unmatched simple_type: {[simple_type]}')
             return Any
         raise ValueError(
