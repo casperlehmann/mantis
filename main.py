@@ -145,6 +145,85 @@ if __name__ == '__main__':
     elif jira_options.action == 'auto-complete':
         auto_complete_suggestions = jira.auto_complete.get_suggestions("reporter", 'Casper')
         print(auto_complete_suggestions)
+    elif jira_options.action == 'update-issue-from-draft':
+        for issue_key in jira_options.issues:
+            issue = jira.issues.get(key=issue_key)
+            draft_data = issue.draft.read_draft()
+            # print (f'draft_data: {draft_data}'.strip()) # draft_data: Implement payment processing functionality for the checkout system.
+            # print('# issue.issuetype:')
+            # pprint(issue.issuetype) # 'Epic'
+
+            # print()
+            # print('# issue.editmeta:')
+            # pprint(issue.editmeta) # IssueModel(key='ECS-2', id='10000', fields=MetaModelFields(summary=...
+            
+            # print()
+            # print("# issue.createmeta")
+            # pprint(issue.createmeta) # IssueModel(key='ECS-2', id='10000', fields=MetaModelFields(assignee=...
+            
+            # print()
+            # print('# issue.createmeta (depends on issue.createmeta having been run):')
+            # pprint(issue._createmeta_factory.meta_fields)  # type: ignore
+            # [{'autoCompleteUrl': 'https://account.atlassian.net/rest/api/2/user/assignable/search?project=ECS&query=',
+            #  'fieldId': 'assignee', ...
+
+            # print()
+            # print("# issue.editmeta")
+            # pprint(issue.editmeta) # IssueModel(key='ECS-2', id='10000', fields=MetaModelFields(summary='
+
+            # print()
+            # print('dump editmeta')
+            # pprint(issue.editmeta.model_dump()) # {'fields': {'assignee': None,
+
+            # print()
+            local_vars = ('ignore', 'header')
+            for draft_field_key in draft_data.keys():
+                if draft_field_key in local_vars:  # E.g. Local custom fields
+                    continue
+                value_from_draft = draft_data.get(draft_field_key)
+                value_from_cache = issue.get_field(draft_field_key, 'N/A')
+                
+                if value_from_cache == 'N/A':
+                    # https://caspertestaccount.atlassian.net/rest/api/latest/issue/ecs-1?expand=editmeta
+                    # https://caspertestaccount.atlassian.net/rest/api/latest/issue/ecs-1/editmeta
+                    # return default
+                    # check editmeta
+                    target_editmeta = issue.editmeta_data['fields'][draft_field_key]
+                    target_editmeta_fields = issue.editmeta.fields.model_fields_set  # type: ignore
+                    # print('# target_editmeta_fields')
+                    # pprint(target_editmeta_fields)
+                    # {'hasDefaultValue': False,
+                    #     'key': 'parent',
+                    #     'name': 'Parent',
+                    #     'operations': ['set'],
+                    #     'required': False,
+                    #     'schema': {'system': 'parent', 'type': 'issuelink'}}
+                    # print(f'draft_field_key {draft_field_key} in editmeta: {draft_field_key in issue.editmeta_data['fields']}')  # True
+                    # print(f'draft_field_key {draft_field_key} in editmeta: {draft_field_key in issue.editmeta.fields.model_fields_set}')  # type: ignore  # True
+
+                print (f"# {issue_key} ", end="")
+                extracted_from_cache = value_from_cache if isinstance(value_from_cache, str) else value_from_cache.get('displayName') or value_from_cache.get('name')
+                if not value_from_draft:  # E.g. parent not set
+                    print(f'| Not set   ({draft_field_key}) is None')
+                elif not value_from_draft or value_from_draft == 'None' or value_from_draft == {draft_field_key: None}:
+                    print(f'| None      ({draft_field_key}) is None')
+                elif value_from_cache == 'N/A':
+                    print(f'| Miss      ({draft_field_key}) not found in cache')
+                elif not value_from_cache:
+                    print(f'| Null      ({draft_field_key}) in cache but None')
+                elif value_from_cache == 'None':
+                    print(f'| Field     ({draft_field_key}) not found in cache')
+                elif value_from_draft == value_from_cache:
+                    print(f"| Same      ({draft_field_key}): {value_from_draft}")
+                elif value_from_draft == extracted_from_cache:
+                    print(f"| Extracted ({draft_field_key}): {value_from_draft}")
+                else:
+                    print(f"| Different: {draft_field_key}:")
+                    print(f"{value_from_draft}")
+                    pprint(value_from_cache)
+                    input()
+            assert draft_data.content == f'{draft_data.to_dict().get('content', '')}'
+            assert not draft_data.content.startswith(f'# {draft_data.get('summary', '')}\n\n')
     elif jira_options.action == 'get-project-keys':
         print ('Fetching from Jira...')
         resp = jira.system_config_loader.fetch_and_update_all_createmeta()
