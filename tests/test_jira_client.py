@@ -124,3 +124,12 @@ class TestJiraClient:
             '- E-Commerce Checkin Team (abc124)\n')
         assert captured.err == ""
 
+    def test_validate_input_returns_no_suggestions(self, fake_jira: JiraClient, requests_mock, capsys):
+        url = f'{fake_jira.api_url}/jql/autocompletedata/suggestions?fieldName=cf[10001]&fieldValue=Freeloader'
+        return_value: dict[str, list[dict]] = {'results': []}
+        requests_mock.get(url, json=return_value)
+        validation_suggestions = fake_jira.validate_input('cf[10001]', 'Freeloader')
+        assert len(validation_suggestions) == 0
+        captured = capsys.readouterr()
+        assert captured.out == 'No results found for cf[10001] "Freeloader"\n'
+        assert captured.err == ""
