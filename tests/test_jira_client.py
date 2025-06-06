@@ -103,7 +103,6 @@ class TestJiraClient:
         return_value = {'results': [entry]}
         requests_mock.get(url, json=return_value)
         validation_suggestions = fake_jira.validate_input('cf[10001]', 'Commerce')
-        assert validation_suggestions is not None
         assert validation_suggestions[0].display_name == 'E-Commerce Checkout Team'
         captured = capsys.readouterr()
         assert captured.out == ('Single match found for cf[10001] "Commerce":\n- E-Commerce Checkout Team (abc123)\n')

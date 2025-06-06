@@ -219,12 +219,12 @@ class JiraClient:
             exit()
         return response.json()
 
-    def validate_input(self, search_field: str, search_name: str) -> None | list[Suggestion]:
+    def validate_input(self, search_field: str, search_name: str) -> list[Suggestion]:
         """Validate user input by checking it against the JQL auto-complete endpoint."""
         auto_complete_suggestions = self.auto_complete.get_suggestions(search_field, search_name)
         if len(auto_complete_suggestions) == 0:
             print(f'No results found for {search_field} "{search_name}"')
-            return None
+            return []
         elif len(auto_complete_suggestions) == 1:
             suggestion = auto_complete_suggestions[0]
             print(f'Single match found for {search_field} "{search_name}":')
