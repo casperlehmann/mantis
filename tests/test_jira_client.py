@@ -97,14 +97,39 @@ class TestJiraClient:
         raw_auto_complete = fake_jira.jql_auto_complete('reporter', 'Marcus')
         assert raw_auto_complete == return_value
 
-    def test_validate_input_returns_suggestion(self, fake_jira: JiraClient, requests_mock, capsys):
+    def test_validate_input_returns_one_suggestion(self, fake_jira: JiraClient, requests_mock, capsys):
         url = f'{fake_jira.api_url}/jql/autocompletedata/suggestions?fieldName=cf[10001]&fieldValue=Commerce'
         entry = {'value': 'abc123', 'displayName': 'E-<b>Commerce</b> Checkout Team'}
         return_value = {'results': [entry]}
         requests_mock.get(url, json=return_value)
         validation_suggestions = fake_jira.validate_input('cf[10001]', 'Commerce')
-        assert validation_suggestions is not None
         assert validation_suggestions[0].display_name == 'E-Commerce Checkout Team'
         captured = capsys.readouterr()
         assert captured.out == ('Single match found for cf[10001] "Commerce":\n- E-Commerce Checkout Team (abc123)\n')
+        assert captured.err == ""
+
+    def test_validate_input_returns_multiple_suggestion(self, fake_jira: JiraClient, requests_mock, capsys):
+        url = f'{fake_jira.api_url}/jql/autocompletedata/suggestions?fieldName=cf[10001]&fieldValue=Commerce'
+        entry_1 = {'value': 'abc123', 'displayName': 'E-<b>Commerce</b> Checkout Team'}
+        entry_2 = {'value': 'abc124', 'displayName': 'E-<b>Commerce</b> Checkin Team'}
+        return_value = {'results': [entry_1, entry_2]}
+        requests_mock.get(url, json=return_value)
+        validation_suggestions = fake_jira.validate_input('cf[10001]', 'Commerce')
+        assert validation_suggestions[0].display_name == 'E-Commerce Checkout Team'
+        assert validation_suggestions[1].display_name == 'E-Commerce Checkin Team'
+        captured = capsys.readouterr()
+        assert captured.out == (
+            'Ambiguous result:\n'
+            '- E-Commerce Checkout Team (abc123)\n'
+            '- E-Commerce Checkin Team (abc124)\n')
+        assert captured.err == ""
+
+    def test_validate_input_returns_no_suggestions(self, fake_jira: JiraClient, requests_mock, capsys):
+        url = f'{fake_jira.api_url}/jql/autocompletedata/suggestions?fieldName=cf[10001]&fieldValue=Freeloader'
+        return_value: dict[str, list[dict]] = {'results': []}
+        requests_mock.get(url, json=return_value)
+        validation_suggestions = fake_jira.validate_input('cf[10001]', 'Freeloader')
+        assert len(validation_suggestions) == 0
+        captured = capsys.readouterr()
+        assert captured.out == 'No results found for cf[10001] "Freeloader"\n'
         assert captured.err == ""
