@@ -56,7 +56,7 @@ class JiraIssue:
         # TODO: Createmeta is shared for all issues of the same type.
         #       Should be loaded into a shared object, not one per Issue
         if self._createmeta_factory is None:
-            self._createmeta_factory = CreatemetaModelFactory(self.createmeta_data)
+            self._createmeta_factory = CreatemetaModelFactory(self.createmeta_data, self.issuetype, self.client)
         return self._createmeta_factory.make(self.data)
 
     @property
@@ -67,7 +67,7 @@ class JiraIssue:
     def editmeta(self) -> BaseModel:
         # TODO: Consider if editmeta itself should be cached insted.
         if self._editmeta_factory is None:
-            self._editmeta_factory = EditmetaModelFactory(self.editmeta_data)
+            self._editmeta_factory = EditmetaModelFactory(self.editmeta_data, self.issuetype, self.client)
         return self._editmeta_factory.make(self.data)
 
     @property

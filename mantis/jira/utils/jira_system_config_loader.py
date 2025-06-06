@@ -32,7 +32,11 @@ class MetaModelFactory(ABC):
         if "fields" not in metadata.keys():
             raise ValueError(
                 f'The provided data "metadata" does not contain a keys named "fields". Got: {metadata.keys()}')
-    
+
+    @abstractmethod
+    def _write_plugin(self):
+        pass
+
     @property
     def meta_fields(self) -> list[dict[str, Any]] | dict[str, dict[str, Any]]:
         return self.metadata["fields"]
@@ -135,8 +139,10 @@ class CreatemetaModelFactory(MetaModelFactory):
         "timespent",
     }
 
-    def __init__(self, metadata: Dict[str, Any]):
+    def __init__(self, metadata: Dict[str, Any], issuetype_name: str, client: "JiraClient", write_plugin=True):
         super().__init__(metadata)
+        self.client = client
+        self.issuetype_name = issuetype_name
         if isinstance(self.meta_fields, dict):
             raise ValueError('CreatemetaModelFactory.meta_fields should be of type list. '
                              'Got dict. Did you accidentally pass be an "editmeta"?')
@@ -144,6 +150,21 @@ class CreatemetaModelFactory(MetaModelFactory):
             raise TypeError(
                 f'CreatemetaModelFactory.meta_fields should be of type list. Got: {type(self.meta_fields)}')
         self.create_model()
+        if write_plugin:
+            self._write_plugin()
+
+    def _write_plugin(self):
+        schema = self.model.model_json_schema()
+        output_json_schema = self.client.cache.createmeta_schemas / f'{self.issuetype_name.lower()}.json'
+        output_plugin = self.client.plugins_dir / f'{self.issuetype_name.lower()}_createmeta.py'
+        with open(output_json_schema, 'w') as f:
+            json.dump(schema, f)
+        generate(
+            json.dumps(schema),
+            input_file_type=InputFileType.JsonSchema,
+            output=output_plugin,
+            output_model_type=DataModelType.PydanticV2BaseModel,
+        )
 
 
 class EditmetaModelFactory(MetaModelFactory):
@@ -156,8 +177,9 @@ class EditmetaModelFactory(MetaModelFactory):
         "environment"
     }
 
-    def __init__(self, metadata: Dict[str, Any]):
+    def __init__(self, metadata: Dict[str, Any], issuetype_name: str, client: "JiraClient", write_plugin=False):
         super().__init__(metadata)
+        self.issuetype_name = issuetype_name
         if isinstance(self.meta_fields, list):
             raise ValueError('EditmetaModelFactory.meta_fields should be of type dict. '
                              'Got list. Did you accidentally pass be a "createmeta"?')
@@ -165,6 +187,9 @@ class EditmetaModelFactory(MetaModelFactory):
             raise TypeError(
                 f'EditmetaModelFactory.meta_fields should be of type dict. Got: {type(self.meta_fields)}')
         self.create_model()
+
+    def _write_plugin(self):
+        pass
 
 
 class JiraSystemConfigLoader:
@@ -179,7 +204,7 @@ class JiraSystemConfigLoader:
         if not metadata:
             raise CacheMissException(f"{issuetype_name}")
         assert isinstance(metadata, dict)
-        fields = CreatemetaModelFactory(metadata)
+        fields = CreatemetaModelFactory(metadata, issuetype_name, self.client)
         loaded = fields.make(data)
         assert loaded.key == issue_id  # type: ignore
         print(loaded.key)  # type: ignore
@@ -242,6 +267,8 @@ class JiraSystemConfigLoader:
 
         for issuetype in nested_issuetypes:
             data = self._update_single_createmeta(issuetype)
+            # Run CreatemetaModelFactory to dump schemas
+            fields = CreatemetaModelFactory(data, issuetype['name'], self.client)
         return self.client.issues.load_allowed_types()
 
     def _update_single_createmeta(self, issuetype: dict[str, Any]) -> dict[str, Any]:
@@ -336,19 +363,20 @@ class Inspector:
             if not metadata:
                 raise CacheMissException(f"{issuetype}")
             assert isinstance(metadata, dict)
-            d[issuetype] = CreatemetaModelFactory(metadata)
+            d[issuetype] = CreatemetaModelFactory(metadata, issuetype, client)
         return d
 
     @staticmethod
     def get_editmeta_models(client: 'JiraClient', issue_keys: list[str]) -> dict[str, EditmetaModelFactory]:    
         d: dict[str, EditmetaModelFactory] = {}
         for issue_key in issue_keys:
-            metadata = client.issues.get(issue_key).editmeta
+            issue = client.issues.get(issue_key)
+            metadata = issue.editmeta
             if not metadata:
                 raise CacheMissException(f"{issue_key}")
             assert isinstance(metadata, dict)
             assert 'fields' in metadata.keys()
-            d[issue_key] = EditmetaModelFactory(metadata)
+            d[issue_key] = EditmetaModelFactory(metadata, issue.issuetype ,client)
         return d
 
     @classmethod
