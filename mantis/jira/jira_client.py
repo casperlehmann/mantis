@@ -5,6 +5,7 @@ import requests
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
+from mantis.jira.auto_complete import AutoComplete
 from mantis.jira.jira_issues import JiraIssues
 from mantis.jira.utils import Cache, JiraSystemConfigLoader
 
@@ -50,6 +51,7 @@ class JiraClient:
         self.plugins_dir.mkdir(exist_ok=True)
         self.system_config_loader = JiraSystemConfigLoader(self)
         self.issues = JiraIssues(self)
+        self.auto_complete = AutoComplete(self)
 
     @property
     def drafts_dir(self) -> Path:
@@ -201,7 +203,22 @@ class JiraClient:
             print (e.response.json() )
             exit()
         return True
-    
+
+    def jql_auto_complete(self, field_name: str, field_value: str) -> dict[str, Any]:
+        uri = f"jql/autocompletedata/suggestions"
+        query = {
+            'fieldName': field_name,
+            'fieldValue': field_value,
+        }
+        response = self._get(uri, query)
+        try:
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            print (e.response.reason )
+            print (e.response.json() )
+            exit()
+        return response.json()
+
     def test_auth(self) -> bool:
         try:
             user = self.get_current_user()
