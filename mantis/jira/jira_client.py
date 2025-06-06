@@ -5,6 +5,7 @@ import requests
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
+from mantis.jira.auto_complete import AutoComplete
 from mantis.jira.jira_issues import JiraIssues
 from mantis.jira.utils import Cache, JiraSystemConfigLoader
 
@@ -50,6 +51,7 @@ class JiraClient:
         self.plugins_dir.mkdir(exist_ok=True)
         self.system_config_loader = JiraSystemConfigLoader(self)
         self.issues = JiraIssues(self)
+        self.auto_complete = AutoComplete(self)
 
     @property
     def drafts_dir(self) -> Path:
