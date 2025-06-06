@@ -5,7 +5,7 @@ import requests
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from mantis.jira.auto_complete import AutoComplete
+from mantis.jira.auto_complete import AutoComplete, Suggestion
 from mantis.jira.jira_issues import JiraIssues
 from mantis.jira.utils import Cache, JiraSystemConfigLoader
 
@@ -218,6 +218,23 @@ class JiraClient:
             print (e.response.json() )
             exit()
         return response.json()
+
+    def validate_input(self, search_field: str, search_name: str) -> None | list[Suggestion]:
+        """Validate user input by checking it against the JQL auto-complete endpoint."""
+        auto_complete_suggestions = self.auto_complete.get_suggestions(search_field, search_name)
+        if len(auto_complete_suggestions) == 0:
+            print(f'No results found for {search_field} "{search_name}"')
+            return None
+        elif len(auto_complete_suggestions) == 1:
+            suggestion = auto_complete_suggestions[0]
+            print(f'Single match found for {search_field} "{search_name}":')
+            print(f'- {suggestion.display_name} ({suggestion.value})')
+            return [suggestion]
+        else:
+            print('Ambiguous result:')
+            for suggestion in auto_complete_suggestions:
+                print(f'- {suggestion.display_name} ({suggestion.value})')
+            return auto_complete_suggestions
 
     def test_auth(self) -> bool:
         try:

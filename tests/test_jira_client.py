@@ -4,6 +4,7 @@ import requests
 from unittest.mock import patch
 
 from mantis.jira import JiraClient
+from mantis.jira.auto_complete import Suggestion
 from tests.data import CacheData
 
 
@@ -86,4 +87,24 @@ class TestJiraClient:
                 fake_jira.test_auth()
         captured = capsys.readouterr()
         assert captured.out == ("test_auth failed for unknown reasons.\n")
+        assert captured.err == ""
+
+    def test_jql_auto_complete_returns_json(self, fake_jira: JiraClient, requests_mock):
+        url = f'{fake_jira.api_url}/jql/autocompletedata/suggestions?fieldName=reporter&fieldValue=Marcus'
+        accountId = CacheData().placeholder_account['accountId']
+        return_value = {'results': [{'value': accountId, 'displayName': '<b>Marcus</b> Aurelius - <b>marcus</b>@rome.gov'}]}
+        requests_mock.get(url, json=return_value)
+        raw_auto_complete = fake_jira.jql_auto_complete('reporter', 'Marcus')
+        assert raw_auto_complete == return_value
+
+    def test_validate_input_returns_suggestion(self, fake_jira: JiraClient, requests_mock, capsys):
+        url = f'{fake_jira.api_url}/jql/autocompletedata/suggestions?fieldName=cf[10001]&fieldValue=Commerce'
+        entry = {'value': 'abc123', 'displayName': 'E-<b>Commerce</b> Checkout Team'}
+        return_value = {'results': [entry]}
+        requests_mock.get(url, json=return_value)
+        validation_suggestions = fake_jira.validate_input('cf[10001]', 'Commerce')
+        assert validation_suggestions is not None
+        assert validation_suggestions[0].display_name == 'E-Commerce Checkout Team'
+        captured = capsys.readouterr()
+        assert captured.out == ('Single match found for cf[10001] "Commerce":\n- E-Commerce Checkout Team (abc123)\n')
         assert captured.err == ""
