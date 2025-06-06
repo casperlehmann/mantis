@@ -219,7 +219,7 @@ class JiraClient:
             exit()
         return response.json()
 
-    def validate_input(self, search_field: str, search_name: str) -> None | Suggestion | list[Suggestion]:
+    def validate_input(self, search_field: str, search_name: str) -> None | list[Suggestion]:
         """Validate user input by checking it against the JQL auto-complete endpoint."""
         auto_complete_suggestions = self.auto_complete.get_suggestions(search_field, search_name)
         if len(auto_complete_suggestions) == 0:
@@ -229,7 +229,7 @@ class JiraClient:
             suggestion = auto_complete_suggestions[0]
             print(f'Single match found for {search_field} "{search_name}":')
             print(f'- {suggestion.display_name} ({suggestion.value})')
-            return suggestion
+            return [suggestion]
         else:
             print('Ambiguous result:')
             for suggestion in auto_complete_suggestions:

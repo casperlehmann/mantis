@@ -104,5 +104,4 @@ class TestJiraClient:
         requests_mock.get(url, json=return_value)
         validation_suggestions = fake_jira.validate_input('cf[10001]', 'Commerce')
         assert validation_suggestions is not None
-        assert isinstance(validation_suggestions, Suggestion)
-        assert validation_suggestions.display_name == 'E-Commerce Checkout Team'
+        assert validation_suggestions[0].display_name == 'E-Commerce Checkout Team'
