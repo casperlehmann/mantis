@@ -97,7 +97,7 @@ class TestJiraClient:
         raw_auto_complete = fake_jira.jql_auto_complete('reporter', 'Marcus')
         assert raw_auto_complete == return_value
 
-    def test_validate_input_returns_suggestion(self, fake_jira: JiraClient, requests_mock, capsys):
+    def test_validate_input_returns_one_suggestion(self, fake_jira: JiraClient, requests_mock, capsys):
         url = f'{fake_jira.api_url}/jql/autocompletedata/suggestions?fieldName=cf[10001]&fieldValue=Commerce'
         entry = {'value': 'abc123', 'displayName': 'E-<b>Commerce</b> Checkout Team'}
         return_value = {'results': [entry]}
