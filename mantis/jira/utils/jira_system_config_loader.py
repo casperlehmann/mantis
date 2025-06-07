@@ -254,8 +254,7 @@ class JiraSystemConfigLoader:
         data: dict[str, Any] = self.client.get_createmeta(issuetype_id)
         assert isinstance(data, dict)
         self.cache.write_createmeta(issuetype_name, data)
-        return data        
-
+        return data
 
     def compile_plugins(self) -> None:
         for input_file in self.cache.iter_dir("createmeta"):
@@ -329,7 +328,7 @@ class Inspector:
         print_header_footer()
 
     @staticmethod
-    def get_createmeta_models(client: 'JiraClient') -> dict[str, CreatemetaModelFactory]:    
+    def get_createmeta_models(client: 'JiraClient') -> dict[str, CreatemetaModelFactory]:
         d: dict[str, CreatemetaModelFactory] = {}
         for issuetype in client.issues.allowed_types:
             metadata = client.cache.get_createmeta_from_cache(issuetype)
