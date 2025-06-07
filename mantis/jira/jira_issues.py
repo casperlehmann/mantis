@@ -115,6 +115,8 @@ class JiraIssue:
         if not (editmeta_schema or createmeta_schema):
             if key in self.non_meta_fields:
                 print(f'Expected: Field "{key}" cannot be set.')
+                createmeta_type = 'N/A'
+                editmeta_type = 'N/A'
             else:
                 raise ValueError(f'Field "{key}" is in neither createmeta nor editmeta schema.')
         elif not editmeta_schema:
