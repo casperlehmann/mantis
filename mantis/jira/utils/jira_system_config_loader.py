@@ -173,6 +173,7 @@ class EditmetaModelFactory(MetaModelFactory):
         self.create_model()
 
     def field_by_key(self, key: str, default: Any | None = None) -> Any | None:
+        assert isinstance(self.meta_fields, dict), 'Asserting to satisfy type checker.'
         return self.meta_fields.get(key, default)
 
 class JiraSystemConfigLoader:
