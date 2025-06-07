@@ -104,6 +104,22 @@ class JiraIssue:
 
     def update_field(self, data: dict[str, Any]) -> None:
         self.client.update_field(self.key, data)
+
+    def check_field(self, key: str) -> bool:
+        """Check the existance and status of a field in the issue."""
+        createmeta_schema = self.createmeta_factory.field_by_key(key)
+        editmeta_schema = self.editmeta_factory.field_by_key(key)
+        if not (editmeta_schema or createmeta_schema):
+            raise ValueError(f'Field "{key}" is in neither createmeta nor editmeta schema.')
+        elif not editmeta_schema:
+            raise ValueError(f'Field {key} is not in editmeta_schema.')
+        elif not createmeta_schema:
+            raise ValueError(f'Field {key} is not in createmeta_schema.')
+        else:
+            editmeta_type = editmeta_schema['schema']['type']
+            createmeta_type = createmeta_schema['schema']['type']
+        value_from_draft = self.draft.get(key, None)
+        value_from_cache = self.get_field(key)
     
 
 class JiraIssues:
