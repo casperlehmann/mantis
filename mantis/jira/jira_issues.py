@@ -22,6 +22,9 @@ class JiraIssue:
       then comparing with entered data while ensuring conformity
       with editmeta before pushing to upstream.
     """
+    
+    non_meta_fields = ('reporter', 'status')
+
     def __init__(self, client: "JiraClient", raw_data: dict[str, Any]) -> None:
         self.client = client
         self.data = raw_data
@@ -110,7 +113,10 @@ class JiraIssue:
         createmeta_schema = self.createmeta_factory.field_by_key(key)
         editmeta_schema = self.editmeta_factory.field_by_key(key)
         if not (editmeta_schema or createmeta_schema):
-            raise ValueError(f'Field "{key}" is in neither createmeta nor editmeta schema.')
+            if key in self.non_meta_fields:
+                print(f'Expected: Field "{key}" cannot be set.')
+            else:
+                raise ValueError(f'Field "{key}" is in neither createmeta nor editmeta schema.')
         elif not editmeta_schema:
             raise ValueError(f'Field {key} is not in editmeta_schema.')
         elif not createmeta_schema:
