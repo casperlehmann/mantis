@@ -34,7 +34,7 @@ class MetaModelFactory(ABC):
                 f'The provided data "metadata" does not contain a keys named "fields". Got: {metadata.keys()}')
 
     @abstractmethod
-    def field_by_key(self, key: str):
+    def field_by_key(self, key: str) -> Any | None:
         pass
 
     @property
@@ -149,7 +149,7 @@ class CreatemetaModelFactory(MetaModelFactory):
                 f'CreatemetaModelFactory.meta_fields should be of type list. Got: {type(self.meta_fields)}')
         self.create_model()
 
-    def field_by_key(self, key: str, default: Any | None = None):
+    def field_by_key(self, key: str, default: Any | None = None) -> Any | None:
         return next((item for item in self._iter_meta_fields if item.get('key') == key), default)
 
 class EditmetaModelFactory(MetaModelFactory):
@@ -172,7 +172,7 @@ class EditmetaModelFactory(MetaModelFactory):
                 f'EditmetaModelFactory.meta_fields should be of type dict. Got: {type(self.meta_fields)}')
         self.create_model()
 
-    def field_by_key(self, key: str, default: Any | None = None):
+    def field_by_key(self, key: str, default: Any | None = None) -> Any | None:
         return self.meta_fields.get(key, default)
 
 class JiraSystemConfigLoader:
