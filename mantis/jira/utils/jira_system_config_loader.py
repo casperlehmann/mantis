@@ -254,8 +254,7 @@ class JiraSystemConfigLoader:
         data: dict[str, Any] = self.client.get_createmeta(issuetype_id)
         assert isinstance(data, dict)
         self.cache.write_createmeta(issuetype_name, data)
-        return data        
-
+        return data
 
     def compile_plugins(self) -> None:
         for input_file in self.cache.iter_dir("createmeta"):
@@ -329,7 +328,7 @@ class Inspector:
         print_header_footer()
 
     @staticmethod
-    def get_createmeta_models(client: 'JiraClient') -> dict[str, CreatemetaModelFactory]:    
+    def get_createmeta_models(client: 'JiraClient') -> dict[str, CreatemetaModelFactory]:
         d: dict[str, CreatemetaModelFactory] = {}
         for issuetype in client.issues.allowed_types:
             metadata = client.cache.get_createmeta_from_cache(issuetype)
@@ -343,10 +342,10 @@ class Inspector:
     def get_editmeta_models(client: 'JiraClient', issue_keys: list[str]) -> dict[str, EditmetaModelFactory]:    
         d: dict[str, EditmetaModelFactory] = {}
         for issue_key in issue_keys:
-            metadata = client.issues.get(issue_key).editmeta
+            metadata = client.issues.get(issue_key).editmeta_data
             if not metadata:
                 raise CacheMissException(f"{issue_key}")
-            assert isinstance(metadata, dict)
+            assert isinstance(metadata, dict), f'Editmeta for {issue_key} is not a dict. Got: {type(metadata)}): {metadata}'
             assert 'fields' in metadata.keys()
             d[issue_key] = EditmetaModelFactory(metadata)
         return d
