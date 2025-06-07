@@ -82,6 +82,14 @@ class Draft:
         draft_data = self.remove_draft_header(draft_data)
         return draft_data
 
+    def iter_draft_field_keys(self):
+        local_vars = ('ignore', 'header')
+        draft_data = self.read_draft()
+        for draft_field_key in draft_data.keys():
+            if draft_field_key in local_vars:  # E.g. Local custom fields
+                continue
+            yield draft_field_key
+
     def get(self, key: str, default: Any = None) -> Any:
         local_vars = ('ignore', 'header')
         draft_data = self.read_draft()
