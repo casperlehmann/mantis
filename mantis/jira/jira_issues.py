@@ -118,7 +118,11 @@ class JiraIssue:
             else:
                 raise ValueError(f'Field "{key}" is in neither createmeta nor editmeta schema.')
         elif not editmeta_schema:
-            raise ValueError(f'Field {key} is not in editmeta_schema.')
+            if key in self.non_editmeta_fields:
+                editmeta_type = 'N/A'
+                createmeta_type = createmeta_schema['schema']['type']
+            else:
+                raise ValueError(f'Field {key} is not in editmeta_schema.')
         elif not createmeta_schema:
             raise ValueError(f'Field {key} is not in createmeta_schema.')
         else:
