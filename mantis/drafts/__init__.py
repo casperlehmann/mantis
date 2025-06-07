@@ -1,5 +1,5 @@
 import re
-from typing import Callable, TYPE_CHECKING
+from typing import Any, Callable, TYPE_CHECKING
 
 import frontmatter  # type: ignore
 
@@ -81,3 +81,8 @@ class Draft:
             draft_data = frontmatter.load(f)
         draft_data = self.remove_draft_header(draft_data)
         return draft_data
+
+    def get(self, key: str, default: Any = None) -> Any:
+        local_vars = ('ignore', 'header')
+        draft_data = self.read_draft()
+        return draft_data.get(key, default)
