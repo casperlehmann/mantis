@@ -24,6 +24,7 @@ class JiraIssue:
     """
     
     non_meta_fields = ('reporter', 'status')
+    non_editmeta_fields = ('project', 'reporter', 'status')
 
     def __init__(self, client: "JiraClient", raw_data: dict[str, Any]) -> None:
         self.client = client
