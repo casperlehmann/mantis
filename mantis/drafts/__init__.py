@@ -1,5 +1,5 @@
 import re
-from typing import Any, Callable, TYPE_CHECKING
+from typing import Any, Callable, TYPE_CHECKING, Generator
 
 import frontmatter  # type: ignore
 
@@ -82,7 +82,7 @@ class Draft:
         draft_data = self.remove_draft_header(draft_data)
         return draft_data
 
-    def iter_draft_field_items(self):
+    def iter_draft_field_items(self) -> Generator[tuple[str, Any], None, None]:
         local_vars = ('ignore', 'header')
         draft_data = self.read_draft()
         for draft_field_key in draft_data.keys():
@@ -90,7 +90,7 @@ class Draft:
                 continue
             yield draft_field_key, draft_data.get(draft_field_key)
 
-    def iter_draft_field_keys(self):
+    def iter_draft_field_keys(self) -> Generator[str, None, None]:
         local_vars = ('ignore', 'header')
         draft_data = self.read_draft()
         for draft_field_key in draft_data.keys():
