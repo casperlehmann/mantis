@@ -345,7 +345,7 @@ class Inspector:
             metadata = client.issues.get(issue_key).editmeta_data
             if not metadata:
                 raise CacheMissException(f"{issue_key}")
-            assert isinstance(metadata, dict)
+            assert isinstance(metadata, dict), f'Editmeta for {issue_key} is not a dict. Got: {type(metadata)}): {metadata}'
             assert 'fields' in metadata.keys()
             d[issue_key] = EditmetaModelFactory(metadata)
         return d
