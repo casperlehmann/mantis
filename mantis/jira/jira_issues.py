@@ -52,12 +52,16 @@ class JiraIssue:
         return self._createmeta_data
 
     @property
+    def createmeta_factory(self) -> CreatemetaModelFactory:
+        if self._createmeta_factory is None:
+            self._createmeta_factory = CreatemetaModelFactory(self.createmeta_data)
+        return self._createmeta_factory
+
+    @property
     def createmeta(self) -> BaseModel:
         # TODO: Createmeta is shared for all issues of the same type.
         #       Should be loaded into a shared object, not one per Issue
-        if self._createmeta_factory is None:
-            self._createmeta_factory = CreatemetaModelFactory(self.createmeta_data)
-        return self._createmeta_factory.make(self.data)
+        return self.createmeta_factory.make(self.data)
 
     @property
     def editmeta_data(self) -> dict[str, Any]:
