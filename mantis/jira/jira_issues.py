@@ -25,6 +25,7 @@ class JiraIssue:
     
     non_meta_fields = ('reporter', 'status')
     non_editmeta_fields = ('project', 'reporter', 'status')
+    non_createmeta_fields: tuple[str] = ('',)
 
     def __init__(self, client: "JiraClient", raw_data: dict[str, Any]) -> None:
         self.client = client
@@ -127,7 +128,11 @@ class JiraIssue:
             else:
                 raise ValueError(f'Field {key} is not in editmeta_schema.')
         elif not createmeta_schema:
-            raise ValueError(f'Field {key} is not in createmeta_schema.')
+            if key in self.non_createmeta_fields:
+                createmeta_type = 'N/A'
+                editmeta_type = editmeta_schema['schema']['type']
+            else:
+                raise ValueError(f'Field {key} is not in createmeta_schema.')
         else:
             editmeta_type = editmeta_schema['schema']['type']
             createmeta_type = createmeta_schema['schema']['type']
