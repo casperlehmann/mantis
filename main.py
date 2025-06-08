@@ -184,6 +184,10 @@ if __name__ == '__main__':
         jira.warmup()
     elif jira_options.action == 'attempt':
         jira.system_config_loader.attempt(issue_id = "ECS-1", issuetype_name = "epic")
+    elif jira_options.action == 'get-field-names':
+        for issue_key in jira_options.issues:
+            names = jira.get_field_names(issue_key)
+            print(names)
     else:
         print(f'Action {jira_options.action} not recognized')
 
