@@ -114,29 +114,6 @@ class JiraIssue:
     def update_field(self, data: dict[str, Any]) -> None:
         self.client.update_field(self.key, data)
 
-    def check_field(self, key: str) -> bool:
-        """Check the existance and status of a field in the issue."""
-        field = IssueField(self, key)
-        editmeta_type, createmeta_type = field._extract_meta_types(key)
-
-        value_from_draft = self.draft.get(key, None)
-        # if value_from_draft is None:
-        #     raise ValueError(f'value_from_cache is None for key: {key}')
-
-        name_from_cache = field._extract_name_from_cached_object(editmeta_type, createmeta_type)
-
-        if key in self.editmeta_data["fields"]:
-            auto_complete_url = self.editmeta_data["fields"][key].get("autoCompleteUrl")
-        else:
-            auto_complete_url = None
-
-        type_part = f'(type: {editmeta_type}):'
-        if name_from_cache == value_from_draft:
-            update_part = f'{str(name_from_cache)}'
-        else:
-            update_part = f'{name_from_cache} -> {value_from_draft}'
-        print(f'{key:<10} {type_part:<20} {update_part:<35} (autoCompleteUrl: {auto_complete_url})')
-        return True
 
 class JiraIssues:
     _allowed_types: list[str] | None = None
