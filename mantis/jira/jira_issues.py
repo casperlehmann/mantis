@@ -169,7 +169,11 @@ class JiraIssue:
         else:
             editmeta_type = editmeta_schema['schema']['type']
             createmeta_type = createmeta_schema['schema']['type']
+
         value_from_draft = self.draft.get(key, None)
+        # if value_from_draft is None:
+        #     raise ValueError(f'value_from_cache is None for key: {key}')
+
         name_from_cache = self._extract_name_from_cached_object(key, editmeta_type, createmeta_type)
 
         if key in self.editmeta_data["fields"]:
