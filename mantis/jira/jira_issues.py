@@ -162,10 +162,15 @@ class JiraIssue:
         else:
             name_from_cache = value_from_cache.get('name')
 
-        if name_from_cache == value_from_draft:
-            print(f'{key} (type: {editmeta_type}): {name_from_cache}')
+        if key in self.editmeta_data["fields"]:
+            auto_complete_url = self.editmeta_data["fields"][key].get("autoCompleteUrl")
         else:
-            print(f'{key} (type: {editmeta_type}): {name_from_cache} -> {value_from_draft}')
+            auto_complete_url = None
+
+        if name_from_cache == value_from_draft:
+            print(f'{key} (type: {editmeta_type}): {name_from_cache} (autoCompleteUrl: {auto_complete_url})')
+        else:
+            print(f'{key} (type: {editmeta_type}): {name_from_cache} -> {value_from_draft} (autoCompleteUrl: {auto_complete_url})')
         return True
 
 class JiraIssues:
