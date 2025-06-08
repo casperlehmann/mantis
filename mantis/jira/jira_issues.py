@@ -34,6 +34,7 @@ class JiraIssue:
         self.draft = Draft(self.client, self)
         self._createmeta_factory: CreatemetaModelFactory | None = None
         self._editmeta_factory: EditmetaModelFactory | None = None
+        self._editmeta: Any | None = None
 
     def get(self, key: str, default: Any = None) -> Any:
         return self.data.get(key, default) or default
@@ -81,7 +82,9 @@ class JiraIssue:
 
     @property
     def editmeta(self) -> BaseModel:
-        return self.editmeta_factory.make(self.data)
+        if not self._editmeta:
+            self._editmeta = self.editmeta_factory.make(self.data)
+        return self._editmeta
 
     @property
     def fields(self) -> dict[str, Any]:
