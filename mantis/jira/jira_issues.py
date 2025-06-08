@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any
 from pydantic import BaseModel
 
 from mantis.drafts import Draft
+from mantis.jira.issue_field import IssueField
 from mantis.jira.utils.jira_system_config_loader import CreatemetaModelFactory, EditmetaModelFactory
 
 if TYPE_CHECKING:
@@ -113,91 +114,16 @@ class JiraIssue:
     def update_field(self, data: dict[str, Any]) -> None:
         self.client.update_field(self.key, data)
 
-    def _extract_name_from_cached_object(self, key: str, editmeta_type: str, createmeta_type: str):
-        value_from_cache = self.get_field(key)
-        if value_from_cache is None:
-            #raise ValueError(f'value_from_cache is None for key: {key}')
-            name_from_cache = None
-        elif key in ('project', 'status'):
-            name_from_cache = value_from_cache['name']
-        elif isinstance(value_from_cache, str):
-            assert editmeta_type == 'string' and createmeta_type == 'string'
-            name_from_cache = value_from_cache
-        elif editmeta_type == 'user' or createmeta_type == 'user':
-            name_from_cache = value_from_cache.get('displayName')
-        elif editmeta_type in ('issuelink', 'issuetype'):
-            name_from_cache = 'issuelink/issuetype'
-        elif editmeta_type == 'N/A' and createmeta_type == 'N/A':
-            raise ValueError(
-                f"Both editmeta_type and createmeta_type are N/A. This field ('{key}') probably shouldn't be updated like this. editmeta_type: '{editmeta_type}'. createmeta_type: '{createmeta_type}'.")
-        elif editmeta_type == 'N/A' or createmeta_type == 'N/A':
-            raise NotImplementedError(f"editmeta_type == 'N/A' or createmeta_type == 'N/A' for '{key}'")
-        else:
-            name_from_cache = value_from_cache.get('name')
-        return name_from_cache
-
-    def _extract_meta_types(self, key: str):
-        createmeta_schema = self.createmeta_factory.field_by_key(key)
-        editmeta_schema = self.editmeta_factory.field_by_key(key)
-        if key == 'project':
-            # project is not in createmeta because createmeta is specific to the project, e.g.:
-            # issue/createmeta/ECS/issuetypes/10001
-            createmeta_type = '?'
-            editmeta_type = '?'
-        elif key == 'parent':
-            # PUT /rest/api/3/issue/{issueIdOrKey}
-            # parent not in https://caspertestaccount.atlassian.net/rest/api/latest/issue/ecs-1/editmeta
-            # But docs say it's fine: https://caspertestaccount.atlassian.net/rest/api/latest/issue/ecs-1/
-            # The parent field may be set by key or ID. For standard issue types, the parent may be removed by setting update.parent.set.none to true. 
-            createmeta_type = '?'
-            editmeta_type = '?'
-        elif key == 'reporter':
-            # reporter might be disabled:
-            # https://community.developer.atlassian.com/t/issue-createmeta-projectidorkey-issuetypes-issuetypeid-does-not-send-the-reporter-field-anymore/80973
-            createmeta_type = 'user'
-            editmeta_type = 'user'
-            # Assign issue endpoint:
-            # https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/#api-rest-api-3-issue-issueidorkey-assignee-put
-        elif key == 'status':
-            # To transition an issue, POST tp the dedicated endpoint
-            # https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/#api-rest-api-3-issue-issueidorkey-transitions-post
-            # https://caspertestaccount.atlassian.net/rest/api/latest/issue/ecs-1/transitions
-            # To list transitions, send a GET request
-            # https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/#api-rest-api-3-issue-issueidorkey-transitions-get
-            createmeta_type = '?'
-            editmeta_type = '?'
-        elif not (editmeta_schema or createmeta_schema):
-            if key in self.non_meta_fields:
-                raise ValueError(f'Expected: Field "{key}" cannot be set.')
-            else:
-                raise ValueError(f'Field "{key}" is in neither createmeta nor editmeta schema.')
-        elif not editmeta_schema:
-            assert createmeta_schema
-            if key in self.non_editmeta_fields:
-                editmeta_type = 'N/A'
-                createmeta_type = createmeta_schema['schema']['type']
-            else:
-                raise ValueError(f'Field {key} is not in editmeta_schema.')
-        elif not createmeta_schema:
-            if key in self.non_createmeta_fields:
-                createmeta_type = 'N/A'
-                editmeta_type = editmeta_schema['schema']['type']
-            else:
-                raise ValueError(f'Field {key} is not in createmeta_schema.')
-        else:
-            editmeta_type = editmeta_schema['schema']['type']
-            createmeta_type = createmeta_schema['schema']['type']
-        return editmeta_type, createmeta_type
-
     def check_field(self, key: str) -> bool:
         """Check the existance and status of a field in the issue."""
-        editmeta_type, createmeta_type = self._extract_meta_types(key)
+        field = IssueField(self, key)
+        editmeta_type, createmeta_type = field._extract_meta_types(key)
 
         value_from_draft = self.draft.get(key, None)
         # if value_from_draft is None:
         #     raise ValueError(f'value_from_cache is None for key: {key}')
 
-        name_from_cache = self._extract_name_from_cached_object(key, editmeta_type, createmeta_type)
+        name_from_cache = field._extract_name_from_cached_object(editmeta_type, createmeta_type)
 
         if key in self.editmeta_data["fields"]:
             auto_complete_url = self.editmeta_data["fields"][key].get("autoCompleteUrl")
