@@ -153,6 +153,7 @@ class IssueField:
                 self.key: self.payload
             }
         }
+        self.issue.update_field(data)
     
     @property
     def updated(self) -> bool:
