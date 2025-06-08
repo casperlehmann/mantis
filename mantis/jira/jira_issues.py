@@ -151,16 +151,23 @@ class JiraIssue:
             # But docs say it's fine: https://caspertestaccount.atlassian.net/rest/api/latest/issue/ecs-1/
             # The parent field may be set by key or ID. For standard issue types, the parent may be removed by setting update.parent.set.none to true. 
             pass
+        elif key == 'reporter':
+            # reporter might be disabled:
+            # https://community.developer.atlassian.com/t/issue-createmeta-projectidorkey-issuetypes-issuetypeid-does-not-send-the-reporter-field-anymore/80973
+            createmeta_type = 'user'
+            editmeta_type = 'user'
+            # Assign issue endpoint:
+            # https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/#api-rest-api-3-issue-issueidorkey-assignee-put
+        elif key == 'status':
+            # To transition an issue, POST tp the dedicated endpoint
+            # https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/#api-rest-api-3-issue-issueidorkey-transitions-post
+            # https://caspertestaccount.atlassian.net/rest/api/latest/issue/ecs-1/transitions
+            # To list transitions, send a GET request
+            # https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/#api-rest-api-3-issue-issueidorkey-transitions-get
+            createmeta_type = '?'
+            editmeta_type = '?'
         elif not (editmeta_schema or createmeta_schema):
-            if key == 'reporter':
-                # reporter might be disabled:
-                # https://community.developer.atlassian.com/t/issue-createmeta-projectidorkey-issuetypes-issuetypeid-does-not-send-the-reporter-field-anymore/80973
-                createmeta_type = 'user'
-                editmeta_type = 'user'
-            elif key == 'status':
-                createmeta_type = '?'
-                editmeta_type = '?'
-            elif key in self.non_meta_fields:
+            if key in self.non_meta_fields:
                 raise ValueError(f'Expected: Field "{key}" cannot be set.')
             else:
                 raise ValueError(f'Field "{key}" is in neither createmeta nor editmeta schema.')
