@@ -145,6 +145,10 @@ if __name__ == '__main__':
     elif jira_options.action == 'auto-complete':
         auto_complete_suggestions = jira.auto_complete.get_suggestions("reporter", 'Casper')
         print(auto_complete_suggestions)
+    elif jira_options.action == 'check-field':
+        for issue_key in jira_options.issues:
+            issue = jira.issues.get(key=issue_key)
+            issue.check_field('assignee')
     elif jira_options.action == 'get-project-keys':
         print ('Fetching from Jira...')
         resp = jira.system_config_loader.fetch_and_update_all_createmeta()

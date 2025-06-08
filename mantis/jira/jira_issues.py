@@ -22,6 +22,11 @@ class JiraIssue:
       then comparing with entered data while ensuring conformity
       with editmeta before pushing to upstream.
     """
+    
+    non_meta_fields = ('reporter', 'status')
+    non_editmeta_fields = ('project', 'reporter', 'status')
+    non_createmeta_fields: tuple[str] = ('',)
+
     def __init__(self, client: "JiraClient", raw_data: dict[str, Any]) -> None:
         self.client = client
         self.data = raw_data
@@ -52,23 +57,31 @@ class JiraIssue:
         return self._createmeta_data
 
     @property
+    def createmeta_factory(self) -> CreatemetaModelFactory:
+        if self._createmeta_factory is None:
+            self._createmeta_factory = CreatemetaModelFactory(self.createmeta_data)
+        return self._createmeta_factory
+
+    @property
     def createmeta(self) -> BaseModel:
         # TODO: Createmeta is shared for all issues of the same type.
         #       Should be loaded into a shared object, not one per Issue
-        if self._createmeta_factory is None:
-            self._createmeta_factory = CreatemetaModelFactory(self.createmeta_data)
-        return self._createmeta_factory.make(self.data)
+        return self.createmeta_factory.make(self.data)
 
     @property
     def editmeta_data(self) -> dict[str, Any]:
         return self.client.get_editmeta(self.key)
 
     @property
-    def editmeta(self) -> BaseModel:
-        # TODO: Consider if editmeta itself should be cached insted.
+    def editmeta_factory(self) -> EditmetaModelFactory:
+        # TODO: Consider if editmeta itself should be cached instead.
         if self._editmeta_factory is None:
             self._editmeta_factory = EditmetaModelFactory(self.editmeta_data)
-        return self._editmeta_factory.make(self.data)
+        return self._editmeta_factory
+
+    @property
+    def editmeta(self) -> BaseModel:
+        return self.editmeta_factory.make(self.data)
 
     @property
     def fields(self) -> dict[str, Any]:
@@ -96,7 +109,69 @@ class JiraIssue:
 
     def update_field(self, data: dict[str, Any]) -> None:
         self.client.update_field(self.key, data)
-    
+
+    def check_field(self, key: str) -> bool:
+        """Check the existance and status of a field in the issue."""
+        createmeta_schema = self.createmeta_factory.field_by_key(key)
+        editmeta_schema = self.editmeta_factory.field_by_key(key)
+        if not (editmeta_schema or createmeta_schema):
+            if key == 'reporter':
+                # reporter might be disabled:
+                # https://community.developer.atlassian.com/t/issue-createmeta-projectidorkey-issuetypes-issuetypeid-does-not-send-the-reporter-field-anymore/80973
+                createmeta_type = 'user'
+                editmeta_type = 'user'
+            elif key == 'status':
+                createmeta_type = '?'
+                editmeta_type = '?'
+            elif key in self.non_meta_fields:
+                raise ValueError(f'Expected: Field "{key}" cannot be set.')
+            else:
+                raise ValueError(f'Field "{key}" is in neither createmeta nor editmeta schema.')
+        elif not editmeta_schema:
+            assert createmeta_schema
+            if key in self.non_editmeta_fields:
+                editmeta_type = 'N/A'
+                createmeta_type = createmeta_schema['schema']['type']
+            else:
+                raise ValueError(f'Field {key} is not in editmeta_schema.')
+        elif not createmeta_schema:
+            if key in self.non_createmeta_fields:
+                createmeta_type = 'N/A'
+                editmeta_type = editmeta_schema['schema']['type']
+            else:
+                raise ValueError(f'Field {key} is not in createmeta_schema.')
+        else:
+            editmeta_type = editmeta_schema['schema']['type']
+            createmeta_type = createmeta_schema['schema']['type']
+        value_from_draft = self.draft.get(key, None)
+        value_from_cache = self.get_field(key)
+        if key in ('project', 'status'):
+            name_from_cache = value_from_cache['name']
+        elif isinstance(value_from_cache, str):
+            assert editmeta_type == 'string' and createmeta_type == 'string'
+            name_from_cache = value_from_cache
+        elif editmeta_type == 'user' or createmeta_type == 'user':
+            name_from_cache = value_from_cache.get('displayName')
+        elif editmeta_type in ('issuelink', 'issuetype'):
+            name_from_cache = 'issuelink/issuetype'
+        elif editmeta_type == 'N/A' and createmeta_type == 'N/A':
+            raise ValueError(
+                f"Both editmeta_type and createmeta_type are N/A. This field ('{key}') probably shouldn't be updated like this. editmeta_type: '{editmeta_type}'. createmeta_type: '{createmeta_type}'.")
+        elif editmeta_type == 'N/A' or createmeta_type == 'N/A':
+            raise NotImplementedError(f"editmeta_type == 'N/A' or createmeta_type == 'N/A' for '{key}'")
+        else:
+            name_from_cache = value_from_cache.get('name')
+
+        if key in self.editmeta_data["fields"]:
+            auto_complete_url = self.editmeta_data["fields"][key].get("autoCompleteUrl")
+        else:
+            auto_complete_url = None
+
+        if name_from_cache == value_from_draft:
+            print(f'{key} (type: {editmeta_type}): {name_from_cache} (autoCompleteUrl: {auto_complete_url})')
+        else:
+            print(f'{key} (type: {editmeta_type}): {name_from_cache} -> {value_from_draft} (autoCompleteUrl: {auto_complete_url})')
+        return True
 
 class JiraIssues:
     _allowed_types: list[str] | None = None
