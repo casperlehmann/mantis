@@ -1,8 +1,10 @@
 import json
 from typing import Any
 
-from .update_projects_cache_response import update_projects_cache_response
-from .get_issuetypes_response import get_issuetypes_response
+from tests.data.get_issuetypes_response import get_issuetypes_response
+from tests.data.get_names import get_names
+from tests.data.update_projects_cache_response import update_projects_cache_response
+
 
 class CacheData:
     @property
@@ -77,3 +79,8 @@ class CacheData:
             "emailAddress": "marcus@rome.gov",
             "displayName": "Marcus Aurelius",
         }
+
+    @property
+    def get_names(self) -> dict[str, Any]:
+        # issue/ECS-2?expand=names
+        return get_names
