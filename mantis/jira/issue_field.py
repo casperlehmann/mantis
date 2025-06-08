@@ -33,52 +33,80 @@ class IssueField:
         else:
             return value_from_cache.get('name')
 
-    def _extract_meta_types(self, key: str) -> tuple[str, str]:
-        createmeta_schema = self.issue.createmeta_factory.field_by_key(key)
-        editmeta_schema = self.issue.editmeta_factory.field_by_key(key)
-        if key == 'project':
+    @property
+    def editmeta_schema(self):
+        return self.issue.editmeta_factory.field_by_key(self.key)
+
+    @property
+    def editmeta_type(self):
+        if self.key == 'project':
             # project is not in createmeta because createmeta is specific to the project, e.g.:
             # issue/createmeta/ECS/issuetypes/10001
-            createmeta_type = '?'
-            editmeta_type = '?'
-        elif key == 'parent':
+            return '?'
+        elif self.key == 'parent':
             # PUT /rest/api/3/issue/{issueIdOrKey}
             # parent not in https://caspertestaccount.atlassian.net/rest/api/latest/issue/ecs-1/editmeta
             # But docs say it's fine: https://caspertestaccount.atlassian.net/rest/api/latest/issue/ecs-1/
             # The parent field may be set by key or ID. For standard issue types, the parent may be removed by setting update.parent.set.none to true. 
-            createmeta_type = '?'
-            editmeta_type = '?'
-        elif key == 'reporter':
+            return '?'
+        elif self.key == 'reporter':
             # reporter might be disabled:
             # https://community.developer.atlassian.com/t/issue-createmeta-projectidorkey-issuetypes-issuetypeid-does-not-send-the-reporter-field-anymore/80973
-            createmeta_type = 'user'
-            editmeta_type = 'user'
+            return 'user'
             # Assign issue endpoint:
             # https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/#api-rest-api-3-issue-issueidorkey-assignee-put
-        elif key == 'status':
+        elif self.key == 'status':
             # To transition an issue, POST tp the dedicated endpoint
             # https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/#api-rest-api-3-issue-issueidorkey-transitions-post
             # https://caspertestaccount.atlassian.net/rest/api/latest/issue/ecs-1/transitions
             # To list transitions, send a GET request
             # https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/#api-rest-api-3-issue-issueidorkey-transitions-get
-            createmeta_type = '?'
-            editmeta_type = '?'
-        elif not (editmeta_schema or createmeta_schema):
-            if key in self.issue.non_meta_fields:
-                raise ValueError(f'Expected: Field "{key}" cannot be set.')
+            return '?'
+        elif self.editmeta_schema:
+            return self.editmeta_schema['schema']['type']
+        else:
+            if self.key in self.issue.non_editmeta_fields:
+                return 'N/A'
             else:
-                raise ValueError(f'Field "{key}" is in neither createmeta nor editmeta schema.')
-        elif not editmeta_schema:
-            assert createmeta_schema
-            if key in self.issue.non_editmeta_fields:
-                editmeta_type = 'N/A'
-                createmeta_type = createmeta_schema['schema']['type']
+                raise ValueError(f'Field {self.key} is not in editmeta_schema.')
+
+    @property
+    def createmeta_schema(self):
+        return self.issue.createmeta_factory.field_by_key(self.key)
+
+    @property
+    def createmeta_type(self):
+        if self.key == 'project':
+            # project is not in createmeta because createmeta is specific to the project, e.g.:
+            # issue/createmeta/ECS/issuetypes/10001
+            return '?'
+        elif self.key == 'parent':
+            # PUT /rest/api/3/issue/{issueIdOrKey}
+            # parent not in https://caspertestaccount.atlassian.net/rest/api/latest/issue/ecs-1/editmeta
+            # But docs say it's fine: https://caspertestaccount.atlassian.net/rest/api/latest/issue/ecs-1/
+            # The parent field may be set by key or ID. For standard issue types, the parent may be removed by setting update.parent.set.none to true. 
+            return '?'
+        elif self.key == 'reporter':
+            # reporter might be disabled:
+            # https://community.developer.atlassian.com/t/issue-createmeta-projectidorkey-issuetypes-issuetypeid-does-not-send-the-reporter-field-anymore/80973
+            return 'user'
+            # Assign issue endpoint:
+            # https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/#api-rest-api-3-issue-issueidorkey-assignee-put
+        elif self.key == 'status':
+            # To transition an issue, POST tp the dedicated endpoint
+            # https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/#api-rest-api-3-issue-issueidorkey-transitions-post
+            # https://caspertestaccount.atlassian.net/rest/api/latest/issue/ecs-1/transitions
+            # To list transitions, send a GET request
+            # https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/#api-rest-api-3-issue-issueidorkey-transitions-get
+            return '?'
+        elif self.createmeta_schema:
+            return self.createmeta_schema['schema']['type']
+        else:
+            if self.key in self.issue.non_createmeta_fields:
+                return 'N/A'
             else:
-                raise ValueError(f'Field {key} is not in editmeta_schema.')
-        elif not createmeta_schema:
-            if key in self.issue.non_createmeta_fields:
-                createmeta_type = 'N/A'
-                editmeta_type = editmeta_schema['schema']['type']
+                raise ValueError(f'Field {self.key} is not in createmeta_schema.')
+
             else:
                 raise ValueError(f'Field {key} is not in createmeta_schema.')
         else:
