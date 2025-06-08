@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 
 if TYPE_CHECKING:
@@ -10,7 +10,7 @@ class IssueField:
         self.issue = issue
         self.key = key
 
-    def _extract_name_from_cached_object(self):
+    def _extract_name_from_cached_object(self) -> Any | None:
         value_from_cache = self.issue.get_field(self.key)
         assert self.editmeta_type == self.createmeta_type
         if value_from_cache is None:
@@ -34,11 +34,11 @@ class IssueField:
             return value_from_cache.get('name')
 
     @property
-    def editmeta_schema(self):
+    def editmeta_schema(self) -> Any | None:
         return self.issue.editmeta_factory.field_by_key(self.key)
 
     @property
-    def editmeta_type(self):
+    def editmeta_type(self) -> str:
         if self.key == 'project':
             # project is not in createmeta because createmeta is specific to the project, e.g.:
             # issue/createmeta/ECS/issuetypes/10001
@@ -71,11 +71,11 @@ class IssueField:
                 raise ValueError(f'Field {self.key} is not in editmeta_schema.')
 
     @property
-    def createmeta_schema(self):
+    def createmeta_schema(self) -> Any | None:
         return self.issue.createmeta_factory.field_by_key(self.key)
 
     @property
-    def createmeta_type(self):
+    def createmeta_type(self) -> str:
         if self.key == 'project':
             # project is not in createmeta because createmeta is specific to the project, e.g.:
             # issue/createmeta/ECS/issuetypes/10001
@@ -108,7 +108,7 @@ class IssueField:
                 raise ValueError(f'Field {self.key} is not in createmeta_schema.')
 
     @property
-    def value_from_draft(self):
+    def value_from_draft(self) -> Any | None:
         return self.issue.draft.get(self.key, None)
 
     def check_field(self) -> bool:
@@ -136,18 +136,18 @@ class IssueField:
         return True
 
     @property
-    def payload(self):
+    def payload(self) -> dict[str, Any] | str | Any:
         if self.editmeta_type in {'string'}:
-            pass
+            return self.value_from_draft
         elif self.editmeta_type in {'issuetype', 'user'}:
-            pass
+            return {'id': self.value_from_draft}
         elif self.editmeta_type in {'team'}:
             raise NotImplementedError('Convert team name to id.')
             return self.value_from_draft
         else:
             raise NotImplementedError(f'Type: {self.editmeta_type}')
 
-    def update_field_from_draft(self):
+    def update_field_from_draft(self) -> None:
         data = {
             "fields": {
                 self.key: self.payload

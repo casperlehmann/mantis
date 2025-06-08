@@ -115,7 +115,7 @@ class JiraIssue:
         self.client.update_field(self.key, data)
 
 
-    def reload_issue(self):
+    def reload_issue(self) -> None:
         self.client.issues.get(self.key, force_skip_cache=True)
 
 class JiraIssues:
