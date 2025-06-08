@@ -104,7 +104,7 @@ class JiraIssue:
         or editmeta endpoints.
         """
         if key not in self.fields:
-            print(f"key '{key}' not in self.fields (i.e. not present upstream)")
+            # print(f"key '{key}' not in self.fields (i.e. not present upstream)")
             return default
         # Field is sure to exist, but it might still have value None.
         value = self.fields[key]
