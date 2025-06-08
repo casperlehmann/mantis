@@ -111,8 +111,30 @@ class IssueField:
     def value_from_draft(self):
         return self.issue.draft.get(self.key, None)
 
+    def check_field(self) -> bool:
+        """Check the existance and status of a field in the issue."""
+        # if self.value_from_draft is None:
+        #     raise ValueError(f'value_from_cache is None for key: {self.key}')
+
+        if self.createmeta_type == self.editmeta_type == 'N/A':
+            if self.key in self.issue.non_meta_fields:
+                raise ValueError(f'Expected: Field "{self.key}" cannot be set.')
             else:
-                raise ValueError(f'Field {key} is not in createmeta_schema.')
+                raise ValueError(f'Field "{self.key}" is in neither createmeta nor editmeta schema.')
+
+        if self.editmeta_type != self.createmeta_type:
+            raise ValueError(f'editmeta_type ({self.editmeta_type}) and createmeta_type ({self.createmeta_type}) are not equal')
+        
+        name_from_cache = self._extract_name_from_cached_object()
+        # create_auto_complete_url = self.issue.createmeta_data["fields"][self.key].get("autoCompleteUrl") if self.key in self.issue.createmeta_data["fields"] else None
+        edit_auto_complete_url = self.issue.editmeta_data["fields"][self.key].get("autoCompleteUrl") if self.key in self.issue.editmeta_data["fields"] else None
+        # assert create_auto_complete_url == edit_auto_complete_url, f'{create_auto_complete_url} != {edit_auto_complete_url}'
+        type_part = f'(type: {self.editmeta_type}):'
+        update_part = f'{str(name_from_cache)}' if name_from_cache == self.value_from_draft else f'{name_from_cache} -> {self.value_from_draft}'
+
+        print(f'{self.key:<10} {type_part:<20} {update_part:<35} (autoCompleteUrl: {edit_auto_complete_url})')
+        return True
+
         else:
             editmeta_type = editmeta_schema['schema']['type']
             createmeta_type = createmeta_schema['schema']['type']
