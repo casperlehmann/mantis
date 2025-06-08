@@ -153,7 +153,9 @@ class IssueField:
                 self.key: self.payload
             }
         }
+        print(f'Updating {self.key} with data: ({data})')
         self.issue.update_field(data)
+        print(f'Reloading {self.key}')
         self.issue.reload_issue()
     
     @property
