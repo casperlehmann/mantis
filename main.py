@@ -155,6 +155,10 @@ if __name__ == '__main__':
         for issue_key in jira_options.issues:
             issue = jira.issues.get(key=issue_key)
             issue.update_from_draft()
+    elif jira_options.action == 'diff-issue-from-draft':
+        for issue_key in jira_options.issues:
+            issue = jira.issues.get(key=issue_key)
+            issue.diff_issue_from_draft()
     elif jira_options.action == 'get-project-keys':
         print ('Fetching from Jira...')
         resp = jira.system_config_loader.fetch_and_update_all_createmeta()
