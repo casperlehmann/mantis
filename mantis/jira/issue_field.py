@@ -139,7 +139,11 @@ class IssueField:
     def payload(self) -> dict[str, Any] | str | Any:
         if self.editmeta_type in {'string'}:
             return self.value_from_draft
+        elif self.editmeta_type in {'issuetype'}:
+            # When using the issuetype_name
+            return {'name': self.value_from_draft}
         elif self.editmeta_type in {'issuetype', 'user'}:
+            # When using the issuetype_id
             return {'id': self.value_from_draft}
         elif self.editmeta_type in {'team'}:
             raise NotImplementedError('Convert team name to id.')
@@ -153,7 +157,9 @@ class IssueField:
                 self.key: self.payload
             }
         }
+        print(f'Updating {self.key} with data: ({data})')
         self.issue.update_field(data)
+        print(f'Reloading {self.key}')
         self.issue.reload_issue()
     
     @property
