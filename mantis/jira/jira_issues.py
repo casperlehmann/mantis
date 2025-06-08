@@ -115,10 +115,16 @@ class JiraIssue:
         createmeta_schema = self.createmeta_factory.field_by_key(key)
         editmeta_schema = self.editmeta_factory.field_by_key(key)
         if not (editmeta_schema or createmeta_schema):
-            if key in self.non_meta_fields:
-                print(f'Expected: Field "{key}" cannot be set.')
-                createmeta_type = 'N/A'
-                editmeta_type = 'N/A'
+            if key == 'reporter':
+                # reporter might be disabled:
+                # https://community.developer.atlassian.com/t/issue-createmeta-projectidorkey-issuetypes-issuetypeid-does-not-send-the-reporter-field-anymore/80973
+                createmeta_type = 'user'
+                editmeta_type = 'user'
+            elif key == 'status':
+                createmeta_type = '?'
+                editmeta_type = '?'
+            elif key in self.non_meta_fields:
+                raise ValueError(f'Expected: Field "{key}" cannot be set.')
             else:
                 raise ValueError(f'Field "{key}" is in neither createmeta nor editmeta schema.')
         elif not editmeta_schema:
