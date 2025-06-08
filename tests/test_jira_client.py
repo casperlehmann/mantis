@@ -133,3 +133,13 @@ class TestJiraClient:
         captured = capsys.readouterr()
         assert captured.out == 'No results found for cf[10001] "Freeloader"\n'
         assert captured.err == ""
+
+    def test_get_field_names(self, fake_jira: JiraClient, requests_mock):
+        return_value = CacheData().get_names
+        url = f'{fake_jira.api_url}/issue/ECS-2?expand=names'
+        requests_mock.get(url, json=return_value)
+        fetch_field_names = fake_jira.get_field_names('ECS-2')
+        assert isinstance(fetch_field_names, dict)
+        assert set(fetch_field_names.keys()) == {'id', 'expand', 'self', 'names', 'key', 'fields'}
+        assert fetch_field_names['names'].get('aggregateprogress') == 'Σ Progress'
+        assert fetch_field_names['names'].get('customfield_10035') == 'Design'
