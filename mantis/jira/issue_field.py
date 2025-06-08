@@ -135,7 +135,21 @@ class IssueField:
         print(f'{self.key:<10} {type_part:<20} {update_part:<35} (autoCompleteUrl: {edit_auto_complete_url})')
         return True
 
+    @property
+    def payload(self):
+        if self.editmeta_type in {'string'}:
+            pass
+        elif self.editmeta_type in {'issuetype', 'user'}:
+            pass
+        elif self.editmeta_type in {'team'}:
+            raise NotImplementedError('Convert team name to id.')
+            return self.value_from_draft
         else:
-            editmeta_type = editmeta_schema['schema']['type']
-            createmeta_type = createmeta_schema['schema']['type']
-        return editmeta_type, createmeta_type
+            raise NotImplementedError(f'Type: {self.editmeta_type}')
+
+    def update_field_from_draft(self):
+        data = {
+            "fields": {
+                self.key: self.payload
+            }
+        }
