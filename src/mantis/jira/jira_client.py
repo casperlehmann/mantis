@@ -269,3 +269,14 @@ class JiraClient:
                     ) from exception
             case _:
                 raise AttributeError("Unknown reason") from exception
+
+    def get_field_names(self, issue_key: str) -> dict[str, Any]:
+        """Fetch the field names for an issue.
+        
+        https://support.atlassian.com/cloud-automation/docs/find-the-smart-value-for-a-field/
+        https://<yourinstanceurl>/rest/api/2/issue/<issuekey>?expand=names
+        """
+        url = f"issue/{issue_key}?expand=names"
+        response = self.mantis.http._get(url)
+        response.raise_for_status()
+        return response.json()
