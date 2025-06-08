@@ -162,6 +162,11 @@ class JiraIssue:
         else:
             name_from_cache = value_from_cache.get('name')
 
+        if name_from_cache == value_from_draft:
+            print(f'{key} (type: {editmeta_type}): {name_from_cache}')
+        else:
+            print(f'{key} (type: {editmeta_type}): {name_from_cache} -> {value_from_draft}')
+        return True
 
 class JiraIssues:
     _allowed_types: list[str] | None = None
