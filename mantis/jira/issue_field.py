@@ -154,6 +154,7 @@ class IssueField:
             }
         }
         self.issue.update_field(data)
+        self.issue.reload_issue()
     
     @property
     def updated(self) -> bool:
