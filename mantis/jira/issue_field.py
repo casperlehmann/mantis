@@ -6,7 +6,7 @@ if TYPE_CHECKING:
 
 
 class IssueField:
-    def __init__(self, issue: 'JiraIssue', key) -> None:
+    def __init__(self, issue: 'JiraIssue', key: str) -> None:
         self.issue = issue
         self.key = key
 
