@@ -10,28 +10,27 @@ class IssueField:
         self.issue = issue
         self.key = key
 
-    def _extract_name_from_cached_object(self, editmeta_type: str, createmeta_type: str):
+    def _extract_name_from_cached_object(self):
         value_from_cache = self.issue.get_field(self.key)
         if value_from_cache is None:
-            #raise ValueError(f'value_from_cache is None for key: {key}')
-            name_from_cache = None
-        elif self.key in ('project', 'status'):
-            name_from_cache = value_from_cache['name']
+            #raise ValueError(f'value_from_cache is None for key: {self.key}')
+            return None
+        elif self.key in ('project', 'status', 'issuetype'):
+            return value_from_cache['name']
         elif isinstance(value_from_cache, str):
-            assert editmeta_type == 'string' and createmeta_type == 'string'
-            name_from_cache = value_from_cache
-        elif editmeta_type == 'user' or createmeta_type == 'user':
-            name_from_cache = value_from_cache.get('displayName')
-        elif editmeta_type in ('issuelink', 'issuetype'):
-            name_from_cache = 'issuelink/issuetype'
-        elif editmeta_type == 'N/A' and createmeta_type == 'N/A':
+            assert self.editmeta_type == 'string' and self.createmeta_type == 'string'
+            return value_from_cache
+        elif self.editmeta_type == 'user' or self.createmeta_type == 'user':
+            return value_from_cache.get('displayName')
+        elif self.editmeta_type in ('issuelink'):
+            return 'issuelink'
+        elif self.editmeta_type == 'N/A' and self.createmeta_type == 'N/A':
             raise ValueError(
-                f"Both editmeta_type and createmeta_type are N/A. This field ('{self.key}') probably shouldn't be updated like this. editmeta_type: '{editmeta_type}'. createmeta_type: '{createmeta_type}'.")
-        elif editmeta_type == 'N/A' or createmeta_type == 'N/A':
+                f"Both editmeta_type and createmeta_type are N/A. This field ('{self.key}') probably shouldn't be updated like this. editmeta_type: '{self.editmeta_type}'. createmeta_type: '{self.createmeta_type}'.")
+        elif self.editmeta_type == 'N/A' or self.createmeta_type == 'N/A':
             raise NotImplementedError(f"editmeta_type == 'N/A' or createmeta_type == 'N/A' for '{self.key}'")
         else:
-            name_from_cache = value_from_cache.get('name')
-        return name_from_cache
+            return value_from_cache.get('name')
 
     def _extract_meta_types(self, key: str) -> tuple[str, str]:
         createmeta_schema = self.issue.createmeta_factory.field_by_key(key)
