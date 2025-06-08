@@ -140,7 +140,12 @@ class JiraIssue:
         """Check the existance and status of a field in the issue."""
         createmeta_schema = self.createmeta_factory.field_by_key(key)
         editmeta_schema = self.editmeta_factory.field_by_key(key)
-        if not (editmeta_schema or createmeta_schema):
+        if key == 'project':
+            # project is not in createmeta because createmeta is specific to the project, e.g.:
+            # issue/createmeta/ECS/issuetypes/10001
+            createmeta_type = '?'
+            editmeta_type = '?'
+        elif not (editmeta_schema or createmeta_schema):
             if key == 'reporter':
                 # reporter might be disabled:
                 # https://community.developer.atlassian.com/t/issue-createmeta-projectidorkey-issuetypes-issuetypeid-does-not-send-the-reporter-field-anymore/80973
