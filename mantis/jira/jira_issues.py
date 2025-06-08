@@ -200,10 +200,12 @@ class JiraIssue:
         else:
             auto_complete_url = None
 
+        type_part = f'(type: {editmeta_type}):'
         if name_from_cache == value_from_draft:
-            print(f'{key} (type: {editmeta_type}): {name_from_cache} (autoCompleteUrl: {auto_complete_url})')
+            update_part = f'{str(name_from_cache)}'
         else:
-            print(f'{key} (type: {editmeta_type}): {name_from_cache} -> {value_from_draft} (autoCompleteUrl: {auto_complete_url})')
+            update_part = f'{name_from_cache} -> {value_from_draft}'
+        print(f'{key:<10} {type_part:<20} {update_part:<35} (autoCompleteUrl: {auto_complete_url})')
         return True
 
 class JiraIssues:
