@@ -12,6 +12,7 @@ class IssueField:
 
     def _extract_name_from_cached_object(self):
         value_from_cache = self.issue.get_field(self.key)
+        assert self.editmeta_type == self.createmeta_type
         if value_from_cache is None:
             #raise ValueError(f'value_from_cache is None for key: {self.key}')
             return None
