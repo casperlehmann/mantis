@@ -113,6 +113,29 @@ class JiraIssue:
     def update_field(self, data: dict[str, Any]) -> None:
         self.client.update_field(self.key, data)
 
+    def _extract_name_from_cached_object(self, key: str, editmeta_type: str, createmeta_type: str):
+        value_from_cache = self.get_field(key)
+        if value_from_cache is None:
+            #raise ValueError(f'value_from_cache is None for key: {key}')
+            name_from_cache = None
+        elif key in ('project', 'status'):
+            name_from_cache = value_from_cache['name']
+        elif isinstance(value_from_cache, str):
+            assert editmeta_type == 'string' and createmeta_type == 'string'
+            name_from_cache = value_from_cache
+        elif editmeta_type == 'user' or createmeta_type == 'user':
+            name_from_cache = value_from_cache.get('displayName')
+        elif editmeta_type in ('issuelink', 'issuetype'):
+            name_from_cache = 'issuelink/issuetype'
+        elif editmeta_type == 'N/A' and createmeta_type == 'N/A':
+            raise ValueError(
+                f"Both editmeta_type and createmeta_type are N/A. This field ('{key}') probably shouldn't be updated like this. editmeta_type: '{editmeta_type}'. createmeta_type: '{createmeta_type}'.")
+        elif editmeta_type == 'N/A' or createmeta_type == 'N/A':
+            raise NotImplementedError(f"editmeta_type == 'N/A' or createmeta_type == 'N/A' for '{key}'")
+        else:
+            name_from_cache = value_from_cache.get('name')
+        return name_from_cache
+
     def check_field(self, key: str) -> bool:
         """Check the existance and status of a field in the issue."""
         createmeta_schema = self.createmeta_factory.field_by_key(key)
@@ -147,23 +170,7 @@ class JiraIssue:
             editmeta_type = editmeta_schema['schema']['type']
             createmeta_type = createmeta_schema['schema']['type']
         value_from_draft = self.draft.get(key, None)
-        value_from_cache = self.get_field(key)
-        if key in ('project', 'status'):
-            name_from_cache = value_from_cache['name']
-        elif isinstance(value_from_cache, str):
-            assert editmeta_type == 'string' and createmeta_type == 'string'
-            name_from_cache = value_from_cache
-        elif editmeta_type == 'user' or createmeta_type == 'user':
-            name_from_cache = value_from_cache.get('displayName')
-        elif editmeta_type in ('issuelink', 'issuetype'):
-            name_from_cache = 'issuelink/issuetype'
-        elif editmeta_type == 'N/A' and createmeta_type == 'N/A':
-            raise ValueError(
-                f"Both editmeta_type and createmeta_type are N/A. This field ('{key}') probably shouldn't be updated like this. editmeta_type: '{editmeta_type}'. createmeta_type: '{createmeta_type}'.")
-        elif editmeta_type == 'N/A' or createmeta_type == 'N/A':
-            raise NotImplementedError(f"editmeta_type == 'N/A' or createmeta_type == 'N/A' for '{key}'")
-        else:
-            name_from_cache = value_from_cache.get('name')
+        name_from_cache = self._extract_name_from_cached_object(key, editmeta_type, createmeta_type)
 
         if key in self.editmeta_data["fields"]:
             auto_complete_url = self.editmeta_data["fields"][key].get("autoCompleteUrl")
