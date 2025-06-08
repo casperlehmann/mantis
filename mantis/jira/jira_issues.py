@@ -145,6 +145,12 @@ class JiraIssue:
             # issue/createmeta/ECS/issuetypes/10001
             createmeta_type = '?'
             editmeta_type = '?'
+        elif key == 'parent':
+            # PUT /rest/api/3/issue/{issueIdOrKey}
+            # parent not in https://caspertestaccount.atlassian.net/rest/api/latest/issue/ecs-1/editmeta
+            # But docs say it's fine: https://caspertestaccount.atlassian.net/rest/api/latest/issue/ecs-1/
+            # The parent field may be set by key or ID. For standard issue types, the parent may be removed by setting update.parent.set.none to true. 
+            pass
         elif not (editmeta_schema or createmeta_schema):
             if key == 'reporter':
                 # reporter might be disabled:
