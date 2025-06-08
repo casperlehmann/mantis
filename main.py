@@ -3,6 +3,7 @@
 from pprint import pprint
 
 from mantis.jira import JiraAuth, JiraClient, JiraOptions, parse_args
+from mantis.jira.issue_field import IssueField
 
 if __name__ == '__main__':
     jira_options = JiraOptions(parse_args(), 'options.toml')
@@ -148,7 +149,8 @@ if __name__ == '__main__':
     elif jira_options.action == 'check-field':
         for issue_key in jira_options.issues:
             issue = jira.issues.get(key=issue_key)
-            issue.check_field('assignee')
+            field = IssueField(issue, 'assignee')
+            field.check_field()
     elif jira_options.action == 'update-issue-from-draft':
         for issue_key in jira_options.issues:
             issue = jira.issues.get(key=issue_key)
