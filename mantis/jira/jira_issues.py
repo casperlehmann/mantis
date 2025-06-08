@@ -136,8 +136,7 @@ class JiraIssue:
             name_from_cache = value_from_cache.get('name')
         return name_from_cache
 
-    def check_field(self, key: str) -> bool:
-        """Check the existance and status of a field in the issue."""
+    def _extract_meta_types(self, key: str):
         createmeta_schema = self.createmeta_factory.field_by_key(key)
         editmeta_schema = self.editmeta_factory.field_by_key(key)
         if key == 'project':
@@ -188,6 +187,11 @@ class JiraIssue:
         else:
             editmeta_type = editmeta_schema['schema']['type']
             createmeta_type = createmeta_schema['schema']['type']
+        return editmeta_type, createmeta_type
+
+    def check_field(self, key: str) -> bool:
+        """Check the existance and status of a field in the issue."""
+        editmeta_type, createmeta_type = self._extract_meta_types(key)
 
         value_from_draft = self.draft.get(key, None)
         # if value_from_draft is None:
