@@ -153,3 +153,8 @@ class IssueField:
                 self.key: self.payload
             }
         }
+    
+    @property
+    def updated(self) -> bool:
+        return self._extract_name_from_cached_object() != self.value_from_draft
+
