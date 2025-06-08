@@ -107,6 +107,10 @@ class IssueField:
             else:
                 raise ValueError(f'Field {self.key} is not in createmeta_schema.')
 
+    @property
+    def value_from_draft(self):
+        return self.issue.draft.get(self.key, None)
+
             else:
                 raise ValueError(f'Field {key} is not in createmeta_schema.')
         else:
