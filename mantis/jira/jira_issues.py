@@ -119,34 +119,10 @@ class JiraIssue:
         for draft_field_key, value_from_draft in self.draft.iter_draft_field_items():
             value_from_cache = self.get_field(draft_field_key, None)
             field = IssueField(self, draft_field_key)
-            field.check_field()
-        print()
-        for draft_field_key, value_from_draft in self.draft.iter_draft_field_items():
-            value_from_cache = self.get_field(draft_field_key, None)
-            print(f"# {self.key} ", end="")
-            if value_from_cache is None:
-                extracted_from_cache = 'None'
-            else:
-                extracted_from_cache = value_from_cache if isinstance(value_from_cache, str) else value_from_cache.get('displayName') or value_from_cache.get('name')
-            if not value_from_draft:  # E.g. parent not set
-                print(f'| Not set   ({draft_field_key}) is None')
-            elif not value_from_draft or value_from_draft == 'None' or value_from_draft == {draft_field_key: None}:
-                print(f'| None      ({draft_field_key}) is None')
-            elif value_from_cache == 'N/A':
-                print(f'| Miss      ({draft_field_key}) not found in cache')
-            elif not value_from_cache:
-                print(f'| Null      ({draft_field_key}) in cache but None')
-            elif value_from_cache == 'None':
-                print(f'| Field     ({draft_field_key}) not found in cache')
-            elif value_from_draft == value_from_cache:
-                print(f"| Same      ({draft_field_key}): {value_from_draft}")
-            elif value_from_draft == extracted_from_cache:
-                print(f"| Extracted ({draft_field_key}): {value_from_draft}")
-            else:
-                print(f"| Different: {draft_field_key}:")
-                print(f"{value_from_draft}")
-                pprint(value_from_cache)
-                input()
+            # print(f'Updated ({draft_field_key}): {field.updated}')
+            if field.updated:
+                print(f'Updating ({draft_field_key})')
+                field.update_field_from_draft()
 
     def reload_issue(self) -> None:
         self.client.issues.get(self.key, force_skip_cache=True)
