@@ -280,6 +280,23 @@ class JiraSystemConfigLoader:
         self.cache.write_createmeta(issuetype_name, createmeta)
         return createmeta
 
+    def get_editmeta(self, issue_key: str, force_skip_cache: bool = False) -> dict[str, int | list[dict[str, Any]]]:
+        if not self.client._no_read_cache or force_skip_cache:
+            from_cache = self.cache.get_editmeta_from_cache(issue_key)
+            if from_cache:
+                return from_cache
+        editmeta = self.client.get_editmeta(issue_key)
+        if not isinstance(editmeta, dict):
+            raise ValueError(f'The editmeta object should be a dict. Got: {type(editmeta)}')
+        if len(editmeta.keys()) == 0:
+            raise ValueError(
+                'No content in editmeta. Something is probably very wrong.')
+        if not 'fields' in editmeta:
+            raise ValueError(f'The editmeta has no fields. Got: {editmeta.keys()}')
+        
+        self.cache.write_editmeta(issue_key, editmeta)
+        return editmeta
+
     def fetch_and_update_all_createmeta(self) -> list[str]:
         """Updates all createmate from upstream, returns updated list of allowed types"""
         issuetypes: dict[str, list[dict[str, Any]]] = self.get_issuetypes(force_skip_cache = False)
