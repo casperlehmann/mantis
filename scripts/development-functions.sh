@@ -2,12 +2,26 @@ reset_cache() {
   python main.py --action reset
 }
 
+fetch_issues() {
+  python main.py --action warmup-issues
+}
+
+inspect_issues() {
+  python main.py --action inspect
+}
+
 jsonfmt() {
   find .jira_cache -type f -name '*.json' -exec sh -c 'jq . "$1" > "$1.tmp" && mv "$1.tmp" "$1"' _ {} \;
 }
 
 get_and_fmt() {
   reset_cache
+  jsonfmt
+}
+
+get_and_fmt_with_issues_and_drafts() {
+  reset_cache # Includes createmeta plugins
+  fetch_issues # includes editmeta plugins and drafts (if not exists)
   jsonfmt
 }
 
@@ -70,6 +84,7 @@ anonymize_test_data() {
 update_test_data() {
     cp -rf drafts/ tests/data/drafts
     cp -rf .jira_cache/* tests/data/jira_cache/
+    cp -rf plugins/ tests/data/plugins
     format_test_data
     anonymize_test_data
 }
