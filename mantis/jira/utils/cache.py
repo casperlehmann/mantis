@@ -132,7 +132,7 @@ class Cache:
         filename = f"createmeta_{issuetype_name.lower()}.json"
         self._write(self.createmeta, filename, json.dumps(createmeta))
 
-    def write_editemeta(self, issue_key: str, editmeta: list[dict[str, Any]]) -> None:
+    def write_editmeta(self, issue_key: str, editmeta: dict[str, Any]) -> None:
         filename = f"editmeta_{issue_key.lower()}.json"
         self._write(self.editmeta, filename, json.dumps(editmeta))
 
