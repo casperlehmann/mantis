@@ -71,13 +71,13 @@ class JiraIssue:
 
     @property
     def editmeta_data(self) -> dict[str, Any]:
-        return self.client.get_editmeta(self.key)
+        return self.client.system_config_loader.get_editmeta(self.key)
 
     @property
     def editmeta_factory(self) -> EditmetaModelFactory:
         # TODO: Consider if editmeta itself should be cached instead.
         if self._editmeta_factory is None:
-            self._editmeta_factory = EditmetaModelFactory(self.editmeta_data)
+            self._editmeta_factory = EditmetaModelFactory(self.editmeta_data, self.issuetype, self.client, self.key)
         return self._editmeta_factory
 
     @property

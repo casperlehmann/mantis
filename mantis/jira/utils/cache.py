@@ -21,6 +21,7 @@ class Cache:
         self.createmeta.mkdir(exist_ok=True)
         self.createmeta_schemas.mkdir(exist_ok=True)
         self.editmeta.mkdir(exist_ok=True)
+        self.editmeta_schemas.mkdir(exist_ok=True)
 
     def invalidate(self) -> None:
         if self.root.exists():
@@ -32,6 +33,7 @@ class Cache:
         self.createmeta.mkdir(exist_ok=True)
         self.createmeta_schemas.mkdir(exist_ok=True)
         self.editmeta.mkdir(exist_ok=True)
+        self.editmeta_schemas.mkdir(exist_ok=True)
 
     @property
     def root(self) -> Path:
@@ -52,6 +54,10 @@ class Cache:
     @property
     def createmeta_schemas(self) -> Path:
         return self.system / "createmeta_schemas"
+
+    @property
+    def editmeta_schemas(self) -> Path:
+        return self.system / "editmeta_schemas"
 
     @property
     def editmeta(self) -> Path:
@@ -126,13 +132,17 @@ class Cache:
         filename = f"createmeta_{issuetype_name.lower()}.json"
         self._write(self.createmeta, filename, json.dumps(createmeta))
 
-    def write_editemeta(self, issue_key: str, editmeta: list[dict[str, Any]]) -> None:
+    def write_editmeta(self, issue_key: str, editmeta: dict[str, Any]) -> None:
         filename = f"editmeta_{issue_key.lower()}.json"
         self._write(self.editmeta, filename, json.dumps(editmeta))
 
     def write_createmeta_schema(self, issuetype_name: str, createmeta: dict[str, int | list[dict[str, Any]]]) -> None:
         filename = f"{issuetype_name.lower()}.json"
         self._write(self.createmeta_schemas, filename, json.dumps(createmeta))
+
+    def write_editmeta_schema(self, issue_key: str, editmeta: dict[str, Any]) -> None:
+        filename = f"{issue_key.lower()}.json"
+        self._write(self.editmeta_schemas, filename, json.dumps(editmeta))
 
     def remove(self, filename: str) -> bool:
         if not (self.root / filename).exists():
