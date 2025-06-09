@@ -1,0 +1,302 @@
+{
+  "fields": {
+    "summary": {
+      "required": true,
+      "schema": {
+        "type": "string",
+        "system": "summary"
+      },
+      "name": "Summary",
+      "key": "summary",
+      "operations": [
+        "set"
+      ]
+    },
+    "issuetype": {
+      "required": true,
+      "schema": {
+        "type": "issuetype",
+        "system": "issuetype"
+      },
+      "name": "Issue Type",
+      "key": "issuetype",
+      "operations": [],
+      "allowedValues": [
+        {
+          "self": "https://caspertestaccount.atlassian.net/rest/api/2/issuetype/10003",
+          "id": "10003",
+          "description": "Tasks track small, distinct pieces of work.",
+          "iconUrl": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/issuetype/avatar/10318?size=medium",
+          "name": "Task",
+          "subtask": false,
+          "avatarId": 10318,
+          "entityId": "8b309288-0f8a-4ab7-8c30-e54238a9341e",
+          "hierarchyLevel": 0
+        },
+        {
+          "self": "https://caspertestaccount.atlassian.net/rest/api/2/issuetype/10004",
+          "id": "10004",
+          "description": "Stories track functionality or features expressed as user goals.",
+          "iconUrl": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/issuetype/avatar/10315?size=medium",
+          "name": "Story",
+          "subtask": false,
+          "avatarId": 10315,
+          "entityId": "c14ac0d0-64d3-4a7d-8d7d-2545caaac562",
+          "hierarchyLevel": 0
+        },
+        {
+          "self": "https://caspertestaccount.atlassian.net/rest/api/2/issuetype/10005",
+          "id": "10005",
+          "description": "Bugs track problems or errors.",
+          "iconUrl": "https://caspertestaccount.atlassian.net/rest/api/2/universal_avatar/view/type/issuetype/avatar/10303?size=medium",
+          "name": "Bug",
+          "subtask": false,
+          "avatarId": 10303,
+          "entityId": "16671d46-87f6-4007-9cdd-a2ab468315e0",
+          "hierarchyLevel": 0
+        }
+      ]
+    },
+    "customfield_10031": {
+      "required": false,
+      "schema": {
+        "type": "any",
+        "custom": "com.atlassian.jira.plugins.jira-development-integration-plugin:devsummarycf",
+        "customId": 10031
+      },
+      "name": "development",
+      "key": "customfield_10031",
+      "operations": [
+        "set"
+      ]
+    },
+    "description": {
+      "required": false,
+      "schema": {
+        "type": "string",
+        "system": "description"
+      },
+      "name": "Description",
+      "key": "description",
+      "operations": [
+        "set"
+      ]
+    },
+    "customfield_10021": {
+      "required": false,
+      "schema": {
+        "type": "array",
+        "items": "option",
+        "custom": "com.atlassian.jira.plugin.system.customfieldtypes:multicheckboxes",
+        "customId": 10021
+      },
+      "name": "Flagged",
+      "key": "customfield_10021",
+      "operations": [
+        "add",
+        "set",
+        "remove"
+      ],
+      "allowedValues": [
+        {
+          "self": "https://caspertestaccount.atlassian.net/rest/api/2/customFieldOption/10019",
+          "value": "Impediment",
+          "id": "10019"
+        }
+      ]
+    },
+    "reporter": {
+      "required": true,
+      "schema": {
+        "type": "user",
+        "system": "reporter"
+      },
+      "name": "Reporter",
+      "key": "reporter",
+      "autoCompleteUrl": "https://caspertestaccount.atlassian.net/rest/api/2/user/recommend?context=Reporter&issueKey=ECS-1",
+      "operations": [
+        "set"
+      ]
+    },
+    "customfield_10001": {
+      "required": false,
+      "schema": {
+        "type": "team",
+        "custom": "com.atlassian.jira.plugin.system.customfieldtypes:atlassian-team",
+        "customId": 10001,
+        "configuration": {
+          "com.atlassian.jira.plugin.system.customfieldtypes:atlassian-team": true
+        }
+      },
+      "name": "Team",
+      "key": "customfield_10001",
+      "autoCompleteUrl": "https://caspertestaccount.atlassian.net/gateway/api/v1/recommendations",
+      "operations": [
+        "set"
+      ]
+    },
+    "customfield_10034": {
+      "required": false,
+      "schema": {
+        "type": "any",
+        "custom": "com.atlassian.jira.plugins.jira-development-integration-plugin:vulnerabilitycf",
+        "customId": 10034
+      },
+      "name": "Vulnerability",
+      "key": "customfield_10034",
+      "operations": [
+        "set"
+      ]
+    },
+    "customfield_10035": {
+      "required": false,
+      "schema": {
+        "type": "array",
+        "items": "design.field.name",
+        "custom": "com.atlassian.jira.plugins.jira-development-integration-plugin:designcf",
+        "customId": 10035
+      },
+      "name": "Design",
+      "key": "customfield_10035",
+      "autoCompleteUrl": "",
+      "operations": [
+        "set"
+      ]
+    },
+    "customfield_10015": {
+      "required": false,
+      "schema": {
+        "type": "date",
+        "custom": "com.atlassian.jira.plugin.system.customfieldtypes:datepicker",
+        "customId": 10015
+      },
+      "name": "Start date",
+      "key": "customfield_10015",
+      "operations": [
+        "set"
+      ]
+    },
+    "labels": {
+      "required": false,
+      "schema": {
+        "type": "array",
+        "items": "string",
+        "system": "labels"
+      },
+      "name": "Labels",
+      "key": "labels",
+      "autoCompleteUrl": "https://caspertestaccount.atlassian.net/rest/api/1.0/labels/10001/suggest?query=",
+      "operations": [
+        "add",
+        "set",
+        "remove"
+      ]
+    },
+    "customfield_10017": {
+      "required": false,
+      "schema": {
+        "type": "string",
+        "custom": "com.pyxis.greenhopper.jira:jsw-issue-color",
+        "customId": 10017
+      },
+      "name": "Issue color",
+      "key": "customfield_10017",
+      "operations": [
+        "set"
+      ]
+    },
+    "environment": {
+      "required": false,
+      "schema": {
+        "type": "string",
+        "system": "environment"
+      },
+      "name": "Environment",
+      "key": "environment",
+      "operations": [
+        "set"
+      ]
+    },
+    "customfield_10019": {
+      "required": false,
+      "schema": {
+        "type": "any",
+        "custom": "com.pyxis.greenhopper.jira:gh-lexo-rank",
+        "customId": 10019
+      },
+      "name": "Rank",
+      "key": "customfield_10019",
+      "operations": [
+        "set"
+      ]
+    },
+    "attachment": {
+      "required": false,
+      "schema": {
+        "type": "array",
+        "items": "attachment",
+        "system": "attachment"
+      },
+      "name": "Attachment",
+      "key": "attachment",
+      "operations": [
+        "set",
+        "copy"
+      ]
+    },
+    "duedate": {
+      "required": false,
+      "schema": {
+        "type": "date",
+        "system": "duedate"
+      },
+      "name": "Due date",
+      "key": "duedate",
+      "operations": [
+        "set"
+      ]
+    },
+    "issuelinks": {
+      "required": false,
+      "schema": {
+        "type": "array",
+        "items": "issuelinks",
+        "system": "issuelinks"
+      },
+      "name": "Linked Issues",
+      "key": "issuelinks",
+      "autoCompleteUrl": "https://caspertestaccount.atlassian.net/rest/api/2/issue/picker?currentProjectId=&showSubTaskParent=true&showSubTasks=true&currentIssueKey=ECS-1&query=",
+      "operations": [
+        "add",
+        "copy"
+      ]
+    },
+    "comment": {
+      "required": false,
+      "schema": {
+        "type": "comments-page",
+        "system": "comment"
+      },
+      "name": "Comment",
+      "key": "comment",
+      "operations": [
+        "add",
+        "edit",
+        "remove"
+      ]
+    },
+    "assignee": {
+      "required": false,
+      "schema": {
+        "type": "user",
+        "system": "assignee"
+      },
+      "name": "Assignee",
+      "key": "assignee",
+      "autoCompleteUrl": "https://caspertestaccount.atlassian.net/rest/api/2/user/assignable/search?issueKey=ECS-1&query=",
+      "operations": [
+        "set"
+      ]
+    }
+  }
+}

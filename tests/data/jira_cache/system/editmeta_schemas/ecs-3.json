@@ -1,0 +1,194 @@
+{
+  "$defs": {
+    "MetaModelFields": {
+      "properties": {
+        "summary": {
+          "title": "Summary",
+          "type": "string"
+        },
+        "issuetype": {
+          "title": "Issuetype"
+        },
+        "parent": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Parent"
+        },
+        "customfield_10031": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Customfield 10031"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        },
+        "customfield_10021": {
+          "anyOf": [
+            {
+              "items": {},
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Customfield 10021"
+        },
+        "reporter": {
+          "title": "Reporter"
+        },
+        "customfield_10001": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Customfield 10001"
+        },
+        "customfield_10034": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Customfield 10034"
+        },
+        "customfield_10035": {
+          "anyOf": [
+            {
+              "items": {},
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Customfield 10035"
+        },
+        "labels": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Labels"
+        },
+        "customfield_10019": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Customfield 10019"
+        },
+        "attachment": {
+          "anyOf": [
+            {
+              "items": {},
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Attachment"
+        },
+        "issuelinks": {
+          "anyOf": [
+            {
+              "items": {},
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Issuelinks"
+        },
+        "comment": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Comment"
+        },
+        "assignee": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Assignee"
+        }
+      },
+      "required": [
+        "summary",
+        "issuetype",
+        "reporter"
+      ],
+      "title": "MetaModelFields",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "key": {
+      "title": "Key",
+      "type": "string"
+    },
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "fields": {
+      "$ref": "#/$defs/MetaModelFields"
+    }
+  },
+  "required": [
+    "key",
+    "id",
+    "fields"
+  ],
+  "title": "IssueModel",
+  "type": "object"
+}

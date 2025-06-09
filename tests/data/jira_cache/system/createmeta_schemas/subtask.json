@@ -1,0 +1,182 @@
+{
+  "$defs": {
+    "MetaModelFields": {
+      "properties": {
+        "assignee": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Assignee"
+        },
+        "attachment": {
+          "anyOf": [
+            {
+              "items": {},
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Attachment"
+        },
+        "customfield_10001": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Customfield 10001"
+        },
+        "customfield_10019": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Customfield 10019"
+        },
+        "customfield_10021": {
+          "anyOf": [
+            {
+              "items": {},
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Customfield 10021"
+        },
+        "customfield_10031": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Customfield 10031"
+        },
+        "customfield_10034": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Customfield 10034"
+        },
+        "customfield_10035": {
+          "anyOf": [
+            {
+              "items": {},
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Customfield 10035"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        },
+        "issuelinks": {
+          "anyOf": [
+            {
+              "items": {},
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Issuelinks"
+        },
+        "issuetype": {
+          "title": "Issuetype"
+        },
+        "labels": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Labels"
+        },
+        "parent": {
+          "title": "Parent"
+        },
+        "project": {
+          "title": "Project"
+        },
+        "reporter": {
+          "title": "Reporter"
+        },
+        "summary": {
+          "title": "Summary",
+          "type": "string"
+        }
+      },
+      "required": [
+        "issuetype",
+        "parent",
+        "project",
+        "reporter",
+        "summary"
+      ],
+      "title": "MetaModelFields",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "key": {
+      "title": "Key",
+      "type": "string"
+    },
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "fields": {
+      "$ref": "#/$defs/MetaModelFields"
+    }
+  },
+  "required": [
+    "key",
+    "id",
+    "fields"
+  ],
+  "title": "IssueModel",
+  "type": "object"
+}
