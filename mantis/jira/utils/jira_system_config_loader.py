@@ -193,10 +193,23 @@ class EditmetaModelFactory(MetaModelFactory):
             raise TypeError(
                 f'EditmetaModelFactory.meta_fields should be of type dict. Got: {type(self.meta_fields)}')
         self.create_model()
+        if write_plugin:
+            self._write_plugin()
 
     def field_by_key(self, key: str, default: Any | None = None) -> Any | None:
         assert isinstance(self.meta_fields, dict), 'Asserting to satisfy type checker.'
         return self.meta_fields.get(key, default)
+
+    def _write_plugin(self):
+        schema = self.model.model_json_schema()
+        self.client.cache.write_editmeta_schema(self.issue_key, schema)
+        output_plugin = self.client.plugins_dir / f'{self.issue_key.lower()}_editmeta.py'
+        generate(
+            json.dumps(schema),
+            input_file_type=InputFileType.JsonSchema,
+            output=output_plugin,
+            output_model_type=DataModelType.PydanticV2BaseModel,
+        )
 
 
 class JiraSystemConfigLoader:
