@@ -169,10 +169,11 @@ class JiraClient:
         resp = self.system_config_loader.fetch_and_update_all_createmeta()
         pprint(resp)
 
-    def warmup_issues(self, *issue_keys: str):
+    def warmup_issues(self, *issue_keys: str) -> None:
         for issue_key in issue_keys:
             self.issues.get(key=issue_key).editmeta
         print(f'Fetched issues: {issue_keys}')
+
     def get_projects(self) -> list[dict[str, Any]]:
         url = 'project'
         response = self._get(url)
