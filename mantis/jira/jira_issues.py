@@ -61,7 +61,7 @@ class JiraIssue:
     @property
     def createmeta_factory(self) -> CreatemetaModelFactory:
         if self._createmeta_factory is None:
-            self._createmeta_factory = CreatemetaModelFactory(self.createmeta_data, self.issuetype)
+            self._createmeta_factory = CreatemetaModelFactory(self.createmeta_data, self.issuetype, self.client)
         return self._createmeta_factory
 
     @property

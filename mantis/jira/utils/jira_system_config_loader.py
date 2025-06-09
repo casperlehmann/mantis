@@ -37,6 +37,9 @@ class MetaModelFactory(ABC):
     def field_by_key(self, key: str) -> Any | None:
         pass
 
+    def _write_plugin(self):
+        pass
+
     @property
     def meta_fields(self) -> list[dict[str, Any]] | dict[str, dict[str, Any]]:
         return self.metadata["fields"]
@@ -139,8 +142,9 @@ class CreatemetaModelFactory(MetaModelFactory):
         "timespent",
     }
 
-    def __init__(self, metadata: Dict[str, Any], issuetype_name: str):
+    def __init__(self, metadata: Dict[str, Any], issuetype_name: str, client: "JiraClient", write_plugin=True):
         super().__init__(metadata)
+        self.client = client
         self.issuetype_name = issuetype_name
         if isinstance(self.meta_fields, dict):
             raise ValueError('CreatemetaModelFactory.meta_fields should be of type list. '
@@ -149,6 +153,21 @@ class CreatemetaModelFactory(MetaModelFactory):
             raise TypeError(
                 f'CreatemetaModelFactory.meta_fields should be of type list. Got: {type(self.meta_fields)}')
         self.create_model()
+        if write_plugin:
+            self._write_plugin()
+
+    def _write_plugin(self):
+        schema = self.model.model_json_schema()
+        output_json_schema = self.client.cache.createmeta_schemas / f'{self.issuetype_name.lower()}.json'
+        output_plugin = self.client.plugins_dir / f'{self.issuetype_name.lower()}_createmeta.py'
+        with open(output_json_schema, 'w') as f:
+            json.dump(schema, f)
+        generate(
+            json.dumps(schema),
+            input_file_type=InputFileType.JsonSchema,
+            output=output_plugin,
+            output_model_type=DataModelType.PydanticV2BaseModel,
+        )
 
     def field_by_key(self, key: str, default: Any | None = None) -> Any | None:
         return next((item for item in self._iter_meta_fields if item.get('key') == key), default)
@@ -177,6 +196,7 @@ class EditmetaModelFactory(MetaModelFactory):
         assert isinstance(self.meta_fields, dict), 'Asserting to satisfy type checker.'
         return self.meta_fields.get(key, default)
 
+
 class JiraSystemConfigLoader:
     def __init__(self, client: "JiraClient") -> None:
         self.client = client
@@ -189,7 +209,7 @@ class JiraSystemConfigLoader:
         if not metadata:
             raise CacheMissException(f"{issuetype_name}")
         assert isinstance(metadata, dict)
-        fields = CreatemetaModelFactory(metadata, issuetype_name)
+        fields = CreatemetaModelFactory(metadata, issuetype_name, self.client)
         loaded = fields.make(data)
         assert loaded.key == issue_id  # type: ignore
         print(loaded.key)  # type: ignore
@@ -345,7 +365,7 @@ class Inspector:
             if not metadata:
                 raise CacheMissException(f"{issuetype}")
             assert isinstance(metadata, dict)
-            d[issuetype] = CreatemetaModelFactory(metadata, issuetype)
+            d[issuetype] = CreatemetaModelFactory(metadata, issuetype, client)
         return d
 
     @staticmethod
