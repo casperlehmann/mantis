@@ -182,6 +182,9 @@ if __name__ == '__main__':
         jira.cache.invalidate()
     elif jira_options.action == 'reset':
         jira.warmup()
+    elif jira_options.action == 'warmup-issues':
+        issue_names = [f'{jira.project_name}-{i}' for i in range(1, 6)]
+        jira.warmup_issues(*issue_names)
     elif jira_options.action == 'attempt':
         jira.system_config_loader.attempt(issue_id = "ECS-1", issuetype_name = "epic")
     else:
