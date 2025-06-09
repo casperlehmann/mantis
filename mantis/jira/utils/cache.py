@@ -140,6 +140,10 @@ class Cache:
         filename = f"{issuetype_name.lower()}.json"
         self._write(self.createmeta_schemas, filename, json.dumps(createmeta))
 
+    def write_editmeta_schema(self, issue_key: str, editmeta: dict[str, Any]) -> None:
+        filename = f"{issue_key.lower()}.json"
+        self._write(self.editmeta_schemas, filename, json.dumps(editmeta))
+
     def remove(self, filename: str) -> bool:
         if not (self.root / filename).exists():
             return False
