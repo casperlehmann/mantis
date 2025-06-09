@@ -37,6 +37,9 @@ class MetaModelFactory(ABC):
     def field_by_key(self, key: str) -> Any | None:
         pass
 
+    def _write_plugin(self) -> None:
+        pass
+
     @property
     def meta_fields(self) -> list[dict[str, Any]] | dict[str, dict[str, Any]]:
         return self.metadata["fields"]
@@ -139,8 +142,10 @@ class CreatemetaModelFactory(MetaModelFactory):
         "timespent",
     }
 
-    def __init__(self, metadata: Dict[str, Any]):
+    def __init__(self, metadata: Dict[str, Any], issuetype_name: str, client: "JiraClient", write_plugin: bool=True) -> None:
         super().__init__(metadata)
+        self.client = client
+        self.issuetype_name = issuetype_name
         if isinstance(self.meta_fields, dict):
             raise ValueError('CreatemetaModelFactory.meta_fields should be of type list. '
                              'Got dict. Did you accidentally pass be an "editmeta"?')
@@ -148,6 +153,19 @@ class CreatemetaModelFactory(MetaModelFactory):
             raise TypeError(
                 f'CreatemetaModelFactory.meta_fields should be of type list. Got: {type(self.meta_fields)}')
         self.create_model()
+        if write_plugin:
+            self._write_plugin()
+
+    def _write_plugin(self) -> None:
+        schema = self.model.model_json_schema()
+        self.client.cache.write_createmeta_schema(self.issuetype_name, schema)
+        output_plugin = self.client.plugins_dir / f'{self.issuetype_name.lower()}_createmeta.py'
+        generate(
+            json.dumps(schema),
+            input_file_type=InputFileType.JsonSchema,
+            output=output_plugin,
+            output_model_type=DataModelType.PydanticV2BaseModel,
+        )
 
     def field_by_key(self, key: str, default: Any | None = None) -> Any | None:
         return next((item for item in self._iter_meta_fields if item.get('key') == key), default)
@@ -176,6 +194,7 @@ class EditmetaModelFactory(MetaModelFactory):
         assert isinstance(self.meta_fields, dict), 'Asserting to satisfy type checker.'
         return self.meta_fields.get(key, default)
 
+
 class JiraSystemConfigLoader:
     def __init__(self, client: "JiraClient") -> None:
         self.client = client
@@ -188,7 +207,7 @@ class JiraSystemConfigLoader:
         if not metadata:
             raise CacheMissException(f"{issuetype_name}")
         assert isinstance(metadata, dict)
-        fields = CreatemetaModelFactory(metadata)
+        fields = CreatemetaModelFactory(metadata, issuetype_name, self.client)
         loaded = fields.make(data)
         assert loaded.key == issue_id  # type: ignore
         print(loaded.key)  # type: ignore
@@ -249,18 +268,15 @@ class JiraSystemConfigLoader:
         issuetypes: dict[str, list[dict[str, Any]]] = self.get_issuetypes(force_skip_cache = False)
         nested_issuetypes = issuetypes['issueTypes']
 
-        for issuetype in nested_issuetypes:
-            data = self._update_single_createmeta(issuetype)
+        for issuetype_data in nested_issuetypes:
+            issuetype_name: str = issuetype_data['name']
+            data = self._update_single_createmeta(issuetype_name)
+            # Run CreatemetaModelFactory to dump schemas
+            fields = CreatemetaModelFactory(data, issuetype_name, self.client)
         return self.client.issues.load_allowed_types()
 
-    def _update_single_createmeta(self, issuetype: dict[str, Any]) -> dict[str, Any]:
-        assert 'name' in issuetype.keys()
-        assert 'id' in issuetype.keys()
-        issuetype_name: str = issuetype['name']
-        issuetype_id: str = issuetype['id']
-        assert isinstance(issuetype_name, str)
-        assert isinstance(issuetype_id, str)
-        data: dict[str, Any] = self.client.get_createmeta(issuetype_id)
+    def _update_single_createmeta(self, issuetype_name: str) -> dict[str, Any]:
+        data: dict[str, Any] = self.get_createmeta(issuetype_name)
         assert isinstance(data, dict)
         self.cache.write_createmeta(issuetype_name, data)
         return data
@@ -344,7 +360,7 @@ class Inspector:
             if not metadata:
                 raise CacheMissException(f"{issuetype}")
             assert isinstance(metadata, dict)
-            d[issuetype] = CreatemetaModelFactory(metadata)
+            d[issuetype] = CreatemetaModelFactory(metadata, issuetype, client)
         return d
 
     @staticmethod

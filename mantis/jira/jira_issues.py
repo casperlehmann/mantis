@@ -55,13 +55,12 @@ class JiraIssue:
 
     @property
     def createmeta_data(self) -> dict[str, int | list[dict[str, Any]]]:
-        self._createmeta_data = self.client.system_config_loader.get_createmeta(self.issuetype)
-        return self._createmeta_data
+        return self.client.system_config_loader.get_createmeta(self.issuetype)
 
     @property
     def createmeta_factory(self) -> CreatemetaModelFactory:
         if self._createmeta_factory is None:
-            self._createmeta_factory = CreatemetaModelFactory(self.createmeta_data)
+            self._createmeta_factory = CreatemetaModelFactory(self.createmeta_data, self.issuetype, self.client)
         return self._createmeta_factory
 
     @property
