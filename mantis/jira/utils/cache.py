@@ -21,6 +21,7 @@ class Cache:
         self.createmeta.mkdir(exist_ok=True)
         self.createmeta_schemas.mkdir(exist_ok=True)
         self.editmeta.mkdir(exist_ok=True)
+        self.editmeta_schemas.mkdir(exist_ok=True)
 
     def invalidate(self) -> None:
         if self.root.exists():
@@ -32,6 +33,7 @@ class Cache:
         self.createmeta.mkdir(exist_ok=True)
         self.createmeta_schemas.mkdir(exist_ok=True)
         self.editmeta.mkdir(exist_ok=True)
+        self.editmeta_schemas.mkdir(exist_ok=True)
 
     @property
     def root(self) -> Path:
@@ -52,6 +54,10 @@ class Cache:
     @property
     def createmeta_schemas(self) -> Path:
         return self.system / "createmeta_schemas"
+
+    @property
+    def editmeta_schemas(self) -> Path:
+        return self.system / "editmeta_schemas"
 
     @property
     def editmeta(self) -> Path:
