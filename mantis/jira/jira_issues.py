@@ -71,7 +71,7 @@ class JiraIssue:
 
     @property
     def editmeta_data(self) -> dict[str, Any]:
-        return self.client.get_editmeta(self.key)
+        return self.client.system_config_loader.get_editmeta(self.key)
 
     @property
     def editmeta_factory(self) -> EditmetaModelFactory:
