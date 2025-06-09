@@ -37,6 +37,7 @@ class MetaModelFactory(ABC):
     def field_by_key(self, key: str) -> Any | None:
         pass
 
+    @abstractmethod
     def _write_plugin(self) -> None:
         pass
 
