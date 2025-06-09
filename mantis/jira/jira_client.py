@@ -161,7 +161,7 @@ class JiraClient:
         response.raise_for_status()
         return response.json()
 
-    def warmup(self, delete_drafts=False) -> None:
+    def warmup(self, delete_drafts: bool=False) -> None:
         if delete_drafts:
             if self.drafts_dir.exists():
                 # This violently removes everything. Don't store anything important in the drafts_dir.
