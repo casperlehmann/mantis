@@ -77,7 +77,7 @@ class JiraIssue:
     def editmeta_factory(self) -> EditmetaModelFactory:
         # TODO: Consider if editmeta itself should be cached instead.
         if self._editmeta_factory is None:
-            self._editmeta_factory = EditmetaModelFactory(self.editmeta_data)
+            self._editmeta_factory = EditmetaModelFactory(self.editmeta_data, self.issuetype, self.client, self.key)
         return self._editmeta_factory
 
     @property
