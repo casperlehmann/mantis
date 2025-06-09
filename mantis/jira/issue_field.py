@@ -137,7 +137,9 @@ class IssueField:
 
     @property
     def payload(self) -> dict[str, Any] | str | Any:
-        if self.editmeta_type in {'string'}:
+        if self.key in {'parent'}:
+            return {'key': self.value_from_draft} # works
+        elif self.editmeta_type in {'string'}:
             return self.value_from_draft
         elif self.editmeta_type in {'issuetype'}:
             # When using the issuetype_name

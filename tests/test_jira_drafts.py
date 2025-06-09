@@ -51,7 +51,7 @@ class TestJiraDraft:
         )
         with open(fake_jira.drafts_dir / "ECS-1.md", "r") as f:
             for content in f.readlines():
-                assert content.strip() in expectations, f"content.strip() ({content.strip()}) not in expectations in: {expectations}"
+                assert content.strip() in expectations, f"content.strip() ({[content.strip()]}) not in expectations in:\n\t{expectations}"
 
     def test_read_draft(self, fake_jira: JiraClient, requests_mock):
         requests_mock.get(f'{fake_jira.api_url}/issue/ECS-1', json=CacheData().ecs_1)

@@ -3,8 +3,7 @@ assignee: null
 header: '[ECS-5] (Sample) Order Confirmation'
 ignore: true
 issuetype: Task
-parent:
-  parent: null
+parent: ECS-2
 project: E-Commerce Checkout System
 reporter: Casper Lehmann
 status: To Do

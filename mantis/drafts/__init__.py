@@ -48,9 +48,18 @@ class Draft:
             if str(template_value) in ('True', 'False'):
                 self.template.metadata[field_name] = template_value
             elif isinstance(value, dict):
-                for nested_field in ('displayName', 'name'):
+                for nested_field in (
+                    'displayName', # Users
+                    'name', # Most other fields
+                    'key' # Parent
+                    # To-do...
+                ):
                     if nested_field in value:
                         self.template.metadata[field_name] = value.get(nested_field)
+                        # Note: We break, in order to avoid `key` overwriting `name` in cases like:
+                        # - name: E-Commerce Checkout System
+                        # = key: ECS
+                        break
             else:
                 self.template.metadata[field_name] = value
         # The header is not a Jira field.

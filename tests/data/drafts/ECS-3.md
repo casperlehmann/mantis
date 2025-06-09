@@ -3,8 +3,7 @@ assignee: null
 header: '[ECS-3] (Sample) Credit Card Payment Integration'
 ignore: true
 issuetype: Bug
-parent:
-  parent: null
+parent: ECS-2
 project: E-Commerce Checkout System
 reporter: Casper Lehmann
 status: In Progress
