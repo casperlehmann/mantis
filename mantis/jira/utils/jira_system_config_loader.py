@@ -37,7 +37,7 @@ class MetaModelFactory(ABC):
     def field_by_key(self, key: str) -> Any | None:
         pass
 
-    def _write_plugin(self):
+    def _write_plugin(self) -> None:
         pass
 
     @property
@@ -142,7 +142,7 @@ class CreatemetaModelFactory(MetaModelFactory):
         "timespent",
     }
 
-    def __init__(self, metadata: Dict[str, Any], issuetype_name: str, client: "JiraClient", write_plugin=True):
+    def __init__(self, metadata: Dict[str, Any], issuetype_name: str, client: "JiraClient", write_plugin: bool=True) -> None:
         super().__init__(metadata)
         self.client = client
         self.issuetype_name = issuetype_name
@@ -156,7 +156,7 @@ class CreatemetaModelFactory(MetaModelFactory):
         if write_plugin:
             self._write_plugin()
 
-    def _write_plugin(self):
+    def _write_plugin(self) -> None:
         schema = self.model.model_json_schema()
         self.client.cache.write_createmeta_schema(self.issuetype_name, schema)
         output_plugin = self.client.plugins_dir / f'{self.issuetype_name.lower()}_createmeta.py'
