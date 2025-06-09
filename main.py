@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import json
 from pprint import pprint
 
 from mantis.jira import JiraAuth, JiraClient, JiraOptions, parse_args
@@ -178,6 +179,11 @@ if __name__ == '__main__':
 
         from plugins.plugins_test import Schema
         print(Schema(type='a', system='b'))
+        from plugins.new_epic import IssueModel
+        with open('tests/data/jira_cache/issues/ECS-1.json') as f:
+            ecs_1 = json.load(f)
+        print(IssueModel(**ecs_1))
+        print(IssueModel.model_validate(ecs_1))
     elif jira_options.action == 'invalidate-cache':
         jira.cache.invalidate()
     elif jira_options.action == 'reset':
