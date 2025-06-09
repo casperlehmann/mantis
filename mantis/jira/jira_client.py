@@ -1,5 +1,6 @@
 from pprint import pprint
 import re
+import shutil
 import requests
 
 from pathlib import Path
@@ -160,7 +161,12 @@ class JiraClient:
         response.raise_for_status()
         return response.json()
 
-    def warmup(self) -> None:
+    def warmup(self, delete_drafts: bool=False) -> None:
+        if delete_drafts:
+            if self.drafts_dir.exists():
+                # This violently removes everything. Don't store anything important in the drafts_dir.
+                shutil.rmtree(self.drafts_dir)
+                self.drafts_dir.mkdir(exist_ok=True)
         self.cache.invalidate()
         self.system_config_loader.get_projects(force_skip_cache = True)
         assert not self.cache.get_issuetypes_from_system_cache()

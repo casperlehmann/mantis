@@ -187,7 +187,7 @@ if __name__ == '__main__':
     elif jira_options.action == 'invalidate-cache':
         jira.cache.invalidate()
     elif jira_options.action == 'reset':
-        jira.warmup()
+        jira.warmup(delete_drafts=False)
     elif jira_options.action == 'warmup-issues':
         issue_names = [f'{jira.project_name}-{i}' for i in range(1, 6)]
         jira.warmup_issues(*issue_names)
