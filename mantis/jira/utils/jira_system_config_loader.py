@@ -158,10 +158,8 @@ class CreatemetaModelFactory(MetaModelFactory):
 
     def _write_plugin(self):
         schema = self.model.model_json_schema()
-        output_json_schema = self.client.cache.createmeta_schemas / f'{self.issuetype_name.lower()}.json'
+        self.client.cache.write_createmeta_schema(self.issuetype_name, schema)
         output_plugin = self.client.plugins_dir / f'{self.issuetype_name.lower()}_createmeta.py'
-        with open(output_json_schema, 'w') as f:
-            json.dump(schema, f)
         generate(
             json.dumps(schema),
             input_file_type=InputFileType.JsonSchema,
@@ -270,20 +268,15 @@ class JiraSystemConfigLoader:
         issuetypes: dict[str, list[dict[str, Any]]] = self.get_issuetypes(force_skip_cache = False)
         nested_issuetypes = issuetypes['issueTypes']
 
-        for issuetype in nested_issuetypes:
-            data = self._update_single_createmeta(issuetype)
+        for issuetype_data in nested_issuetypes:
+            issuetype_name: str = issuetype_data['name']
+            data = self._update_single_createmeta(issuetype_name)
             # Run CreatemetaModelFactory to dump schemas
-            fields = CreatemetaModelFactory(data, issuetype['name'], self.client)
+            fields = CreatemetaModelFactory(data, issuetype_name, self.client)
         return self.client.issues.load_allowed_types()
 
-    def _update_single_createmeta(self, issuetype: dict[str, Any]) -> dict[str, Any]:
-        assert 'name' in issuetype.keys()
-        assert 'id' in issuetype.keys()
-        issuetype_name: str = issuetype['name']
-        issuetype_id: str = issuetype['id']
-        assert isinstance(issuetype_name, str)
-        assert isinstance(issuetype_id, str)
-        data: dict[str, Any] = self.client.get_createmeta(issuetype_id)
+    def _update_single_createmeta(self, issuetype_name: str) -> dict[str, Any]:
+        data: dict[str, Any] = self.get_createmeta(issuetype_name)
         assert isinstance(data, dict)
         self.cache.write_createmeta(issuetype_name, data)
         return data
