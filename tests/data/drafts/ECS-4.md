@@ -3,8 +3,7 @@ assignee: null
 header: '[ECS-4] (Sample) User Registration'
 ignore: true
 issuetype: Story
-parent:
-  parent: null
+parent: ECS-1
 project: E-Commerce Checkout System
 reporter: Casper Lehmann
 status: In Progress
