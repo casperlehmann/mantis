@@ -315,6 +315,13 @@ class JiraSystemConfigLoader:
         self.cache.write_createmeta(issuetype_name, data)
         return data
 
+    def _update_single_editmeta(self, issue_key: str) -> dict[str, Any]:
+        print(f'Getting editmeta for {issue_key}')
+        data: dict[str, Any] = self.client.get_editmeta(issue_key)
+        assert isinstance(data, dict)
+        self.cache.write_editmeta(issue_key, data)
+        return data
+
     def compile_plugins(self) -> None:
         for input_file in self.cache.iter_dir("createmeta"):
             with open(input_file, "r") as f:
