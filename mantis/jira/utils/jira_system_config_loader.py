@@ -408,12 +408,13 @@ class Inspector:
     def get_editmeta_models(client: 'JiraClient', issue_keys: list[str]) -> dict[str, EditmetaModelFactory]:    
         d: dict[str, EditmetaModelFactory] = {}
         for issue_key in issue_keys:
-            metadata = client.issues.get(issue_key).editmeta_data
+            issue = client.issues.get(issue_key)
+            metadata = issue.editmeta_data
             if not metadata:
                 raise CacheMissException(f"{issue_key}")
             assert isinstance(metadata, dict), f'Editmeta for {issue_key} is not a dict. Got: {type(metadata)}): {metadata}'
             assert 'fields' in metadata.keys()
-            d[issue_key] = EditmetaModelFactory(metadata)
+            d[issue_key] = EditmetaModelFactory(metadata, issue.issuetype, client, issue.key)
         return d
 
     @classmethod
