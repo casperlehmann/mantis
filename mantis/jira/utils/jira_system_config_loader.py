@@ -181,8 +181,11 @@ class EditmetaModelFactory(MetaModelFactory):
         "environment"
     }
 
-    def __init__(self, metadata: Dict[str, Any]):
+    def __init__(self, metadata: Dict[str, Any], issuetype_name: str, client: "JiraClient", issue_key: str, write_plugin=True):
         super().__init__(metadata)
+        self.client = client
+        self.issuetype_name = issuetype_name
+        self.issue_key = issue_key
         if isinstance(self.meta_fields, list):
             raise ValueError('EditmetaModelFactory.meta_fields should be of type dict. '
                              'Got list. Did you accidentally pass be a "createmeta"?')
