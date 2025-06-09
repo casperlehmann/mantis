@@ -1,7 +1,7 @@
 {
   "startAt": 0,
   "maxResults": 50,
-  "total": 20,
+  "total": 18,
   "fields": [
     {
       "required": false,
@@ -216,21 +216,6 @@
       "fieldId": "issuelinks"
     },
     {
-      "required": false,
-      "schema": {
-        "type": "issuerestriction",
-        "system": "issuerestriction"
-      },
-      "name": "Restrict to",
-      "key": "issuerestriction",
-      "hasDefaultValue": false,
-      "operations": [
-        "set"
-      ],
-      "allowedValues": [],
-      "fieldId": "issuerestriction"
-    },
-    {
       "required": true,
       "schema": {
         "type": "issuetype",
@@ -272,20 +257,6 @@
         "remove"
       ],
       "fieldId": "labels"
-    },
-    {
-      "required": false,
-      "schema": {
-        "type": "issuelink",
-        "system": "parent"
-      },
-      "name": "Parent",
-      "key": "parent",
-      "hasDefaultValue": false,
-      "operations": [
-        "set"
-      ],
-      "fieldId": "parent"
     },
     {
       "required": true,

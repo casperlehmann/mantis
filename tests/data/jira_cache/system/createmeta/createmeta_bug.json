@@ -1,7 +1,7 @@
 {
   "startAt": 0,
   "maxResults": 50,
-  "total": 17,
+  "total": 16,
   "fields": [
     {
       "required": false,
@@ -170,21 +170,6 @@
         "copy"
       ],
       "fieldId": "issuelinks"
-    },
-    {
-      "required": false,
-      "schema": {
-        "type": "issuerestriction",
-        "system": "issuerestriction"
-      },
-      "name": "Restrict to",
-      "key": "issuerestriction",
-      "hasDefaultValue": false,
-      "operations": [
-        "set"
-      ],
-      "allowedValues": [],
-      "fieldId": "issuerestriction"
     },
     {
       "required": true,
