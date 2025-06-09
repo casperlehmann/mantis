@@ -238,7 +238,11 @@ class JiraSystemConfigLoader:
     def loop_createmeta(self) -> Generator[Path, Any, None]:
         for file in self.cache.createmeta.iterdir():
             yield file
-    
+
+    def loop_editmeta(self) -> Generator[Path, Any, None]:
+        for file in self.cache.editmeta.iterdir():
+            yield file
+
     def get_projects(self, force_skip_cache: bool = False) -> list[dict[str, Any]]:
         if not self.client._no_read_cache or force_skip_cache:
             projects = self.cache.get_projects_from_system_cache()
