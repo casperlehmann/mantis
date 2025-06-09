@@ -181,7 +181,7 @@ class EditmetaModelFactory(MetaModelFactory):
         "environment"
     }
 
-    def __init__(self, metadata: Dict[str, Any], issuetype_name: str, client: "JiraClient", issue_key: str, write_plugin=True):
+    def __init__(self, metadata: Dict[str, Any], issuetype_name: str, client: "JiraClient", issue_key: str, write_plugin: bool=True) -> None:
         super().__init__(metadata)
         self.client = client
         self.issuetype_name = issuetype_name
@@ -200,7 +200,7 @@ class EditmetaModelFactory(MetaModelFactory):
         assert isinstance(self.meta_fields, dict), 'Asserting to satisfy type checker.'
         return self.meta_fields.get(key, default)
 
-    def _write_plugin(self):
+    def _write_plugin(self) -> None:
         schema = self.model.model_json_schema()
         self.client.cache.write_editmeta_schema(self.issue_key, schema)
         output_plugin = self.client.plugins_dir / f'{self.issue_key.lower()}_editmeta.py'
