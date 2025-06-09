@@ -14,12 +14,12 @@ class TestConfigLoader:
         requests_mock.get(f'{fake_jira.api_url}/issue/createmeta/TEST/issuetypes', json=get_issuetypes_response)
 
         set_with_no_issuetypes = list_system_cache_contents(fake_jira)
-        assert set_with_no_issuetypes == {'createmeta', 'editmeta', 'createmeta_schemas'}, (
+        assert set_with_no_issuetypes == {'createmeta', 'editmeta', 'createmeta_schemas', 'editmeta_schemas'}, (
             f"System cache expected 2 values. Got: {set_with_no_issuetypes}")
 
         fake_jira.system_config_loader.get_issuetypes(force_skip_cache = True)
         set_with_issuetypes = list_system_cache_contents(fake_jira)
-        assert set_with_issuetypes == {'createmeta', 'editmeta', 'createmeta_schemas', 'issuetypes.json'}, (
+        assert set_with_issuetypes == {'createmeta', 'editmeta', 'createmeta_schemas', 'issuetypes.json', 'editmeta_schemas'}, (
             f"System cache expected 3 values. Got: {fake_jira.cache.system}")
 
     def test_config_loader_loop_yields_files(self, fake_jira: JiraClient, requests_mock):
