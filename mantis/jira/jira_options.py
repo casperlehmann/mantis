@@ -54,6 +54,22 @@ class JiraOptions:
             and parser.type_id_cutoff
             or options.get("jira", {}).get("type-id-cutoff", 10100)
         )
+
+        self.chat_gpt_base_url = (
+            parser
+            and parser.chat_gpt_base_url
+            or options.get("openai", {}).get("chat-gpt-base-url")
+        )
+        self.chat_gpt_api_key = (
+            parser
+            and parser.chat_gpt_api_key
+            or options.get("openai", {}).get("chat-gpt-api-key")
+        )
+        self.chat_gpt_activated = (
+            parser
+            and parser.chat_gpt_activated
+            or options.get("openai", {}).get("chat-gpt-activated")
+        )
         self.action = parser and parser.action or ""
         self.issues: list[str] = parser and parser.issues or []
         assert self.user, "JiraOptions.user not set"
@@ -63,6 +79,9 @@ class JiraOptions:
         assert self.cache_dir, "JiraOptions.cache_dir not set"
         assert self.drafts_dir, "JiraOptions.drafts_dir not set"
         assert self.plugins_dir, "JiraOptions.plugins_dir not set"
+        if self.chat_gpt_activated:
+            assert self.chat_gpt_base_url, f"ChatGPT is activated, but JiraOptions.chat_gpt_base_url not set {options}"
+            assert self.chat_gpt_api_key, f"ChatGPT is activated, but JiraOptions.chat_gpt_api_key not set {options}"
 
 
 def parse_args(args_overwrite: list[str] | None = None) -> argparse.Namespace:
@@ -123,6 +142,24 @@ def parse_args(args_overwrite: list[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument(
         "--action", dest="action", default="get-issue", help="Get an issue from Jira"
+    )
+    parser.add_argument(
+        "--chat-gpt-base-url",
+        dest='chat_gpt_base_url',
+        default=None,
+        help="Base URL for the ChatGPT API",
+    )
+    parser.add_argument(
+        "--chat-gpt-api-key",
+        dest='chat_gpt_api_key',
+        default=None,
+        help="API Key for the ChatGPT API",
+    )
+    parser.add_argument(
+        "--chat-gpt-activated",
+        dest='chat_gpt_activated',
+        default=None,
+        help="Activation of ChatGPT API",
     )
     parser.add_argument(
         "issues",

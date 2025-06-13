@@ -12,6 +12,7 @@ class TestJiraOptions:
         assert opts.user == "user_2@domain.com"
         assert opts.url == "https://account_2.atlassian-host.net"
         assert opts.personal_access_token == "SECRET_2"
+        assert opts.chat_gpt_base_url == 'https://api.fakeai.com/v1'
 
 
     def test_jira_options_override(self, fake_toml, fake_cli):
