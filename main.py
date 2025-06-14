@@ -3,6 +3,7 @@
 import json
 from pprint import pprint
 
+from mantis.assistant.assistant import TextFormat
 from mantis.jira import JiraAuth, JiraClient, JiraOptions, parse_args
 from mantis.jira.issue_field import IssueField
 
@@ -193,6 +194,9 @@ if __name__ == '__main__':
         jira.warmup_issues(*issue_names)
     elif jira_options.action == 'attempt':
         jira.system_config_loader.attempt(issue_id = "ECS-1", issuetype_name = "epic")
+    elif jira_options.action == 'convert-markdown-to-jira':
+        converted = jira.assistant.convert_text_format("# This is a header\n\nThis is a paragraph with **bold** text and *italic* text.", TextFormat.JIRA)
+        print(converted)
     else:
         print(f'Action {jira_options.action} not recognized')
 
