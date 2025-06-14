@@ -65,10 +65,10 @@ class JiraOptions:
             and parser.chat_gpt_api_key
             or options.get("openai", {}).get("chat-gpt-api-key")
         )
-        self.chat_gpt_activated = (
+        self.chat_gpt_activated: bool = (
             parser
             and parser.chat_gpt_activated
-            or options.get("openai", {}).get("chat-gpt-activated")
+            or options.get("openai", {}).get("chat-gpt-activated", False)
         )
         self.action = parser and parser.action or ""
         self.issues: list[str] = parser and parser.issues or []
