@@ -47,8 +47,8 @@ def fake_cli():
 
 
 @pytest.fixture
-def opts_from_fake_cli(fake_cli):
-    return JiraOptions(parser=fake_cli)
+def opts_from_fake_cli(fake_cli, fake_toml):
+    return JiraOptions(parser=fake_cli, toml_source=fake_toml)
 
 
 @pytest.fixture
