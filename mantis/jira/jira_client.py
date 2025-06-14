@@ -1,11 +1,13 @@
 from pprint import pprint
 import re
 import shutil
+from openai import OpenAI
 import requests
 
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
+from mantis.assistant import Assistant
 from mantis.jira.auto_complete import AutoComplete, Suggestion
 from mantis.jira.jira_issues import JiraIssues
 from mantis.jira.utils import Cache, JiraSystemConfigLoader
@@ -31,6 +33,25 @@ def process_key(key: str, exception: Exception) -> tuple[str, str]:
             ) from exception
 
 
+class OpenAIClient:
+    def __init__(self, jira_client: 'JiraClient') -> None:
+        self.jira_client = jira_client
+        self.client = OpenAI(base_url=self.jira_client.options.chat_gpt_base_url, api_key=self.jira_client.options.chat_gpt_api_key)
+        
+    def get_completion(self, input_text: str, prompt: str, model: str = 'gpt-4.1') -> str:
+        completion = self.client.chat.completions.create(
+                model="gpt-4.1",
+                messages=[
+                    {"role": "developer", "content": prompt},
+                    {"role": "user", "content": input_text}
+                ]
+            )
+        response = completion.choices[0].message.content
+        if not response:
+            raise ValueError("Response is empty")
+        return response
+
+
 class JiraClient:
 
     _project_id: None | str = None
@@ -53,6 +74,8 @@ class JiraClient:
         self.system_config_loader = JiraSystemConfigLoader(self)
         self.issues = JiraIssues(self)
         self.auto_complete = AutoComplete(self)
+        self.open_ai_client = OpenAIClient(self)
+        self.assistant = Assistant(self)
 
     @property
     def drafts_dir(self) -> Path:
