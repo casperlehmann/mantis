@@ -97,6 +97,14 @@ class Draft:
         post.content = re.sub("^" + re.escape(extra_header)+'\\n*', '', post.content)
         return post
 
+    @property
+    def raw_draft(self) -> str:
+        with open(self.draft_path, "r") as f:
+            data = f.read()
+        if not data:
+            raise ValueError('Draft file does not contain any content')
+        return data
+
     def read_draft(self) -> frontmatter.Post:
         with open(self.draft_path, "r") as f:
             draft_data = frontmatter.load(f)
