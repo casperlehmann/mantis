@@ -197,6 +197,9 @@ if __name__ == '__main__':
     elif jira_options.action == 'convert-markdown-to-jira':
         converted = jira.assistant.convert_text_format("# This is a header\n\nThis is a paragraph with **bold** text and *italic* text.", TextFormat.JIRA)
         print(converted)
+    elif jira_options.action == 'make-verbose':
+        converted = jira.assistant.make_verbose("# This is a header\n\nThis is a paragraph with **bold** text and *italic* text.")
+        print(converted)
     else:
         print(f'Action {jira_options.action} not recognized')
 
