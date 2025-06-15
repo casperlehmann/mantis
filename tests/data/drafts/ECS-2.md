@@ -1,7 +1,6 @@
 ---
 assignee: null
 header: '[ECS-2] (Sample) Payment Processing'
-ignore: true
 issuetype: Epic
 parent: null
 project: E-Commerce Checkout System

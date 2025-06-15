@@ -1,7 +1,6 @@
 ---
 assignee: null
 header: '[ECS-4] (Sample) User Registration'
-ignore: true
 issuetype: Story
 parent: ECS-1
 project: E-Commerce Checkout System

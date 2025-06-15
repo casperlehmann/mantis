@@ -1,7 +1,6 @@
 ---
 assignee: null
 header: '[ECS-5] (Sample) Order Confirmation'
-ignore: true
 issuetype: Task
 parent: ECS-2
 project: E-Commerce Checkout System

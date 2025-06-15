@@ -1,7 +1,6 @@
 ---
 assignee: null
 header: '[ECS-6] (Sample) User Login'
-ignore: true
 issuetype: Task
 parent:
   parent: null
