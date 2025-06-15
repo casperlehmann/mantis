@@ -152,3 +152,14 @@ class Draft:
     def content(self) -> str:
         """Return the content of the draft."""
         return self.read_draft().content
+
+    def update_content(self, new_content: str) -> None:
+        self._validate_draft()
+        if not self.draft_path.exists():
+            raise FileNotFoundError(f'Draft file at {self.draft_path} does not exist.')
+        with open(self.draft_path, "r") as f:
+            data = frontmatter.load(f)
+        data.content = self.header_from_raw + '\n\n' + new_content
+        with open(self.draft_path, "wb") as f:
+            frontmatter.dump(data, f)
+
