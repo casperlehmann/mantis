@@ -13,13 +13,13 @@ if TYPE_CHECKING:
 
 class Draft:
     def __init__(self, jira: "JiraClient", issue: "JiraIssue") -> None:
-        self.template = self.load_template()
+        self.template = self._load_template()
         assert jira.drafts_dir
         self.jira = jira
         self.issue = issue
         self.draft_path = self.jira.drafts_dir / f"{self.key}.md"
         self.summary = self.issue.get_field("summary", "")
-        assert self.required_frontmatter == ['header', 'project', 'parent', 'summary', 'status', 'issuetype', 'assignee', 'reporter']
+        assert self._required_frontmatter == ['header', 'project', 'parent', 'summary', 'status', 'issuetype', 'assignee', 'reporter']
         self._materialize()
 
     @property
@@ -34,15 +34,15 @@ class Draft:
         return f'[{self.key}] {self.summary}'
 
     @property
-    def required_frontmatter(self) -> list[str]:
+    def _required_frontmatter(self) -> list[str]:
         return list(self.template.metadata.keys())
 
-    def load_template(self) -> frontmatter.Post:
+    def _load_template(self) -> frontmatter.Post:
         with open('mantis/drafts/template.md', 'r') as f:
             return frontmatter.load(f)
 
-    def generate_frontmatter(self) -> None:
-        for field_name in self.required_frontmatter:
+    def _generate_frontmatter(self) -> None:
+        for field_name in self._required_frontmatter:
             value = self.issue.get_field(field_name, None)
             template_value = self.template.metadata.get(field_name)
             if str(template_value) in ('True', 'False'):
@@ -65,7 +65,7 @@ class Draft:
         # The header is not a Jira field.
         self.template.metadata['header'] = self.formatted_header
 
-    def generate_body(self) -> None:
+    def _generate_body(self) -> None:
         description = self.issue.get_field("description")
         self.template.content = (self.template.content
             .replace('{summary}', self.summary)
@@ -75,12 +75,12 @@ class Draft:
     def _materialize(self) -> None:
         # Only write if not exists!
         if not self.draft_path.exists():
-            self.generate_frontmatter()
-            self.generate_body()
+            self._generate_frontmatter()
+            self._generate_body()
             with open(self.draft_path, "wb") as f:
                 frontmatter.dump(self.template, f)
 
-    def remove_draft_header(self, post: frontmatter.Post) -> frontmatter.Post:
+    def _remove_draft_header(self, post: frontmatter.Post) -> frontmatter.Post:
         extra_header = f'# {self.summary}'
         post.content = re.sub("^" + re.escape(extra_header)+'\\n*', '', post.content)
         return post
@@ -88,7 +88,7 @@ class Draft:
     def read_draft(self) -> frontmatter.Post:
         with open(self.draft_path, "r") as f:
             draft_data = frontmatter.load(f)
-        draft_data = self.remove_draft_header(draft_data)
+        draft_data = self._remove_draft_header(draft_data)
         return draft_data
 
     def iter_draft_field_items(self) -> Generator[tuple[str, Any], None, None]:
