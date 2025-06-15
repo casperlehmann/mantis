@@ -19,6 +19,9 @@ class Cli:
     type_id_cutoff = "10100"
     action = ""
     issues = [""]
+    chat_gpt_activated = False
+    chat_gpt_base_url = "https://api.fakeai.com/v1"
+    chat_gpt_api_key = "socks_off_full_throttle_$%^"
 
 
 @pytest.fixture
@@ -33,7 +36,13 @@ def fake_toml(tmpdir):
             'cache-dir = ".jira_cache_test"',
             'drafts-dir = "drafts_test"',
             'plugins-dir = "plugins_test"',
-            'type-id-cutoff = "10100"' "",
+            'type-id-cutoff = "10100"',
+            "",
+            '[openai]',
+            'chat-gpt-activated = false',
+            'chat-gpt-base-url = "https://api.fakeai.com/v1"',
+            'chat-gpt-api-key = "socks_off_full_throttle_$%^"',
+            "",
         )
     )
     toml = tmpdir / "options.toml"

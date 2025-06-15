@@ -66,10 +66,16 @@ class Draft:
         self.template.metadata['header'] = self.formatted_header
 
     def _generate_body(self) -> None:
-        description = self.issue.get_field("description")
-        self.template.content = (self.template.content
-            .replace('{summary}', self.summary)
-            .replace('{description}', j2m(description))
+        description = self.issue.get_field("description") or "Placeholder description"
+        if self.jira.options.chat_gpt_activated:
+            description = self.jira.assistant.convert_text_format(
+                input_text=description,
+                target_format=self.jira.assistant.TextFormat.MARKDOWN
+            )
+        self.template.content = (
+            self.template.content
+                .replace('{summary}', self.summary)
+                .replace('{description}', description)
         )
 
     def _materialize(self) -> None:

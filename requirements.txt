@@ -10,3 +10,4 @@ datamodel-code-generator
 mypy
 flake8
 python-frontmatter
+OpenAI

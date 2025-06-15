@@ -8,3 +8,7 @@ drafts-dir = "drafts"
 plugins-dir = "plugins"
 type_id_cutoff = "10100"
 
+[openai]
+chat-gpt-activated = true
+chat-gpt-base-url = "https://api.openai.com/v1"
+chat-gpt-api-key = "socks_off_full_throttle_$%^"
