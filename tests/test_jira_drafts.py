@@ -75,3 +75,11 @@ class TestJiraDraft:
         draft_field = draft_data.get('summary', 'N/A')
         assert extracted_from_issue_field == draft_field
 
+    def test_read_content(self, fake_jira: JiraClient, requests_mock):
+        requests_mock.get(f'{fake_jira.api_url}/issue/ECS-1', json=CacheData().ecs_1)
+
+        issue_key = 'ECS-1'
+        issue = fake_jira.issues.get(key=issue_key)
+        draft_content = issue.draft.content
+        assert isinstance(draft_content, str)
+        assert draft_content == "Implement user authentication for the checkout system."

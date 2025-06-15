@@ -117,3 +117,8 @@ class Draft:
         local_vars = ('header')
         draft_data = self.read_draft()
         return draft_data.get(key, default)
+
+    @property
+    def content(self) -> str:
+        """Return the content of the draft."""
+        return self.read_draft().content
