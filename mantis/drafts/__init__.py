@@ -163,3 +163,9 @@ class Draft:
         with open(self.draft_path, "wb") as f:
             frontmatter.dump(data, f)
 
+    def make_verbose(self) -> dict[str, str]:
+        """Expand the content of the draft."""
+        original_content = self.content
+        verbose_content = self.jira.assistant.make_verbose(original_content)
+        self.update_content(verbose_content)
+        return {'original_content': original_content, 'verbose_content': verbose_content}
