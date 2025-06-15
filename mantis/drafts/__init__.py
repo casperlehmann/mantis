@@ -85,11 +85,41 @@ class Draft:
             self._generate_body()
             with open(self.draft_path, "wb") as f:
                 frontmatter.dump(self.template, f)
+                
+    def _validate_draft(self) -> None:
+        if '---' not in self.raw_draft:
+            raise ValueError(f'Draft file at {self.draft_path} does not contain the expected separator: "---": {self.raw_draft}')
+        if f'# {self.summary}' not in self.raw_draft:
+            raise ValueError(f'Draft file at {self.draft_path} does not contain the expected header: "# {self.summary}"')
 
     def _remove_draft_header(self, post: frontmatter.Post) -> frontmatter.Post:
         extra_header = f'# {self.summary}'
         post.content = re.sub("^" + re.escape(extra_header)+'\\n*', '', post.content)
         return post
+
+    @property
+    def raw_draft(self) -> str:
+        with open(self.draft_path, "r") as f:
+            data = f.read()
+        if not data:
+            raise ValueError('Draft file does not contain any content')
+        return data
+
+    @property
+    def header_from_raw(self) -> str:
+        try:
+            content = self.raw_draft.split('---')[2].strip()
+        except IndexError:
+            raise ValueError('Draft file has no content')
+        try:
+            header = content.split('\n')[0]
+        except IndexError:
+            raise ValueError('Draft file is empty')
+        if not header.startswith('# '):
+            raise ValueError(f'Expected draft to start with a markdown header ("#"). Got: "{header}"')
+        if not header == f'# {self.summary}':
+            raise ValueError(f'Expected draft header to match summary. Got: "{header}" || "{self.summary}"')
+        return header
 
     def read_draft(self) -> frontmatter.Post:
         with open(self.draft_path, "r") as f:
@@ -117,3 +147,25 @@ class Draft:
         local_vars = ('header')
         draft_data = self.read_draft()
         return draft_data.get(key, default)
+
+    @property
+    def content(self) -> str:
+        """Return the content of the draft."""
+        return self.read_draft().content
+
+    def update_content(self, new_content: str) -> None:
+        self._validate_draft()
+        if not self.draft_path.exists():
+            raise FileNotFoundError(f'Draft file at {self.draft_path} does not exist.')
+        with open(self.draft_path, "r") as f:
+            data = frontmatter.load(f)
+        data.content = self.header_from_raw + '\n\n' + new_content
+        with open(self.draft_path, "wb") as f:
+            frontmatter.dump(data, f)
+
+    def make_verbose(self) -> dict[str, str]:
+        """Expand the content of the draft."""
+        original_content = self.content
+        verbose_content = self.jira.assistant.make_verbose(original_content)
+        self.update_content(verbose_content)
+        return {'original_content': original_content, 'verbose_content': verbose_content}
