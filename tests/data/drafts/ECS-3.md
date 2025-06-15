@@ -1,7 +1,6 @@
 ---
 assignee: null
 header: '[ECS-3] (Sample) Credit Card Payment Integration'
-ignore: true
 issuetype: Bug
 parent: ECS-2
 project: E-Commerce Checkout System

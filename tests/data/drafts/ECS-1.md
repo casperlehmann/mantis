@@ -1,7 +1,6 @@
 ---
 assignee: null
 header: '[ECS-1] (Sample) User Authentication'
-ignore: true
 issuetype: Epic
 parent: null
 project: E-Commerce Checkout System

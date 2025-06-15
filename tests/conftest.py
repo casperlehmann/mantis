@@ -86,7 +86,6 @@ def minimal_issue_payload():
         "key": "TASK-1",
         "fields": {
             "summary": "redacted",
-            "ignore": True,
             "header": "redacted",
             "project": {"key": "redacted", "name": "redacted"},
             "parent": "redacted",

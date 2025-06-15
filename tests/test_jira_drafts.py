@@ -34,7 +34,6 @@ class TestJiraDraft:
         expectations = (
             "---",
             "header: '[ECS-1] (Sample) User Authentication'",
-            "ignore: true",
             "parent: null",
             "summary: (Sample) User Authentication",
             "issuetype:",
@@ -64,7 +63,6 @@ class TestJiraDraft:
         assert set(draft_data.keys()) == {
             'assignee',
             'header',
-            'ignore',
             'issuetype',
             'parent',
             'project',

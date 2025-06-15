@@ -19,7 +19,7 @@ class Draft:
         self.issue = issue
         self.draft_path = self.jira.drafts_dir / f"{self.key}.md"
         self.summary = self.issue.get_field("summary", "")
-        assert self.required_frontmatter == ['ignore', 'header', 'project', 'parent', 'summary', 'status', 'issuetype', 'assignee', 'reporter']
+        assert self.required_frontmatter == ['header', 'project', 'parent', 'summary', 'status', 'issuetype', 'assignee', 'reporter']
         self._materialize()
 
     @property
@@ -92,7 +92,7 @@ class Draft:
         return draft_data
 
     def iter_draft_field_items(self) -> Generator[tuple[str, Any], None, None]:
-        local_vars = ('ignore', 'header')
+        local_vars = ('header')
         draft_data = self.read_draft()
         for draft_field_key in draft_data.keys():
             if draft_field_key in local_vars:  # E.g. Local custom fields
@@ -100,7 +100,7 @@ class Draft:
             yield draft_field_key, draft_data.get(draft_field_key)
 
     def iter_draft_field_keys(self) -> Generator[str, None, None]:
-        local_vars = ('ignore', 'header')
+        local_vars = ('header')
         draft_data = self.read_draft()
         for draft_field_key in draft_data.keys():
             if draft_field_key in local_vars:  # E.g. Local custom fields
@@ -108,6 +108,6 @@ class Draft:
             yield draft_field_key
 
     def get(self, key: str, default: Any = None) -> Any:
-        local_vars = ('ignore', 'header')
+        local_vars = ('header')
         draft_data = self.read_draft()
         return draft_data.get(key, default)

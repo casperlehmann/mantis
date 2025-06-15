@@ -1,5 +1,4 @@
 ---
-ignore: True
 header: "Will be set dynamically"
 project: {project}
 parent: {parent}
