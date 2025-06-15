@@ -66,9 +66,9 @@ class JiraOptions:
             or options.get("openai", {}).get("chat-gpt-api-key")
         )
         self.chat_gpt_activated: bool = (
-            parser
-            and parser.chat_gpt_activated
-            or options.get("openai", {}).get("chat-gpt-activated", False)
+            # Since a bool can be False, we can't rely on the truthiness of the value and use "or" like in the other cases.
+            parser.chat_gpt_activated if parser and isinstance(parser.chat_gpt_activated, bool)
+            else options.get("openai", {}).get("chat-gpt-activated", False)
         )
         self.action = parser and parser.action or ""
         self.issues: list[str] = parser and parser.issues or []
