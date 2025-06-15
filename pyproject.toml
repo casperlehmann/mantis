@@ -1,3 +1,38 @@
+[project]
+name = "mantis"
+version = "0.1.0"
+description = "CLI for locally managing Jira issues"
+authors = [
+    {name = "casperlehmann",email = "6682833+casperlehmann@users.noreply.github.com"}
+]
+license = { file = "LICENSE.md" }
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pytest (>=8.4.0,<9.0.0)",
+    "requests (>=2.32.4,<3.0.0)",
+    "requests-mock (>=1.12.1,<2.0.0)",
+    "types-requests (>=2.32.4.20250611,<3.0.0.0)",
+    "requests-auth (>=8.0.0,<9.0.0)",
+    "pytest-xdist (>=3.7.0,<4.0.0)",
+    "pytest-cov (>=6.2.1,<7.0.0)",
+    "pydantic (>=2.11.7,<3.0.0)",
+    "datamodel-code-generator (>=0.31.0,<0.32.0)",
+    "mypy (>=1.16.0,<2.0.0)",
+    "flake8 (>=7.2.0,<8.0.0)",
+    "python-frontmatter (>=1.1.0,<2.0.0)",
+    "openai (>=1.86.0,<2.0.0)"
+]
+
+[tool.poetry]
+
+[tool.poetry.group.dev.dependencies]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
 [mypy]
 
 [[requests.auth]]
