@@ -204,8 +204,9 @@ if __name__ == '__main__':
         data_ = jira.issues.get("ECS-1")
         data_.draft.update_content('Trolololo')
     elif jira_options.action == 'make-verbose':
-        converted = jira.assistant.make_verbose("# This is a header\n\nThis is a paragraph with **bold** text and *italic* text.")
-        print(converted)
+        data_ = jira.issues.get("ECS-1")
+        changes = data_.draft.make_verbose()
+        pprint(changes)
     else:
         print(f'Action {jira_options.action} not recognized')
 
