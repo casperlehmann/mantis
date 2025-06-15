@@ -105,6 +105,22 @@ class Draft:
             raise ValueError('Draft file does not contain any content')
         return data
 
+    @property
+    def header_from_raw(self) -> str:
+        try:
+            content = self.raw_draft.split('---')[2].strip()
+        except IndexError:
+            raise ValueError('Draft file has no content')
+        try:
+            header = content.split('\n')[0]
+        except IndexError:
+            raise ValueError('Draft file is empty')
+        if not header.startswith('# '):
+            raise ValueError(f'Expected draft to start with a markdown header ("#"). Got: "{header}"')
+        if not header == f'# {self.summary}':
+            raise ValueError(f'Expected draft header to match summary. Got: "{header}" || "{self.summary}"')
+        return header
+
     def read_draft(self) -> frontmatter.Post:
         with open(self.draft_path, "r") as f:
             draft_data = frontmatter.load(f)
