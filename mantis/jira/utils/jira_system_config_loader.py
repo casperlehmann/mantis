@@ -3,9 +3,10 @@ import json
 
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar, Dict, Generator, KeysView, Mapping, Optional
+import warnings
 
 from datamodel_code_generator import DataModelType, InputFileType, generate
-from pydantic import BaseModel, create_model
+from pydantic import BaseModel, PydanticDeprecatedSince20, create_model
 
 from mantis.jira.utils.cache import CacheMissException
 from mantis.jira.utils.jira_types import JiraIssueFieldSchema
@@ -161,6 +162,7 @@ class CreatemetaModelFactory(MetaModelFactory):
         schema = self.model.model_json_schema()
         self.client.cache.write_createmeta_schema(self.issuetype_name, schema)
         output_plugin = self.client.plugins_dir / f'{self.issuetype_name.lower()}_createmeta.py'
+        warnings.filterwarnings("ignore", category=PydanticDeprecatedSince20)
         generate(
             json.dumps(schema),
             input_file_type=InputFileType.JsonSchema,
@@ -204,6 +206,7 @@ class EditmetaModelFactory(MetaModelFactory):
         schema = self.model.model_json_schema()
         self.client.cache.write_editmeta_schema(self.issue_key, schema)
         output_plugin = self.client.plugins_dir / f'{self.issue_key.lower()}_editmeta.py'
+        warnings.filterwarnings("ignore", category=PydanticDeprecatedSince20)
         generate(
             json.dumps(schema),
             input_file_type=InputFileType.JsonSchema,
@@ -333,6 +336,7 @@ class JiraSystemConfigLoader:
             # Remove the .json extension
             name = input_file.name[:-5].replace("-", "_").replace("_", "_").lower()
             output_path = self.client.plugins_dir / f"{name}.py"
+            warnings.filterwarnings("ignore", category=PydanticDeprecatedSince20)
             generate(
                 content,
                 input_file_type=InputFileType.Json,
@@ -347,6 +351,7 @@ class JiraSystemConfigLoader:
             # Remove the .json extension
             name = input_file.name[:-5].replace("-", "_").replace("_", "_").lower()
             output_path = self.client.plugins_dir / f"{name}.py"
+            warnings.filterwarnings("ignore", category=PydanticDeprecatedSince20)
             generate(
                 content,
                 input_file_type=InputFileType.Json,
