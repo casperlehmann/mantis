@@ -72,7 +72,7 @@ class TestJiraClient:
         assert captured.out == (
             "Connection error. Run it like this:\n"
             "export JIRA_TOKEN=$(cat secret.txt)\n"
-            "python main.py\n"
+            "poetry run python main.py\n"
         )
         assert captured.err == ""
 
