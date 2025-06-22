@@ -80,3 +80,6 @@ jobs:
     - name: MyPy
       run: |
         poetry run mypy --disallow-untyped-calls --disallow-untyped-defs --disallow-incomplete-defs --explicit-package-bases mantis
+    - name: Pytest measure durations
+      run: |
+        poetry run pytest --durations=10
