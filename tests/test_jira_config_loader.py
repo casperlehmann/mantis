@@ -80,6 +80,7 @@ class TestConfigLoader:
         if not (fake_jira.cache.system / 'issuetypes.json').exists():
             raise FileNotFoundError('File "issuetypes.json" should have been created')
 
+    @pytest.mark.slow
     def test_update_createmeta(self, fake_jira: JiraClient, requests_mock):
         requests_mock.get(f'{fake_jira.api_url}/issue/createmeta/TEST/issuetypes', json=CacheData().issuetypes)
         requests_mock.get(f'{fake_jira.api_url}/issue/createmeta/TEST/issuetypes/10001', json=CacheData().createmeta_epic)
