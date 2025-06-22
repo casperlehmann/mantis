@@ -36,9 +36,12 @@ def process_key(key: str, exception: Exception) -> tuple[str, str]:
 class OpenAIClient:
     def __init__(self, jira_client: 'JiraClient') -> None:
         self.jira_client = jira_client
+        self.disabled = not self.jira_client.options.chat_gpt_activated
         self.client = OpenAI(base_url=self.jira_client.options.chat_gpt_base_url, api_key=self.jira_client.options.chat_gpt_api_key)
         
     def get_completion(self, input_text: str, prompt: str, model: str = 'gpt-4.1') -> str:
+        if self.disabled:
+            raise ConnectionError('OpenAI connectivity has not been configured')
         completion = self.client.chat.completions.create(
                 model="gpt-4.1",
                 messages=[
