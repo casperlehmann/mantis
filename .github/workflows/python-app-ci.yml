@@ -80,3 +80,24 @@ jobs:
     - name: MyPy
       run: |
         poetry run mypy --disallow-untyped-calls --disallow-untyped-defs --disallow-incomplete-defs --explicit-package-bases mantis
+
+  check-version-upgrade:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Fetch master branch
+        run: git fetch origin master:refs/remotes/origin/master
+      - name: Check version bump in pyproject.toml
+        run: |
+          set -e
+          VERSION_MASTER=$(git show origin/master:pyproject.toml | grep '^version' | head -1 | cut -d '"' -f2)
+          VERSION_HEAD=$(grep '^version' pyproject.toml | head -1 | cut -d '"' -f2)
+          echo "Master version: $VERSION_MASTER"
+          echo "Current version: $VERSION_HEAD"
+          if [ "$VERSION_MASTER" = "$VERSION_HEAD" ]; then
+            echo "Error: pyproject.toml version has not been updated!"
+            exit 1
+          fi
