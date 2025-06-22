@@ -82,6 +82,7 @@ jobs:
         poetry run mypy --disallow-untyped-calls --disallow-untyped-defs --disallow-incomplete-defs --explicit-package-bases mantis
 
   check-version-upgrade:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
