@@ -1,13 +1,13 @@
 reset_cache() {
-  python main.py --action reset
+  poetry run python main.py --action reset
 }
 
 fetch_issues() {
-  python main.py --action warmup-issues
+  poetry run python main.py --action warmup-issues
 }
 
 inspect_issues() {
-  python main.py --action inspect
+  poetry run python main.py --action inspect
 }
 
 jsonfmt() {
@@ -26,23 +26,23 @@ get_and_fmt_with_issues_and_drafts() {
 }
 
 run_coverage() {
-  pytest --cov
+  poetry run pytest --cov
 }
 
 run_tests() {
-  pytest -f -m "not slow"
+  poetry run pytest -f -m "not slow"
 }
 
 run_mypy() {
-  mypy --disallow-untyped-calls --disallow-untyped-defs --disallow-incomplete-defs mantis
+  poetry run mypy --disallow-untyped-calls --disallow-untyped-defs --disallow-incomplete-defs mantis
 }
 
 run_flake8_sparse() {
-  flake8 mantis --count --select=E9,F63,F7,F82 --show-source --statistics                 
+  poetry run flake8 mantis --count --select=E9,F63,F7,F82 --show-source --statistics                 
 }
 
 run_flake8() {
-  flake8 mantis --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+  poetry run flake8 mantis --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 }
 
 repo_health() {
@@ -55,7 +55,7 @@ repo_health() {
 }
 
 show_coverage() {
-  pytest --cov-report html --cov
+  poetry run pytest --cov-report html --cov
   open htmlcov/index.html
 }
 
