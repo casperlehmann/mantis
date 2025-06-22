@@ -33,6 +33,7 @@ class TestInspector:
         with pytest.raises(ValueError):
             Inspector.print_table(["non-existent"], {"placeholder"}, issuetype_field_map)
 
+    @pytest.mark.slow
     def test_get_project_field_keys_from_cache(self, fake_jira: JiraClient):
         fake_jira.issues._allowed_types = ["Test"] # To avoid calling load_allowed_types
         with pytest.raises(CacheMissException):
