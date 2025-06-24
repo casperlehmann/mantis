@@ -36,12 +36,12 @@ class TestJiraOptions:
         assert err == ""
         assert str(execution_error.value) == "JiraOptions.user not set"
 
-    def test_parse_args_issues(self, ):
+    def test_parse_args_issues(self):
         # We need to pass an empty list. If we didn't, pytest would default
         # to using sys.argv, which might contain '--cov-report html --cov'
-        namespace = parse_args([])
+        namespace = parse_args(['get-issue'])
         assert namespace.issues == []
-        namespace = parse_args(["TEST-1", "TEST-2"])
+        namespace = parse_args(['get-issue', "TEST-1", "TEST-2"])
         assert namespace.issues == ["TEST-1", "TEST-2"]
 
     @pytest.mark.parametrize(
@@ -56,12 +56,11 @@ class TestJiraOptions:
             ("drafts_dir", "--drafts-dir", "drafts", None),
             ("plugins_dir", "--plugins-dir", "plugins", None),
             ("type_id_cutoff", "--type-id-cutoff", "", None),
-            ("action", "--action", "test-auth", "get-issue"),
         ]
     )
     def test_parse_arg_flags(self, attr_name, flag, value, unset):
-        namespace = parse_args([attr_name])
+        namespace = parse_args(['get-tasks'])
         assert getattr(namespace, attr_name) == unset
         # Cast to str to allow expecting None, True, False
-        namespace = parse_args([flag, str(value)])
+        namespace = parse_args([flag, str(value), 'get-tasks'])
         assert getattr(namespace, attr_name) == value

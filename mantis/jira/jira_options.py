@@ -141,9 +141,6 @@ def parse_args(args_overwrite: list[str] | None = None) -> argparse.Namespace:
         help="Set the cutoff for Jira types to fetch",
     )
     parser.add_argument(
-        "--action", dest="action", default="get-issue", help="Get an issue from Jira"
-    )
-    parser.add_argument(
         "--chat-gpt-base-url",
         dest='chat_gpt_base_url',
         default=None,
@@ -160,6 +157,10 @@ def parse_args(args_overwrite: list[str] | None = None) -> argparse.Namespace:
         dest='chat_gpt_activated',
         default=None,
         help="Activation of ChatGPT API",
+    )
+    parser.add_argument(
+        "action",
+        help="Action to perform (e.g. get-issue, create-issue, etc.)",
     )
     parser.add_argument(
         "issues",

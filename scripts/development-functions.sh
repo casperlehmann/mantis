@@ -1,13 +1,13 @@
 reset_cache() {
-  poetry run python main.py --action reset
+  poetry run python main.py reset
 }
 
 fetch_issues() {
-  poetry run python main.py --action warmup-issues
+  poetry run python main.py warmup-issues
 }
 
 inspect_issues() {
-  poetry run python main.py --action inspect
+  poetry run python main.py inspect
 }
 
 jsonfmt() {
