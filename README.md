@@ -50,16 +50,22 @@ cache-dir = ".jira_cache"
 $ poetry run pytest
 ```
 
+## Installing
+
+```sh
+$ poetry install
+```
+
 ## Running the CLI
 
 ```sh
-$ poetry run python main.py --action test-auth
+$ mantis --action test-auth
 Connected as user: Admin9000
 
-$ poetry run python main.py TASK-1
+$ mantis TASK-1
 [TASK-1] Setup Jira
 
-$ poetry run python main.py --action fetch-issuetypes
+$ mantis --action fetch-issuetypes
 Updated local cache for issuetypes:
 [{'description': 'Created by Jira Agile - do not edit or delete. Issue type '
                  'for a user story.',
@@ -68,7 +74,7 @@ Updated local cache for issuetypes:
 [...]
 
 # Re-fetches config files
-$ poetry run python main.py --action reset
+$ mantis --action reset
 ['Epic', 'Subtask', 'Task', 'Story', 'Bug']
 
 # Fornat the fetched json in the Jira cache
@@ -79,24 +85,24 @@ For iterative testing, we can rely on the functions defined in `scripts/developm
 
 ```sh
 reset_cache() {
-  poetry run python main.py --action reset
+  mantis --action reset
 }
 
 jsonfmt() {
-  poetry run python main.py --action reset
+  mantis --action reset
   find .jira_cache -type f -name '*.json' -exec sh -c 'jq . "$1" > "$1.tmp" && mv "$1.tmp" "$1"' _ {} \;
 }
 
 getandfmt() {
   jsonfmt
-  poetry run python main.py --action get-issue ECS-1 ECS-2 ECS-3 ECS-4 ECS-5 ECS-6
+  mantis --action get-issue ECS-1 ECS-2 ECS-3 ECS-4 ECS-5 ECS-6
 }
 ```
 
 Or to overwrite options on the command line (remember to set the JIRA_TOKEN env var):
 
 ```sh
-$ poetry run python main.py \
+$ mantis \
     --user user@domain.com \
     --personal-access-token $JIRA_TOKEN \
     --jira-url=https://account.atlassian.net
@@ -196,8 +202,8 @@ Customfield10003
 # Persisting example payloads for tests
 
 ```sh
-$ poetry run python main.py --action=reset
-$ poetry run python main.py --action=get-issue ECS-1 ECS-2 ECS-3 ECS-4 ECS-5 ECS-6
+$ mantis --action=reset
+$ mantis --action=get-issue ECS-1 ECS-2 ECS-3 ECS-4 ECS-5 ECS-6
 [ECS-1] (Sample) User Authentication
 [ECS-2] (Sample) Payment Processing
 [ECS-3] (Sample) Credit Card Payment Integration
