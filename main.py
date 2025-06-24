@@ -7,7 +7,7 @@ from mantis.assistant.assistant import TextFormat
 from mantis.jira import JiraAuth, JiraClient, JiraOptions, parse_args
 from mantis.jira.issue_field import IssueField
 
-if __name__ == '__main__':
+def main():
     jira_options = JiraOptions(parse_args(), 'options.toml')
     auth = JiraAuth(jira_options)
     jira = JiraClient(jira_options, auth)
@@ -209,4 +209,6 @@ if __name__ == '__main__':
         pprint(changes)
     else:
         print(f'Action {jira_options.action} not recognized')
-
+    
+if __name__ == '__main__':
+    main()
