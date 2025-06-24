@@ -1,6 +1,6 @@
 [project]
 name = "mantis"
-version = "0.1.1"
+version = "0.1.2"
 description = "CLI for locally managing Jira issues"
 authors = [
     {name = "casperlehmann",email = "6682833+casperlehmann@users.noreply.github.com"}
@@ -28,6 +28,8 @@ dependencies = [
 
 [tool.poetry.group.dev.dependencies]
 
+[tool.poetry.scripts]
+mantis = 'mantis.main:main'
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
