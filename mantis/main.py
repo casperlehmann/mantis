@@ -47,7 +47,7 @@ def main() -> None:
                     "assignee": None,
                 }
             }
-            resp = issue.update_field(data)
+            issue.update_field(data)
             jira._no_read_cache = True
             issue = jira.issues.get(key=issue_key, force_skip_cache=True)
             key = issue.get('key', 'N/A')
@@ -172,7 +172,7 @@ def main() -> None:
         jira.system_config_loader.compile_plugins()
     elif jira_options.action == 'load-plugins':
         from plugins import Plugins
-        print(Plugins.all_plugins['plugins_test'].Schema(type='a', system='b'))
+        print(Plugins.all_plugins['plugins_test'].Schema(type='a', system='b'))  # type: ignore
         print(Plugins.plugins_test.Schema(type='a', system='b')) # type: ignore
 
         import plugins
@@ -180,7 +180,7 @@ def main() -> None:
 
         from plugins.plugins_test import Schema
         print(Schema(type='a', system='b'))
-        from plugins.new_epic import IssueModel
+        from plugins.new_epic import IssueModel  # type: ignore
         with open('tests/data/jira_cache/issues/ECS-1.json') as f:
             ecs_1 = json.load(f)
         print(IssueModel(**ecs_1))
