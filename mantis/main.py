@@ -7,7 +7,7 @@ from mantis.assistant.assistant import TextFormat
 from mantis.jira import JiraAuth, JiraClient, JiraOptions, parse_args
 from mantis.jira.issue_field import IssueField
 
-def main():
+def main() -> None:
     jira_options = JiraOptions(parse_args(), 'options.toml')
     auth = JiraAuth(jira_options)
     jira = JiraClient(jira_options, auth)
