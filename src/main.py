@@ -3,7 +3,7 @@
 import json
 from pprint import pprint
 
-from mantis.assistant.assistant import TextFormat
+from assistant import TextFormat
 from mantis.jira import JiraAuth, JiraClient, JiraOptions, parse_args
 from mantis.jira.issue_field import IssueField
 

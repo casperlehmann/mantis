@@ -7,7 +7,7 @@ import requests
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from mantis.assistant import Assistant
+from assistant import Assistant
 from mantis.jira.auto_complete import AutoComplete, Suggestion
 from mantis.jira.jira_issues import JiraIssues
 from mantis.jira.utils import Cache, JiraSystemConfigLoader
