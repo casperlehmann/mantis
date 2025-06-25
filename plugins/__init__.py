@@ -1,5 +1,6 @@
 import importlib
 import os
+from types import ModuleType
 from pydantic import BaseModel
 
 module_dir = os.path.dirname(__file__)
@@ -24,7 +25,7 @@ class Plugins:
         print(plugin)
     """
 
-    all_plugins: dict[str, BaseModel] = {}
+    all_plugins: dict[str, BaseModel | ModuleType] = {}
 
     @classmethod
     def stats(cls) -> None:
