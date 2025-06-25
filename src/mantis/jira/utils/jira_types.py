@@ -2,8 +2,6 @@ import datetime
 from enum import Enum
 from typing import Any, Optional
 from pydantic import BaseModel, Field
-from tests.data import CacheData
-data = CacheData().ecs_1
 
 class Operation(Enum):
     add = "add"
