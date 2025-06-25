@@ -134,7 +134,7 @@ class TestJiraIssues:
                 {"id": '2', "name": "Task", 'scope': {'project': {'id': '10000'}}}
             ]
         }
-        with patch('mantis.jira.utils.jira_system_config_loader.JiraSystemConfigLoader.get_issuetypes', return_value=cached_issuetypes):
+        with patch('mantis.jira.config_loader.JiraSystemConfigLoader.get_issuetypes', return_value=cached_issuetypes):
             fake_jira.issues = JiraIssues(fake_jira)
             assert fake_jira.issues._allowed_types is None
             assert fake_jira.issues.allowed_types == ["Bug", "Task"], f'Unexpected allowed types: {fake_jira.issues._allowed_types}'

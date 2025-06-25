@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 from drafts import Draft
 from mantis.jira.issue_field import IssueField
-from mantis.jira.utils.jira_system_config_loader import CreatemetaModelFactory, EditmetaModelFactory
+from mantis.jira.config_loader.config_loader import CreatemetaModelFactory, EditmetaModelFactory
 
 if TYPE_CHECKING:
     from .jira_client import JiraClient

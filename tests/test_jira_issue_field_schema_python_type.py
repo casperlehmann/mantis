@@ -2,7 +2,7 @@ import typing
 import pydantic_core
 import pytest
 
-from mantis.jira.utils.jira_types import _Schema, JiraIssueFieldSchema, SchemaCustomCustomid, SchemaItemsSystem, SchemaSystem
+from mantis.jira.config_loader.jira_types import _Schema, JiraIssueFieldSchema, SchemaCustomCustomid, SchemaItemsSystem, SchemaSystem
 
 
 class TestJiraIssueFieldSchemaPythonType:

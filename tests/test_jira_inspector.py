@@ -5,7 +5,7 @@ from typing import Any
 
 from mantis.jira import JiraClient
 from mantis.cache import CacheMissException
-from mantis.jira.utils.jira_system_config_loader import Inspector
+from mantis.jira.config_loader.config_loader import Inspector
 from tests.data import CacheData
 
 

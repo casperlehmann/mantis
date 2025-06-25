@@ -11,7 +11,7 @@ from assistant import Assistant
 from mantis.cache import Cache
 from mantis.jira.auto_complete import AutoComplete, Suggestion
 from mantis.jira.jira_issues import JiraIssues
-from mantis.jira.utils import JiraSystemConfigLoader
+from mantis.jira.config_loader import JiraSystemConfigLoader
 
 if TYPE_CHECKING:
     from requests.auth import HTTPBasicAuth

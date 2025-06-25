@@ -9,11 +9,11 @@ from datamodel_code_generator import DataModelType, InputFileType, generate
 from pydantic import BaseModel, PydanticDeprecatedSince20, create_model
 
 from mantis.cache import CacheMissException
-from mantis.jira.utils.jira_types import JiraIssueFieldSchema
+from mantis.jira.config_loader.jira_types import JiraIssueFieldSchema
 
 if TYPE_CHECKING:
     from mantis.jira.jira_client import JiraClient
-    from mantis.jira.utils import Cache
+    from mantis.cache import Cache
 
 
 class MetaModelFactory(ABC):
