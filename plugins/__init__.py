@@ -27,7 +27,7 @@ class Plugins:
     all_plugins: dict[str, BaseModel] = {}
 
     @classmethod
-    def stats(cls):
+    def stats(cls) -> None:
         print("The following plugins have been loaded:")
         for plugin_name, plugin in cls.all_plugins.items():
             models_in_plugin = [_ for _ in dir(plugin) if not _.startswith("_")]
