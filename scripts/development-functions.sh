@@ -34,7 +34,7 @@ run_tests() {
 }
 
 run_mypy() {
-  poetry run mypy --disallow-untyped-calls --disallow-untyped-defs --disallow-incomplete-defs mantis
+  poetry run mypy --disallow-untyped-calls --disallow-untyped-defs --disallow-incomplete-defs src
 }
 
 run_flake8_sparse() {
