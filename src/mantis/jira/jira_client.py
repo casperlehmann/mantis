@@ -61,9 +61,9 @@ class JiraClient:
     _project_id: None | str = None
 
     def __init__(
-        self, jira_option: "OptionsLoader", auth: "JiraAuth", no_read_cache: bool = False
+        self, jira_options: "OptionsLoader", auth: "JiraAuth", no_read_cache: bool = False
     ):
-        self.options = jira_option
+        self.options = jira_options
         self.auth = auth.auth
         self.no_verify_ssl = auth.no_verify_ssl
         self._no_read_cache = no_read_cache
