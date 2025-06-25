@@ -25,11 +25,12 @@ dependencies = [
 ]
 
 [tool.poetry]
+packages = [{ include = "mantis", from = "src" }]
 
 [tool.poetry.group.dev.dependencies]
 
 [tool.poetry.scripts]
-mantis = 'mantis.main:main'
+mantis = 'main:main'
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
