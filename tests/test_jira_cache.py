@@ -76,7 +76,7 @@ class TestCache:
         assert len(list(self.jira.cache.iter_dir(identifier))) == 1
 
     def test_cache_get_issuetypes_from_system_cache(self, requests_mock):
-        requests_mock.get(f'{self.jira.api_url}/issue/createmeta/TEST/issuetypes', json=get_issuetypes_response)
+        requests_mock.get(f'{self.jira.mantis.http.api_url}/issue/createmeta/TEST/issuetypes', json=get_issuetypes_response)
 
         with open(self.jira.cache.system / "issuetypes.json", "w") as f:
             json.dump(CacheData().issuetypes, f)

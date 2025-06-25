@@ -131,7 +131,7 @@ class JiraClient:
 
     def get_issuetypes(self) -> dict[str, list[dict[str, Any]]]:
         url = f'issue/createmeta/{self.project_name}/issuetypes'
-        response = self._get(url)
+        response = self.mantis.http._get(url)
         try:
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
@@ -161,7 +161,7 @@ class JiraClient:
     def get_createmeta(self, issuetype_id: str) -> dict[str, int | list[dict[str, Any]]]:
         """Createmeta dict with a list of fields called 'fields'"""
         url = f"issue/createmeta/{self.project_name}/issuetypes/{issuetype_id}"
-        response = self._get(url)
+        response = self.mantis.http._get(url)
         response.raise_for_status()
         data = response.json()
         assert isinstance(data, dict)
@@ -171,12 +171,12 @@ class JiraClient:
     def get_editmeta(self, issue_key: str) -> dict[str, Any]:
         # url = f"issue/{issue_key}?expand=editmeta"
         url = f"issue/{issue_key}/editmeta"
-        response = self._get(url)
+        response = self.mantis.http._get(url)
         response.raise_for_status()
         return response.json()
 
     def get_issue(self, key: str) -> dict[str, dict]:
-        response = self._get(f"issue/{key}")
+        response = self.mantis.http._get(f"issue/{key}")
         try:
             response.raise_for_status()
         except requests.HTTPError as e:
@@ -185,7 +185,7 @@ class JiraClient:
         return issue_data
 
     def post_issue(self, data: dict) -> dict:
-        response = self._post("issue", data=data)
+        response = self.mantis.http._post("issue", data=data)
         response.raise_for_status()
         return response.json()
 
@@ -210,7 +210,7 @@ class JiraClient:
 
     def get_projects(self) -> list[dict[str, Any]]:
         url = 'project'
-        response = self._get(url)
+        response = self.mantis.http._get(url)
         try:
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
@@ -221,7 +221,7 @@ class JiraClient:
         return payload
 
     def get_current_user(self) -> dict[str, str]:
-        response = self._get("myself")
+        response = self.mantis.http._get("myself")
         response.raise_for_status()
         data = response.json()
         return data
@@ -234,7 +234,7 @@ class JiraClient:
 
     def update_field(self, key: str, data: dict) -> bool:
         uri = f"issue/{key}"
-        response = self._put(uri, data)
+        response = self.mantis.http._put(uri, data)
         try:
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
@@ -249,7 +249,7 @@ class JiraClient:
             'fieldName': field_name,
             'fieldValue': field_value,
         }
-        response = self._get(uri, query)
+        response = self.mantis.http._get(uri, query)
         try:
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:

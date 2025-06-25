@@ -9,8 +9,8 @@ class TestJiraDraft:
     def test_jira_draft(self, fake_jira: JiraClient, minimal_issue_payload, requests_mock):
         ecs_1 = CacheData().ecs_1
         ecs_1['fields']['assignee'] = {"displayName": "Bobby Goodsky"}
-        requests_mock.get(f'{fake_jira.api_url}/issue/ECS-1', json=ecs_1)
-        requests_mock.get(f'{fake_jira.api_url}/issue/ECS-2', json=CacheData().ecs_2)
+        requests_mock.get(f'{fake_jira.mantis.http.api_url}/issue/ECS-1', json=ecs_1)
+        requests_mock.get(f'{fake_jira.mantis.http.api_url}/issue/ECS-2', json=CacheData().ecs_2)
 
         minimal_issue_payload['fields']['assignee'] = {"displayName": "Bobby Goodsky"}
         assert str(fake_jira.cache.root) != ".jira_cache_test"
@@ -53,7 +53,7 @@ class TestJiraDraft:
                 assert content.strip() in expectations, f"content.strip() ({[content.strip()]}) not in expectations in:\n\t{expectations}"
 
     def test_read_draft(self, fake_jira: JiraClient, requests_mock):
-        requests_mock.get(f'{fake_jira.api_url}/issue/ECS-1', json=CacheData().ecs_1)
+        requests_mock.get(f'{fake_jira.mantis.http.api_url}/issue/ECS-1', json=CacheData().ecs_1)
 
         issue_key = 'ECS-1'
         issue = fake_jira.issues.get(key=issue_key)
@@ -76,7 +76,7 @@ class TestJiraDraft:
         assert extracted_from_issue_field == draft_field
 
     def test_read_content(self, fake_jira: JiraClient, requests_mock):
-        requests_mock.get(f'{fake_jira.api_url}/issue/ECS-1', json=CacheData().ecs_1)
+        requests_mock.get(f'{fake_jira.mantis.http.api_url}/issue/ECS-1', json=CacheData().ecs_1)
 
         issue_key = 'ECS-1'
         issue = fake_jira.issues.get(key=issue_key)
