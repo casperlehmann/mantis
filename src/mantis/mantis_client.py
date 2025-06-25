@@ -1,0 +1,18 @@
+from pathlib import Path
+from mantis.http import Http
+from mantis.jira.jira_auth import JiraAuth
+from mantis.jira.jira_client import JiraClient
+from mantis.options_loader import OptionsLoader
+
+
+class MantisClient:
+
+    def __init__(
+        self, options: "OptionsLoader", no_read_cache: bool = False
+    ):
+        self.options = options
+        self.jira_auth = JiraAuth(options)
+        self.jira = JiraClient(self, options, self.jira_auth, no_read_cache=no_read_cache)
+        self.drafts_dir.mkdir(exist_ok=True)
+        self.plugins_dir.mkdir(exist_ok=True)
+        

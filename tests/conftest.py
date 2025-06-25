@@ -4,6 +4,7 @@ from pathlib import Path
 import pytest
 
 from mantis.jira import JiraAuth, JiraClient
+from mantis.mantis_client import MantisClient
 from mantis.options_loader import OptionsLoader
 
 
@@ -63,8 +64,9 @@ def opts_from_fake_cli(fake_cli):
 
 @pytest.fixture
 def jira_client_from_fake_cli(opts_from_fake_cli):
+    mantis = MantisClient(opts_from_fake_cli)
     auth = JiraAuth(opts_from_fake_cli)
-    return JiraClient(opts_from_fake_cli, auth)
+    return JiraClient(mantis, opts_from_fake_cli, auth)
 
 
 @pytest.fixture

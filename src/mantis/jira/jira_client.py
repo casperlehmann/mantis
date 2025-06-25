@@ -14,7 +14,7 @@ from mantis.jira.jira_issues import JiraIssues
 from mantis.jira.config_loader import JiraSystemConfigLoader
 
 if TYPE_CHECKING:
-    from requests.auth import HTTPBasicAuth
+    from mantis.mantis_client import MantisClient
     from mantis.jira.jira_auth import JiraAuth
     from mantis.options_loader import OptionsLoader
 
@@ -61,8 +61,9 @@ class JiraClient:
     _project_id: None | str = None
 
     def __init__(
-        self, jira_options: "OptionsLoader", auth: "JiraAuth", no_read_cache: bool = False
+        self, mantis: 'MantisClient', jira_options: "OptionsLoader", auth: "JiraAuth", no_read_cache: bool = False
     ):
+        self.mantis = mantis
         self.options = jira_options
         self.auth = auth.auth
         self.no_verify_ssl = auth.no_verify_ssl
