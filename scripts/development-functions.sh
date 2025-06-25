@@ -1,13 +1,13 @@
 reset_cache() {
-  poetry run python main.py reset
+  mantis reset
 }
 
 fetch_issues() {
-  poetry run python main.py warmup-issues
+  mantis warmup-issues
 }
 
 inspect_issues() {
-  poetry run python main.py inspect
+  mantis inspect
 }
 
 jsonfmt() {
