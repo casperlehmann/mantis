@@ -8,7 +8,7 @@ import warnings
 from datamodel_code_generator import DataModelType, InputFileType, generate
 from pydantic import BaseModel, PydanticDeprecatedSince20, create_model
 
-from mantis.jira.utils.cache import CacheMissException
+from mantis.cache import CacheMissException
 from mantis.jira.utils.jira_types import JiraIssueFieldSchema
 
 if TYPE_CHECKING:

@@ -8,9 +8,10 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from assistant import Assistant
+from mantis.cache import Cache
 from mantis.jira.auto_complete import AutoComplete, Suggestion
 from mantis.jira.jira_issues import JiraIssues
-from mantis.jira.utils import Cache, JiraSystemConfigLoader
+from mantis.jira.utils import JiraSystemConfigLoader
 
 if TYPE_CHECKING:
     from requests.auth import HTTPBasicAuth
