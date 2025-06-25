@@ -26,6 +26,7 @@ dependencies = [
 
 [tool.poetry]
 packages = [{ include = "mantis", from = "src" }]
+include = ["mantis/py.typed"]
 
 [tool.poetry.group.dev.dependencies]
 
