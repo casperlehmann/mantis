@@ -158,7 +158,7 @@ An example of the coverage report:
 Ensuring typehint coverage (this is also run during [GitHub Actions](.github/workflows/python-app-ci.yml)).
 
 ```
-$ poetry run mypy --disallow-untyped-calls --disallow-untyped-defs --disallow-incomplete-defs mantis
+$ poetry run mypy --disallow-untyped-calls --disallow-untyped-defs --disallow-incomplete-defs src
 Success: no issues found in 10 source files
 ```
 
