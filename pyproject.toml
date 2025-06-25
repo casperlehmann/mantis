@@ -1,6 +1,6 @@
 [project]
 name = "mantis"
-version = "0.1.4"
+version = "0.1.5"
 description = "CLI for locally managing Jira issues"
 authors = [
     {name = "casperlehmann",email = "6682833+casperlehmann@users.noreply.github.com"}
@@ -25,11 +25,13 @@ dependencies = [
 ]
 
 [tool.poetry]
+packages = [{ include = "mantis", from = "src" }]
+include = ["mantis/py.typed"]
 
 [tool.poetry.group.dev.dependencies]
 
 [tool.poetry.scripts]
-mantis = 'mantis.main:main'
+mantis = 'main:main'
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
