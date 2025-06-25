@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     from mantis.mantis_client import MantisClient
     from mantis.jira.jira_auth import JiraAuth
     from mantis.options_loader import OptionsLoader
+    from requests.auth import HTTPBasicAuth
 
 
 def process_key(key: str, exception: Exception) -> tuple[str, str]:
