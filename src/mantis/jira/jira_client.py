@@ -112,23 +112,6 @@ class JiraClient:
         assert re.match(r'^[0-9]*$', project_id), f'project_id must be numeric. Got: {project_id}'
         self._project_id = project_id
         return self._project_id
-    
-    @property
-    def api_url(self) -> str:
-        assert self.options.url
-        return self.options.url + "/rest/api/latest"
-
-    def _get(self, uri: str, params: dict = {}) -> requests.Response:
-        url = f"{self.api_url}/{uri}"
-        return requests.get(url, params=params, **self.requests_kwargs)  # type: ignore
-
-    def _post(self, uri: str, data: dict) -> requests.Response:
-        url = f"{self.api_url}/{uri}"
-        return requests.post(url, json=data, **self.requests_kwargs)  # type: ignore
-
-    def _put(self, uri: str, data: dict) -> requests.Response:
-        url = f"{self.api_url}/{uri}"
-        return requests.put(url, json=data, **self.requests_kwargs)  # type: ignore
 
     def get_issuetypes(self) -> dict[str, list[dict[str, Any]]]:
         url = f'issue/createmeta/{self.project_name}/issuetypes'
