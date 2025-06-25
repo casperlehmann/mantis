@@ -75,8 +75,6 @@ class JiraClient:
             "verify": (not self.no_verify_ssl),
         }
         self.cache = Cache(self)
-        self.drafts_dir.mkdir(exist_ok=True)
-        self.plugins_dir.mkdir(exist_ok=True)
         self.system_config_loader = JiraSystemConfigLoader(self)
         self.issues = JiraIssues(self)
         self.auto_complete = AutoComplete(self)
@@ -85,11 +83,11 @@ class JiraClient:
 
     @property
     def drafts_dir(self) -> Path:
-        return Path(self.options.drafts_dir)
+        return self.mantis.drafts_dir
 
     @property
     def plugins_dir(self) -> Path:
-        return Path(self.options.plugins_dir)
+        return self.mantis.plugins_dir
 
     @property
     def project_name(self) -> str:

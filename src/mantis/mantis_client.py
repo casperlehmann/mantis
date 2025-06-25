@@ -16,4 +16,13 @@ class MantisClient:
         self.drafts_dir.mkdir(exist_ok=True)
         self.plugins_dir.mkdir(exist_ok=True)
         self.http = Http(self, self.jira_auth, no_read_cache)
-        
+        self.drafts_dir.mkdir(exist_ok=True)
+        self.plugins_dir.mkdir(exist_ok=True)
+
+    @property
+    def drafts_dir(self) -> Path:
+        return Path(self.options.drafts_dir)
+
+    @property
+    def plugins_dir(self) -> Path:
+        return Path(self.options.plugins_dir)
