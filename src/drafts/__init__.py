@@ -38,7 +38,7 @@ class Draft:
         return list(self.template.metadata.keys())
 
     def _load_template(self) -> frontmatter.Post:
-        with open('src/mantis/drafts/template.md', 'r') as f:
+        with open('src/drafts/template.md', 'r') as f:
             return frontmatter.load(f)
 
     def _generate_frontmatter(self) -> None:

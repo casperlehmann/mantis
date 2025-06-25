@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel
 
-from mantis.drafts import Draft
+from drafts import Draft
 from mantis.jira.issue_field import IssueField
 from mantis.jira.utils.jira_system_config_loader import CreatemetaModelFactory, EditmetaModelFactory
 
