@@ -3,7 +3,8 @@ from pathlib import Path
 
 import pytest
 
-from mantis.jira import JiraAuth, JiraClient, JiraOptions
+from mantis.jira import JiraAuth, JiraClient
+from mantis.options_loader import OptionsLoader
 
 
 @dataclass
@@ -57,7 +58,7 @@ def fake_cli():
 
 @pytest.fixture
 def opts_from_fake_cli(fake_cli):
-    return JiraOptions(parser=fake_cli)
+    return OptionsLoader(parser=fake_cli)
 
 
 @pytest.fixture

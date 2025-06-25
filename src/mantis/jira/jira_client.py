@@ -16,7 +16,7 @@ from mantis.jira.config_loader import JiraSystemConfigLoader
 if TYPE_CHECKING:
     from requests.auth import HTTPBasicAuth
     from mantis.jira.jira_auth import JiraAuth
-    from mantis.jira.jira_options import JiraOptions
+    from mantis.options_loader import OptionsLoader
 
 
 def process_key(key: str, exception: Exception) -> tuple[str, str]:
@@ -61,7 +61,7 @@ class JiraClient:
     _project_id: None | str = None
 
     def __init__(
-        self, jira_option: "JiraOptions", auth: "JiraAuth", no_read_cache: bool = False
+        self, jira_option: "OptionsLoader", auth: "JiraAuth", no_read_cache: bool = False
     ):
         self.options = jira_option
         self.auth = auth.auth

@@ -3,11 +3,11 @@ from requests.auth import HTTPBasicAuth
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .jira_options import JiraOptions
+    from mantis.options_loader import OptionsLoader
 
 
 class JiraAuth:
-    def __init__(self, options: "JiraOptions") -> None:
+    def __init__(self, options: "OptionsLoader") -> None:
         self.options = options
         assert self.options.url
 

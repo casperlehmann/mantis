@@ -1,17 +1,13 @@
-from typing import TYPE_CHECKING
-
 import pytest
 from requests.auth import HTTPBasicAuth
 
-from mantis.jira import JiraAuth, JiraOptions
-
-if TYPE_CHECKING:
-    from mantis.jira.jira_options import JiraOptions
+from mantis.jira import JiraAuth
+from mantis.options_loader import OptionsLoader
 
 
 class TestJiraAuth:
     def test_creates_jira_auth_settings(self, fake_toml):
-        opts = JiraOptions(toml_source=fake_toml)
+        opts = OptionsLoader(toml_source=fake_toml)
         auth = JiraAuth(opts)
         assert isinstance(auth.auth, HTTPBasicAuth)
 

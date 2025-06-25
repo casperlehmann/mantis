@@ -4,11 +4,11 @@ import json
 from pprint import pprint
 
 from assistant import TextFormat
-from mantis.jira import JiraAuth, JiraClient, JiraOptions, parse_args
+from mantis.jira import JiraAuth, JiraClient, OptionsLoader, parse_args
 from mantis.jira.issue_field import IssueField
 
 def main() -> None:
-    jira_options = JiraOptions(parse_args(), 'options.toml')
+    jira_options = OptionsLoader(parse_args(), 'options.toml')
     auth = JiraAuth(jira_options)
     jira = JiraClient(jira_options, auth)
 

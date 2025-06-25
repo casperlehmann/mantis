@@ -2,11 +2,8 @@ import argparse
 import tomllib
 
 
-class JiraOptions:
+class OptionsLoader:
     """Collects options from toml file, allowing for command line overrides
-
-    poetry run python mantis/jira/jira_options.py --user user@domain.com --personal-access-token $JIRA_TOKEN \
-        --jira-url=https://account.atlassian.net
     """
 
     default_toml_source = "options.toml"
@@ -72,16 +69,16 @@ class JiraOptions:
         )
         self.action = parser and parser.action or ""
         self.issues: list[str] = parser and parser.issues or []
-        assert self.user, "JiraOptions.user not set"
-        assert self.personal_access_token, "JiraOptions.personal_access_token not set"
-        assert self.url, "JiraOptions.url not set"
-        assert self.project, "JiraOptions.project not set"
-        assert self.cache_dir, "JiraOptions.cache_dir not set"
-        assert self.drafts_dir, "JiraOptions.drafts_dir not set"
-        assert self.plugins_dir, "JiraOptions.plugins_dir not set"
+        assert self.user, "OptionsLoader.user not set"
+        assert self.personal_access_token, "OptionsLoader.personal_access_token not set"
+        assert self.url, "OptionsLoader.url not set"
+        assert self.project, "OptionsLoader.project not set"
+        assert self.cache_dir, "OptionsLoader.cache_dir not set"
+        assert self.drafts_dir, "OptionsLoader.drafts_dir not set"
+        assert self.plugins_dir, "OptionsLoader.plugins_dir not set"
         if self.chat_gpt_activated:
-            assert self.chat_gpt_base_url, f"ChatGPT is activated, but JiraOptions.chat_gpt_base_url not set {options}"
-            assert self.chat_gpt_api_key, f"ChatGPT is activated, but JiraOptions.chat_gpt_api_key not set {options}"
+            assert self.chat_gpt_base_url, f"ChatGPT is activated, but OptionsLoader.chat_gpt_base_url not set {options}"
+            assert self.chat_gpt_api_key, f"ChatGPT is activated, but OptionsLoader.chat_gpt_api_key not set {options}"
 
 
 def parse_args(args_overwrite: list[str] | None = None) -> argparse.Namespace:
