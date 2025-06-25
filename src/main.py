@@ -6,12 +6,14 @@ from pprint import pprint
 from assistant import TextFormat
 from mantis.jira import JiraAuth, JiraClient
 from mantis.jira.issue_field import IssueField
+from mantis.mantis_client import MantisClient
 from mantis.options_loader import OptionsLoader, parse_args
 
 def main() -> None:
     options = OptionsLoader(parse_args(), 'options.toml')
+    mantis = MantisClient(options)
     auth = JiraAuth(options)
-    jira = JiraClient(options, auth)
+    jira = JiraClient(mantis, options, auth)
 
     if options.action == 'test-auth':
         jira.test_auth()
