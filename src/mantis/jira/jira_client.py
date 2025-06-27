@@ -69,11 +69,6 @@ class JiraClient:
         self.auth = auth.auth
         self.no_verify_ssl = auth.no_verify_ssl
         self._no_read_cache = no_read_cache
-        self.requests_kwargs: dict[str, 'HTTPBasicAuth | bool | dict[str, Any]'] = {
-            "auth": self.auth,
-            "headers": {"Content-Type": "application/json"},
-            "verify": (not self.no_verify_ssl),
-        }
         self.cache = Cache(mantis, self)
         self.system_config_loader = JiraSystemConfigLoader(self)
         self.issues = JiraIssues(self)
