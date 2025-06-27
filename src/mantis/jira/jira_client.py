@@ -1,7 +1,6 @@
 from pprint import pprint
 import re
 import shutil
-from openai import OpenAI
 import requests
 
 from pathlib import Path
@@ -13,6 +12,7 @@ from mantis.jira.auto_complete import AutoComplete, Suggestion
 from mantis.jira.jira_issues import JiraIssues
 from mantis.jira.config_loader import JiraSystemConfigLoader
 from mantis.jira.jira_auth import JiraAuth
+from mantis.openai_client import OpenAIClient
 
 if TYPE_CHECKING:
     from mantis.mantis_client import MantisClient
@@ -31,29 +31,6 @@ def process_key(key: str, exception: Exception) -> tuple[str, str]:
             raise NotImplementedError(
                 f'Key contains too many components: "{key}"'
             ) from exception
-
-
-class OpenAIClient:
-    def __init__(self, mantis: 'MantisClient', jira_client: 'JiraClient') -> None:
-        self.mantis = mantis
-        self.jira_client = jira_client
-        self.disabled = not self.mantis.options.chat_gpt_activated
-        self.client = OpenAI(base_url=self.mantis.options.chat_gpt_base_url, api_key=self.mantis.options.chat_gpt_api_key)
-        
-    def get_completion(self, input_text: str, prompt: str, model: str = 'gpt-4.1') -> str:
-        if self.disabled:
-            raise ConnectionError('OpenAI connectivity has not been configured')
-        completion = self.client.chat.completions.create(
-                model="gpt-4.1",
-                messages=[
-                    {"role": "developer", "content": prompt},
-                    {"role": "user", "content": input_text}
-                ]
-            )
-        response = completion.choices[0].message.content
-        if not response:
-            raise ValueError("Response is empty")
-        return response
 
 
 class JiraClient:
