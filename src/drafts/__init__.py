@@ -1,3 +1,4 @@
+from pathlib import Path
 import re
 from typing import Any, Callable, TYPE_CHECKING, Generator
 
@@ -22,7 +23,7 @@ class Draft:
         self._materialize()
 
     @property
-    def draft_path(self):
+    def draft_path(self) -> 'Path':
         return self.mantis.drafts_dir / f"{self.key}.md"
 
     @property
