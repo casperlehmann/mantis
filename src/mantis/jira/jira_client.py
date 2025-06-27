@@ -128,10 +128,10 @@ class JiraClient:
 
     def warmup(self, delete_drafts: bool=False) -> None:
         if delete_drafts:
-            if self.drafts_dir.exists():
+            if self.mantis.drafts_dir.exists():
                 # This violently removes everything. Don't store anything important in the drafts_dir.
-                shutil.rmtree(self.drafts_dir)
-                self.drafts_dir.mkdir(exist_ok=True)
+                shutil.rmtree(self.mantis.drafts_dir)
+                self.mantis.drafts_dir.mkdir(exist_ok=True)
         self.mantis.cache.invalidate()
         self.system_config_loader.get_projects(force_skip_cache = True)
         assert not self.mantis.cache.get_issuetypes_from_system_cache()
