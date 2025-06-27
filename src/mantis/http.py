@@ -41,7 +41,7 @@ class Http:
 
 
     @staticmethod
-    def post(url: str, data: dict = None) -> str:
+    def post(url: str, data: dict | None = None) -> str:
         """
         Perform a POST request to the specified URL with optional data.
 
