@@ -4,9 +4,9 @@ from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel
 
-from mantis.drafts import Draft
+from drafts import Draft
+from mantis.jira.config_loader.meta_model_factories import CreatemetaModelFactory, EditmetaModelFactory
 from mantis.jira.issue_field import IssueField
-from mantis.jira.utils.jira_system_config_loader import CreatemetaModelFactory, EditmetaModelFactory
 
 if TYPE_CHECKING:
     from .jira_client import JiraClient
@@ -28,11 +28,11 @@ class JiraIssue:
     non_editmeta_fields = ('project', 'reporter', 'status')
     non_createmeta_fields: tuple[str] = ('',)
 
-    def __init__(self, client: "JiraClient", raw_data: dict[str, Any]) -> None:
-        self.client = client
+    def __init__(self, jira: "JiraClient", raw_data: dict[str, Any]) -> None:
+        self.jira = jira
         self.data = raw_data
         # Only writes if not exists.
-        self.draft = Draft(self.client, self)
+        self.draft = Draft(self.jira.mantis, self)
         self._createmeta_factory: CreatemetaModelFactory | None = None
         self._editmeta_factory: EditmetaModelFactory | None = None
         self._editmeta: Any | None = None
@@ -55,12 +55,12 @@ class JiraIssue:
 
     @property
     def createmeta_data(self) -> dict[str, int | list[dict[str, Any]]]:
-        return self.client.system_config_loader.get_createmeta(self.issuetype)
+        return self.jira.system_config_loader.get_createmeta(self.issuetype)
 
     @property
     def createmeta_factory(self) -> CreatemetaModelFactory:
         if self._createmeta_factory is None:
-            self._createmeta_factory = CreatemetaModelFactory(self.createmeta_data, self.issuetype, self.client)
+            self._createmeta_factory = CreatemetaModelFactory(self.createmeta_data, self.issuetype, self.jira)
         return self._createmeta_factory
 
     @property
@@ -71,13 +71,13 @@ class JiraIssue:
 
     @property
     def editmeta_data(self) -> dict[str, Any]:
-        return self.client.system_config_loader.get_editmeta(self.key)
+        return self.jira.system_config_loader.get_editmeta(self.key)
 
     @property
     def editmeta_factory(self) -> EditmetaModelFactory:
         # TODO: Consider if editmeta itself should be cached instead.
         if self._editmeta_factory is None:
-            self._editmeta_factory = EditmetaModelFactory(self.editmeta_data, self.issuetype, self.client, self.key)
+            self._editmeta_factory = EditmetaModelFactory(self.editmeta_data, self.issuetype, self.jira, self.key)
         return self._editmeta_factory
 
     @property
@@ -111,7 +111,7 @@ class JiraIssue:
         return default if value is None else value
 
     def update_field(self, data: dict[str, Any]) -> None:
-        self.client.update_field(self.key, data)
+        self.jira.update_field(self.key, data)
 
     def update_from_draft(self) -> None:
         """Update the issue in Jira, using the data from its draft."""
@@ -157,18 +157,18 @@ class JiraIssue:
                 # input()
 
     def reload_issue(self) -> None:
-        self.client.issues.get(self.key, force_skip_cache=True)
+        self.jira.issues.get(self.key, force_skip_cache=True)
 
 
 class JiraIssues:
     _allowed_types: list[str] | None = None
 
-    def __init__(self, client: "JiraClient"):
-        self.client = client
+    def __init__(self, jira: "JiraClient"):
+        self.jira = jira
 
     def load_allowed_types(self) -> list[str]:
         issuetypes = (
-            self.client.system_config_loader.get_issuetypes()
+            self.jira.system_config_loader.get_issuetypes()
         )
         if not issuetypes:
             raise ValueError('No values retrieved for issuetypes')
@@ -194,13 +194,13 @@ class JiraIssues:
         return self._allowed_types
 
     def get(self, key: str, force_skip_cache: bool = False) -> JiraIssue:
-        if not self.client._no_read_cache and not force_skip_cache:
-            issue_data_from_cache = self.client.cache.get_issue(key)
+        if not self.jira.mantis._no_read_cache and not force_skip_cache:
+            issue_data_from_cache = self.jira.mantis.cache.get_issue(key)
             if issue_data_from_cache:
-                return JiraIssue(self.client, issue_data_from_cache)
-        data = self.client.get_issue(key)
-        self.client.cache.write_issue(key, data)
-        return JiraIssue(self.client, data)
+                return JiraIssue(self.jira, issue_data_from_cache)
+        data = self.jira.get_issue(key)
+        self.jira.mantis.cache.write_issue(key, data)
+        return JiraIssue(self.jira, data)
 
     def create(self, issuetype: str, title: str, data: dict) -> dict:
         assert issuetype in self.allowed_types
@@ -208,6 +208,6 @@ class JiraIssues:
             raise ValueError("The data object is an empty payload")
         print(f"Create issue ({issuetype}): {title}")
 
-        response = self.client.post_issue(data)
+        response = self.jira.post_issue(data)
         pprint(response)
         return response

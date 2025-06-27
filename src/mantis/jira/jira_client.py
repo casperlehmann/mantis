@@ -1,21 +1,18 @@
 from pprint import pprint
 import re
 import shutil
-from openai import OpenAI
 import requests
 
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from mantis.assistant import Assistant
 from mantis.jira.auto_complete import AutoComplete, Suggestion
 from mantis.jira.jira_issues import JiraIssues
-from mantis.jira.utils import Cache, JiraSystemConfigLoader
+from mantis.jira.config_loader import JiraSystemConfigLoader
+from mantis.jira.jira_auth import JiraAuth
 
 if TYPE_CHECKING:
-    from requests.auth import HTTPBasicAuth
-    from mantis.jira.jira_auth import JiraAuth
-    from mantis.jira.jira_options import JiraOptions
+    from mantis.mantis_client import MantisClient
 
 
 def process_key(key: str, exception: Exception) -> tuple[str, str]:
@@ -33,64 +30,23 @@ def process_key(key: str, exception: Exception) -> tuple[str, str]:
             ) from exception
 
 
-class OpenAIClient:
-    def __init__(self, jira_client: 'JiraClient') -> None:
-        self.jira_client = jira_client
-        self.disabled = not self.jira_client.options.chat_gpt_activated
-        self.client = OpenAI(base_url=self.jira_client.options.chat_gpt_base_url, api_key=self.jira_client.options.chat_gpt_api_key)
-        
-    def get_completion(self, input_text: str, prompt: str, model: str = 'gpt-4.1') -> str:
-        if self.disabled:
-            raise ConnectionError('OpenAI connectivity has not been configured')
-        completion = self.client.chat.completions.create(
-                model="gpt-4.1",
-                messages=[
-                    {"role": "developer", "content": prompt},
-                    {"role": "user", "content": input_text}
-                ]
-            )
-        response = completion.choices[0].message.content
-        if not response:
-            raise ValueError("Response is empty")
-        return response
-
-
 class JiraClient:
 
     _project_id: None | str = None
 
-    def __init__(
-        self, jira_option: "JiraOptions", auth: "JiraAuth", no_read_cache: bool = False
-    ):
-        self.options = jira_option
-        self.auth = auth.auth
-        self.no_verify_ssl = auth.no_verify_ssl
-        self._no_read_cache = no_read_cache
-        self.requests_kwargs: dict[str, 'HTTPBasicAuth | bool | dict[str, Any]'] = {
-            "auth": self.auth,
-            "headers": {"Content-Type": "application/json"},
-            "verify": (not self.no_verify_ssl),
-        }
-        self.cache = Cache(self)
-        self.drafts_dir.mkdir(exist_ok=True)
-        self.plugins_dir.mkdir(exist_ok=True)
+    def __init__(self, mantis: 'MantisClient'):
+        self.mantis = mantis
         self.system_config_loader = JiraSystemConfigLoader(self)
         self.issues = JiraIssues(self)
         self.auto_complete = AutoComplete(self)
-        self.open_ai_client = OpenAIClient(self)
-        self.assistant = Assistant(self)
 
     @property
-    def drafts_dir(self) -> Path:
-        return Path(self.options.drafts_dir)
-
-    @property
-    def plugins_dir(self) -> Path:
-        return Path(self.options.plugins_dir)
+    def auth(self) -> JiraAuth:
+        return JiraAuth(self.mantis.options)
 
     @property
     def project_name(self) -> str:
-        return self.options.project
+        return self.mantis.options.project
     
     @property
     def project_id(self) -> str:
@@ -109,27 +65,10 @@ class JiraClient:
         assert re.match(r'^[0-9]*$', project_id), f'project_id must be numeric. Got: {project_id}'
         self._project_id = project_id
         return self._project_id
-    
-    @property
-    def api_url(self) -> str:
-        assert self.options.url
-        return self.options.url + "/rest/api/latest"
-
-    def _get(self, uri: str, params: dict = {}) -> requests.Response:
-        url = f"{self.api_url}/{uri}"
-        return requests.get(url, params=params, **self.requests_kwargs)  # type: ignore
-
-    def _post(self, uri: str, data: dict) -> requests.Response:
-        url = f"{self.api_url}/{uri}"
-        return requests.post(url, json=data, **self.requests_kwargs)  # type: ignore
-
-    def _put(self, uri: str, data: dict) -> requests.Response:
-        url = f"{self.api_url}/{uri}"
-        return requests.put(url, json=data, **self.requests_kwargs)  # type: ignore
 
     def get_issuetypes(self) -> dict[str, list[dict[str, Any]]]:
         url = f'issue/createmeta/{self.project_name}/issuetypes'
-        response = self._get(url)
+        response = self.mantis.http._get(url)
         try:
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
@@ -159,7 +98,7 @@ class JiraClient:
     def get_createmeta(self, issuetype_id: str) -> dict[str, int | list[dict[str, Any]]]:
         """Createmeta dict with a list of fields called 'fields'"""
         url = f"issue/createmeta/{self.project_name}/issuetypes/{issuetype_id}"
-        response = self._get(url)
+        response = self.mantis.http._get(url)
         response.raise_for_status()
         data = response.json()
         assert isinstance(data, dict)
@@ -169,12 +108,12 @@ class JiraClient:
     def get_editmeta(self, issue_key: str) -> dict[str, Any]:
         # url = f"issue/{issue_key}?expand=editmeta"
         url = f"issue/{issue_key}/editmeta"
-        response = self._get(url)
+        response = self.mantis.http._get(url)
         response.raise_for_status()
         return response.json()
 
     def get_issue(self, key: str) -> dict[str, dict]:
-        response = self._get(f"issue/{key}")
+        response = self.mantis.http._get(f"issue/{key}")
         try:
             response.raise_for_status()
         except requests.HTTPError as e:
@@ -183,21 +122,21 @@ class JiraClient:
         return issue_data
 
     def post_issue(self, data: dict) -> dict:
-        response = self._post("issue", data=data)
+        response = self.mantis.http._post("issue", data=data)
         response.raise_for_status()
         return response.json()
 
     def warmup(self, delete_drafts: bool=False) -> None:
         if delete_drafts:
-            if self.drafts_dir.exists():
+            if self.mantis.drafts_dir.exists():
                 # This violently removes everything. Don't store anything important in the drafts_dir.
-                shutil.rmtree(self.drafts_dir)
-                self.drafts_dir.mkdir(exist_ok=True)
-        self.cache.invalidate()
+                shutil.rmtree(self.mantis.drafts_dir)
+                self.mantis.drafts_dir.mkdir(exist_ok=True)
+        self.mantis.cache.invalidate()
         self.system_config_loader.get_projects(force_skip_cache = True)
-        assert not self.cache.get_issuetypes_from_system_cache()
+        assert not self.mantis.cache.get_issuetypes_from_system_cache()
         self.system_config_loader.get_issuetypes(force_skip_cache = True)
-        assert self.cache.get_issuetypes_from_system_cache()
+        assert self.mantis.cache.get_issuetypes_from_system_cache()
         resp = self.system_config_loader.fetch_and_update_all_createmeta()
         pprint(resp)
 
@@ -208,7 +147,7 @@ class JiraClient:
 
     def get_projects(self) -> list[dict[str, Any]]:
         url = 'project'
-        response = self._get(url)
+        response = self.mantis.http._get(url)
         try:
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
@@ -219,7 +158,7 @@ class JiraClient:
         return payload
 
     def get_current_user(self) -> dict[str, str]:
-        response = self._get("myself")
+        response = self.mantis.http._get("myself")
         response.raise_for_status()
         data = response.json()
         return data
@@ -232,7 +171,7 @@ class JiraClient:
 
     def update_field(self, key: str, data: dict) -> bool:
         uri = f"issue/{key}"
-        response = self._put(uri, data)
+        response = self.mantis.http._put(uri, data)
         try:
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
@@ -247,7 +186,7 @@ class JiraClient:
             'fieldName': field_name,
             'fieldValue': field_value,
         }
-        response = self._get(uri, query)
+        response = self.mantis.http._get(uri, query)
         try:
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
@@ -303,11 +242,11 @@ class JiraClient:
                     raise ValueError(
                         f'Issue number "{task_no_from_key}" in key "{key}" must be numeric'
                     ) from exception
-                elif self.options.project not in key:
+                elif self.mantis.options.project not in key:
                     raise ValueError(
                         f"The requested issue does not exist. Note that the "
                         f'provided key "{key}" does not appear to match '
-                        f'your configured project "{self.options.project}"'
+                        f'your configured project "{self.mantis.options.project}"'
                     ) from exception
                 else:
                     raise ValueError(

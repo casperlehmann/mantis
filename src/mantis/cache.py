@@ -5,7 +5,7 @@ import shutil
 from typing import TYPE_CHECKING, Any, Generator
 
 if TYPE_CHECKING:
-    from mantis.jira.jira_client import JiraClient
+    from mantis.mantis_client import MantisClient
 
 
 class CacheMissException(Exception):
@@ -13,8 +13,8 @@ class CacheMissException(Exception):
 
 
 class Cache:
-    def __init__(self, jira_client: "JiraClient") -> None:
-        self.client = jira_client
+    def __init__(self, mantis: 'MantisClient') -> None:
+        self.mantis = mantis
         self.root.mkdir(exist_ok=True)
         self.issues.mkdir(exist_ok=True)
         self.system.mkdir(exist_ok=True)
@@ -37,7 +37,7 @@ class Cache:
 
     @property
     def root(self) -> Path:
-        return Path(self.client.options.cache_dir)
+        return Path(self.mantis.options.cache_dir)
 
     @property
     def issues(self) -> Path:
@@ -64,7 +64,7 @@ class Cache:
         return self.system / "editmeta"
 
     def _get(self, path: Path, filename: str) -> dict | None:
-        if self.client._no_read_cache:
+        if self.mantis._no_read_cache:
             raise LookupError('Attempted to access cache when _no_read_cache is set')
         if not (path / filename).exists():
             return None
@@ -72,17 +72,17 @@ class Cache:
             return json.load(f)
 
     def get_issue(self, key: str) -> dict | None:
-        if self.client._no_read_cache:
+        if self.mantis._no_read_cache:
             raise LookupError('Attempted to access cache when _no_read_cache is set')
         return self._get(self.issues, f"{key}.json")
 
     def get_from_system_cache(self, filename: str) -> dict[str, Any] | list[dict[str, Any]] | None:
-        if self.client._no_read_cache:
+        if self.mantis._no_read_cache:
             raise LookupError('Attempted to access cache when _no_read_cache is set')
         return self._get(self.system, filename)
 
     def get_projects_from_system_cache(self) -> dict[str, Any] | list[dict[str, Any]] | None:
-        if self.client._no_read_cache:
+        if self.mantis._no_read_cache:
             raise LookupError('Attempted to access cache when _no_read_cache is set')
         projects = self.get_from_system_cache(f"projects.json")
         if not projects:
@@ -91,7 +91,7 @@ class Cache:
         return projects
 
     def get_issuetypes_from_system_cache(self) -> dict[str, Any] | None:
-        if self.client._no_read_cache:
+        if self.mantis._no_read_cache:
             raise LookupError('Attempted to access cache when _no_read_cache is set')
         issuetypes = self.get_from_system_cache("issuetypes.json")
         if not issuetypes:

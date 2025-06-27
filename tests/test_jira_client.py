@@ -10,29 +10,29 @@ from tests.data import CacheData
 
 class TestJiraClient:
     def test_test_auth_complains_with_bad_input(self, requests_mock, fake_jira: JiraClient, capsys):
-        requests_mock.get(f'{fake_jira.api_url}/myself', json={})
+        requests_mock.get(f'{fake_jira.mantis.http.api_url}/myself', json={})
         fake_jira.test_auth()
         captured = capsys.readouterr()
         assert captured.out == ("Connected as user: ERROR: No displayName\n")
         assert captured.err == ""
 
     def test_test_auth_informs_login(self, requests_mock, fake_jira: JiraClient, capsys):
-        requests_mock.get(f'{fake_jira.api_url}/myself', json={'displayName': 'Buddy'})
+        requests_mock.get(f'{fake_jira.mantis.http.api_url}/myself', json={'displayName': 'Buddy'})
         fake_jira.test_auth()
         captured = capsys.readouterr()
         assert captured.out == ("Connected as user: Buddy\n")
         assert captured.err == ""
 
     def test_cache_exists(self, fake_jira: JiraClient):
-        assert str(fake_jira.cache.root) != ".jira_cache_test"
-        list_of = [str(_).split('/')[-1] for _ in fake_jira.cache.root.iterdir()]
-        assert len(list(fake_jira.cache.root.iterdir())) == 2, f'Iter root expected two values, got: {list_of}'
-        assert {item.name for item in fake_jira.cache.root.iterdir()} == {"system", "issues"}
-        assert len(list(fake_jira.cache.system.iterdir())) == 4
-        assert {item.name for item in fake_jira.cache.system.iterdir()} == {"createmeta", 'createmeta_schemas', "editmeta", 'editmeta_schemas'}
+        assert str(fake_jira.mantis.cache.root) != ".jira_cache_test"
+        list_of = [str(_).split('/')[-1] for _ in fake_jira.mantis.cache.root.iterdir()]
+        assert len(list(fake_jira.mantis.cache.root.iterdir())) == 2, f'Iter root expected two values, got: {list_of}'
+        assert {item.name for item in fake_jira.mantis.cache.root.iterdir()} == {"system", "issues"}
+        assert len(list(fake_jira.mantis.cache.system.iterdir())) == 4
+        assert {item.name for item in fake_jira.mantis.cache.system.iterdir()} == {"createmeta", 'createmeta_schemas', "editmeta", 'editmeta_schemas'}
 
     def test_get_current_user(self, fake_jira: JiraClient, requests_mock):
-        requests_mock.get(f'{fake_jira.api_url}/myself', json=CacheData().placeholder_account)
+        requests_mock.get(f'{fake_jira.mantis.http.api_url}/myself', json=CacheData().placeholder_account)
         assert fake_jira.get_current_user() == {
             "accountId": "492581:638245r0-3d02-ki30-kchs-3kjd92hafjmz",
             "emailAddress": "marcus@rome.gov",
@@ -40,20 +40,20 @@ class TestJiraClient:
         }
 
     def test_get_current_user_account_id(self, fake_jira: JiraClient, requests_mock):
-        requests_mock.get(f'{fake_jira.api_url}/myself', json=CacheData().placeholder_account)
+        requests_mock.get(f'{fake_jira.mantis.http.api_url}/myself', json=CacheData().placeholder_account)
         assert (
             fake_jira.get_current_user_account_id()
             == "492581:638245r0-3d02-ki30-kchs-3kjd92hafjmz"
         )
 
     def test_get_current_user_as_assignee(self, fake_jira: JiraClient, requests_mock):
-        requests_mock.get(f'{fake_jira.api_url}/myself', json=CacheData().placeholder_account)
+        requests_mock.get(f'{fake_jira.mantis.http.api_url}/myself', json=CacheData().placeholder_account)
         assert fake_jira.get_current_user_as_assignee() == {
             "assignee": {"accountId": "492581:638245r0-3d02-ki30-kchs-3kjd92hafjmz"}
         }
 
     def test_get_test_auth_success(self, fake_jira: JiraClient, capsys, requests_mock):
-        requests_mock.get(f'{fake_jira.api_url}/myself', json=CacheData().placeholder_account)
+        requests_mock.get(f'{fake_jira.mantis.http.api_url}/myself', json=CacheData().placeholder_account)
         assert fake_jira.test_auth()
         captured = capsys.readouterr()
         assert captured.out == "Connected as user: Marcus Aurelius\n"
@@ -88,7 +88,7 @@ class TestJiraClient:
         assert captured.err == ""
 
     def test_jql_auto_complete_returns_json(self, fake_jira: JiraClient, requests_mock):
-        url = f'{fake_jira.api_url}/jql/autocompletedata/suggestions?fieldName=reporter&fieldValue=Marcus'
+        url = f'{fake_jira.mantis.http.api_url}/jql/autocompletedata/suggestions?fieldName=reporter&fieldValue=Marcus'
         accountId = CacheData().placeholder_account['accountId']
         return_value = {'results': [{'value': accountId, 'displayName': '<b>Marcus</b> Aurelius - <b>marcus</b>@rome.gov'}]}
         requests_mock.get(url, json=return_value)
@@ -96,7 +96,7 @@ class TestJiraClient:
         assert raw_auto_complete == return_value
 
     def test_validate_input_returns_one_suggestion(self, fake_jira: JiraClient, requests_mock, capsys):
-        url = f'{fake_jira.api_url}/jql/autocompletedata/suggestions?fieldName=cf[10001]&fieldValue=Commerce'
+        url = f'{fake_jira.mantis.http.api_url}/jql/autocompletedata/suggestions?fieldName=cf[10001]&fieldValue=Commerce'
         entry = {'value': 'abc123', 'displayName': 'E-<b>Commerce</b> Checkout Team'}
         return_value = {'results': [entry]}
         requests_mock.get(url, json=return_value)
@@ -107,7 +107,7 @@ class TestJiraClient:
         assert captured.err == ""
 
     def test_validate_input_returns_multiple_suggestion(self, fake_jira: JiraClient, requests_mock, capsys):
-        url = f'{fake_jira.api_url}/jql/autocompletedata/suggestions?fieldName=cf[10001]&fieldValue=Commerce'
+        url = f'{fake_jira.mantis.http.api_url}/jql/autocompletedata/suggestions?fieldName=cf[10001]&fieldValue=Commerce'
         entry_1 = {'value': 'abc123', 'displayName': 'E-<b>Commerce</b> Checkout Team'}
         entry_2 = {'value': 'abc124', 'displayName': 'E-<b>Commerce</b> Checkin Team'}
         return_value = {'results': [entry_1, entry_2]}
@@ -123,7 +123,7 @@ class TestJiraClient:
         assert captured.err == ""
 
     def test_validate_input_returns_no_suggestions(self, fake_jira: JiraClient, requests_mock, capsys):
-        url = f'{fake_jira.api_url}/jql/autocompletedata/suggestions?fieldName=cf[10001]&fieldValue=Freeloader'
+        url = f'{fake_jira.mantis.http.api_url}/jql/autocompletedata/suggestions?fieldName=cf[10001]&fieldValue=Freeloader'
         return_value: dict[str, list[dict]] = {'results': []}
         requests_mock.get(url, json=return_value)
         validation_suggestions = fake_jira.validate_input('cf[10001]', 'Freeloader')

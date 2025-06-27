@@ -13,7 +13,7 @@ from tests.data import CacheData
 
 class TestJiraIssues:
     def test_jira_issues_get_fake(self, fake_jira: JiraClient, requests_mock):
-        requests_mock.get(f'{fake_jira.api_url}/issue/ECS-1', json=CacheData().ecs_1)
+        requests_mock.get(f'{fake_jira.mantis.http.api_url}/issue/ECS-1', json=CacheData().ecs_1)
 
         task_1 = fake_jira.issues.get("ECS-1")
         assert task_1.get("key") == "ECS-1"
@@ -21,7 +21,7 @@ class TestJiraIssues:
 
 
     def test_jira_issues_get_mocked(self, fake_jira: JiraClient, with_no_read_cache, minimal_issue_payload):
-        assert fake_jira._no_read_cache is True
+        assert fake_jira.mantis._no_read_cache is True
         expected = minimal_issue_payload
         mock_response = Mock()
         mock_response.status_code = 200
@@ -76,11 +76,11 @@ class TestJiraIssues:
 
     def test_jira_issues_create(self, fake_jira: JiraClient, minimal_issue_payload, requests_mock):
         fake_jira.issues._allowed_types = ["Story", "Subtask", "Epic", "Bug", "Task"]
-        requests_mock.post(f'{fake_jira.api_url}/issue', json={})
+        requests_mock.post(f'{fake_jira.mantis.http.api_url}/issue', json={})
         with pytest.raises(ValueError):
             issue = fake_jira.issues.create(issuetype="Bug", title="Tester", data={})
         minimal_issue_payload['fields']['issuetype']['name'] = 'Bug'
-        requests_mock.post(f'{fake_jira.api_url}/issue', json=minimal_issue_payload)
+        requests_mock.post(f'{fake_jira.mantis.http.api_url}/issue', json=minimal_issue_payload)
         issue = fake_jira.issues.create(
             issuetype="Bug", title="Tester", data={"Summary": "a"}
         )
@@ -102,7 +102,7 @@ class TestJiraIssues:
 
 
     def test_handle_http_error_raises_generic_exception(self, fake_jira: "JiraClient", requests_mock):
-        requests_mock.get(f'{fake_jira.api_url}/issue/ECS-1', json=CacheData().ecs_1)
+        requests_mock.get(f'{fake_jira.mantis.http.api_url}/issue/ECS-1', json=CacheData().ecs_1)
         mock_response = Mock()
         mock_response.reason = "Unknown error"
         mock_response.raise_for_status.side_effect = HTTPError()
@@ -111,7 +111,7 @@ class TestJiraIssues:
         )
         with patch("requests.get", return_value=mock_response):
             try:
-                response = fake_jira._get("Task-3")
+                response = fake_jira.mantis.http._get("Task-3")
                 response.raise_for_status()
             except HTTPError as e:
                 assert e.response.reason == "Unknown error"
@@ -120,7 +120,7 @@ class TestJiraIssues:
 
 
     def test_jira_no_issues_fields_raises(self, fake_jira: JiraClient, requests_mock):
-        requests_mock.get(f'{fake_jira.api_url}/issue/ECS-1', json=CacheData().ecs_1)
+        requests_mock.get(f'{fake_jira.mantis.http.api_url}/issue/ECS-1', json=CacheData().ecs_1)
         issue = fake_jira.issues.get("ECS-1")
         issue.data["fields"] = None  # type: ignore since we are purely testing that it raises an error
         with pytest.raises(KeyError):
@@ -134,26 +134,26 @@ class TestJiraIssues:
                 {"id": '2', "name": "Task", 'scope': {'project': {'id': '10000'}}}
             ]
         }
-        with patch('mantis.jira.utils.jira_system_config_loader.JiraSystemConfigLoader.get_issuetypes', return_value=cached_issuetypes):
+        with patch('mantis.jira.config_loader.JiraSystemConfigLoader.get_issuetypes', return_value=cached_issuetypes):
             fake_jira.issues = JiraIssues(fake_jira)
             assert fake_jira.issues._allowed_types is None
             assert fake_jira.issues.allowed_types == ["Bug", "Task"], f'Unexpected allowed types: {fake_jira.issues._allowed_types}'
             assert fake_jira.issues._allowed_types
 
     def test_jira_issues_get_does_write_to_cache(self, fake_jira: JiraClient, requests_mock):
-        assert fake_jira.cache.get_issue("ECS-1") is None
-        requests_mock.get(f'{fake_jira.api_url}/issue/ECS-1', json=CacheData().ecs_1)
+        assert fake_jira.mantis.cache.get_issue("ECS-1") is None
+        requests_mock.get(f'{fake_jira.mantis.http.api_url}/issue/ECS-1', json=CacheData().ecs_1)
         issue = fake_jira.issues.get("ECS-1")
-        assert fake_jira.cache.get_issue("ECS-1")
-        assert len([file for file in fake_jira.cache.issues.iterdir()]) == 1
-        with open(fake_jira.cache.issues / "ECS-1.json", "r") as f:
+        assert fake_jira.mantis.cache.get_issue("ECS-1")
+        assert len([file for file in fake_jira.mantis.cache.issues.iterdir()]) == 1
+        with open(fake_jira.mantis.cache.issues / "ECS-1.json", "r") as f:
             data = json.load(f)
         assert data["key"] == "ECS-1"
 
 
     def test_jira_issues_get_does_retrieve_from_cache(self, fake_jira: JiraClient, minimal_issue_payload):
-        fake_jira._no_read_cache = False
-        with open(fake_jira.cache.issues / "TASK-1.json", "w") as f:
+        fake_jira.mantis._no_read_cache = False
+        with open(fake_jira.mantis.cache.issues / "TASK-1.json", "w") as f:
             json.dump(minimal_issue_payload, f)
         issue = fake_jira.issues.get("TASK-1")
         assert issue.get_field("summary") == "redacted"

@@ -3,34 +3,35 @@
 import json
 from pprint import pprint
 
-from mantis.assistant.assistant import TextFormat
-from mantis.jira import JiraAuth, JiraClient, JiraOptions, parse_args
+from assistant import TextFormat
 from mantis.jira.issue_field import IssueField
+from mantis.mantis_client import MantisClient
+from mantis.options_loader import OptionsLoader, parse_args
 
 def main() -> None:
-    jira_options = JiraOptions(parse_args(), 'options.toml')
-    auth = JiraAuth(jira_options)
-    jira = JiraClient(jira_options, auth)
+    options = OptionsLoader(parse_args(), 'options.toml')
+    mantis = MantisClient(options)
+    jira = mantis.jira
 
-    if jira_options.action == 'test-auth':
+    if options.action == 'test-auth':
         jira.test_auth()
-    elif jira_options.action == 'me-as-assignee':
+    elif options.action == 'me-as-assignee':
         print(jira.get_current_user_as_assignee())
-    elif jira_options.action == 'fetch-issuetypes':
+    elif options.action == 'fetch-issuetypes':
         jira.system_config_loader.get_issuetypes()
         print('Updated local cache for issuetypes:')
-        pprint(jira.cache.get_issuetypes_from_system_cache())
-    elif jira_options.action == 'fetch-types':
+        pprint(mantis.cache.get_issuetypes_from_system_cache())
+    elif options.action == 'fetch-types':
         x = jira.system_config_loader.get_issuetypes()
         pprint (x)
-    elif jira_options.action == 'get-issue':
-        for issue_key in jira_options.issues:
+    elif options.action == 'get-issue':
+        for issue_key in options.issues:
             issue = jira.issues.get(key=issue_key)
             key = issue.get('key', 'N/A')
             title = issue.get_field('summary')
             print(f'[{key}] {title}')
-        jira._no_read_cache = False
-    elif jira_options.action == 'validate-values':
+        mantis._no_read_cache = False
+    elif options.action == 'validate-values':
         search_name = 'Casper'
         search_field = 'reporter'
 
@@ -38,8 +39,8 @@ def main() -> None:
         search_field = 'cf[10001]' # 'team'
 
         validated_input = jira.validate_input(search_field, search_name)
-    elif jira_options.action == 'update-issue':
-        for issue_key in jira_options.issues:
+    elif options.action == 'update-issue':
+        for issue_key in options.issues:
             issue = jira.issues.get(key=issue_key)
             data = {
                 "fields": {
@@ -48,14 +49,14 @@ def main() -> None:
                 }
             }
             issue.update_field(data)
-            jira._no_read_cache = True
+            mantis._no_read_cache = True
             issue = jira.issues.get(key=issue_key, force_skip_cache=True)
             key = issue.get('key', 'N/A')
             title = issue.get_field('summary')
             print(f'[{key}] {title}')
-            jira._no_read_cache = False
-    elif jira_options.action == 'compare':
-        for issue_key in jira_options.issues:
+            mantis._no_read_cache = False
+    elif options.action == 'compare':
+        for issue_key in options.issues:
             issue = jira.issues.get(key=issue_key)
             print(f'Type: {issue.issuetype}')
             draft_data = issue.draft.read_draft()
@@ -100,8 +101,8 @@ def main() -> None:
             print(20*' ', end=' ')
             print(f'{'create':^10} {'edit':^10} {'issue':^10} {'draft':^10} {'creat_fact':^10} {'edit_fact':^10}')
 
-    elif jira_options.action == 'view-key':
-        for issue_key in jira_options.issues:
+    elif options.action == 'view-key':
+        for issue_key in options.issues:
             issue = jira.issues.get(key=issue_key)
             draft_data = issue.draft.read_draft()
 
@@ -145,32 +146,32 @@ def main() -> None:
             except KeyError:
                 print()
 
-    elif jira_options.action == 'auto-complete':
+    elif options.action == 'auto-complete':
         auto_complete_suggestions = jira.auto_complete.get_suggestions("reporter", 'Casper')
         print(auto_complete_suggestions)
-    elif jira_options.action == 'check-field':
-        for issue_key in jira_options.issues:
+    elif options.action == 'check-field':
+        for issue_key in options.issues:
             issue = jira.issues.get(key=issue_key)
             field = IssueField(issue, 'assignee')
             field.check_field()
-    elif jira_options.action == 'update-issue-from-draft':
-        for issue_key in jira_options.issues:
+    elif options.action == 'update-issue-from-draft':
+        for issue_key in options.issues:
             issue = jira.issues.get(key=issue_key)
             issue.update_from_draft()
-    elif jira_options.action == 'diff-issue-from-draft':
-        for issue_key in jira_options.issues:
+    elif options.action == 'diff-issue-from-draft':
+        for issue_key in options.issues:
             issue = jira.issues.get(key=issue_key)
             issue.diff_issue_from_draft()
-    elif jira_options.action == 'get-project-keys':
+    elif options.action == 'get-project-keys':
         print ('Fetching from Jira...')
         resp = jira.system_config_loader.fetch_and_update_all_createmeta()
         print('Dumped field values for:')
         pprint(resp)
-    elif jira_options.action == 'inspect':
+    elif options.action == 'inspect':
         jira.system_config_loader.inspect()
-    elif jira_options.action == 'compile-plugins':
+    elif options.action == 'compile-plugins':
         jira.system_config_loader.compile_plugins()
-    elif jira_options.action == 'load-plugins':
+    elif options.action == 'load-plugins':
         from plugins import Plugins
         print(Plugins.all_plugins['plugins_test'].Schema(type='a', system='b'))  # type: ignore
         print(Plugins.plugins_test.Schema(type='a', system='b')) # type: ignore
@@ -185,30 +186,30 @@ def main() -> None:
             ecs_1 = json.load(f)
         print(IssueModel(**ecs_1))
         print(IssueModel.model_validate(ecs_1))
-    elif jira_options.action == 'invalidate-cache':
-        jira.cache.invalidate()
-    elif jira_options.action == 'reset':
+    elif options.action == 'invalidate-cache':
+        mantis.cache.invalidate()
+    elif options.action == 'reset':
         jira.warmup(delete_drafts=False)
-    elif jira_options.action == 'warmup-issues':
+    elif options.action == 'warmup-issues':
         issue_names = [f'{jira.project_name}-{i}' for i in range(1, 6)]
         jira.warmup_issues(*issue_names)
-    elif jira_options.action == 'attempt':
+    elif options.action == 'attempt':
         jira.system_config_loader.attempt(issue_id = "ECS-1", issuetype_name = "epic")
-    elif jira_options.action == 'convert-markdown-to-jira':
-        converted = jira.assistant.convert_text_format("# This is a header\n\nThis is a paragraph with **bold** text and *italic* text.", TextFormat.JIRA)
+    elif options.action == 'convert-markdown-to-jira':
+        converted = mantis.assistant.convert_text_format("# This is a header\n\nThis is a paragraph with **bold** text and *italic* text.", TextFormat.JIRA)
         print(converted)
-    elif jira_options.action == 'validate-draft':
+    elif options.action == 'validate-draft':
         data_ = jira.issues.get("ECS-1")
         data_.draft._validate_draft()
-    elif jira_options.action == 'update-draft':
+    elif options.action == 'update-draft':
         data_ = jira.issues.get("ECS-1")
         data_.draft.update_content('Trolololo')
-    elif jira_options.action == 'make-verbose':
+    elif options.action == 'make-verbose':
         data_ = jira.issues.get("ECS-1")
         changes = data_.draft.make_verbose()
         pprint(changes)
     else:
-        print(f'Action {jira_options.action} not recognized')
+        print(f'Action {options.action} not recognized')
     
 if __name__ == '__main__':
     main()

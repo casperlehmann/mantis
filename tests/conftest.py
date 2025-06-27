@@ -3,7 +3,9 @@ from pathlib import Path
 
 import pytest
 
-from mantis.jira import JiraAuth, JiraClient, JiraOptions
+from mantis.jira import JiraClient
+from mantis.mantis_client import MantisClient
+from mantis.options_loader import OptionsLoader
 
 
 @dataclass
@@ -57,18 +59,18 @@ def fake_cli():
 
 @pytest.fixture
 def opts_from_fake_cli(fake_cli):
-    return JiraOptions(parser=fake_cli)
+    return OptionsLoader(parser=fake_cli)
 
 
 @pytest.fixture
 def jira_client_from_fake_cli(opts_from_fake_cli):
-    auth = JiraAuth(opts_from_fake_cli)
-    return JiraClient(opts_from_fake_cli, auth)
+    mantis = MantisClient(opts_from_fake_cli)
+    return mantis.jira
 
 
 @pytest.fixture
 def with_no_read_cache(fake_jira: JiraClient):
-    fake_jira._no_read_cache = True
+    fake_jira.mantis._no_read_cache = True
 
 
 @pytest.fixture
@@ -116,7 +118,7 @@ def fake_jira(
     minimal_issue_payload,
 ):
     jira = jira_client_from_fake_cli
-    assert str(jira.cache.root) != ".jira_cache_test"
-    assert str(jira.drafts_dir) != "drafts_test"
-    assert str(jira.plugins_dir) != "plugins_test"
+    assert str(jira.mantis.cache.root) != ".jira_cache_test"
+    assert str(jira.mantis.drafts_dir) != "drafts_test"
+    assert str(jira.mantis.plugins_dir) != "plugins_test"
     return jira
