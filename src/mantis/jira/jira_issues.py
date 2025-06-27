@@ -194,7 +194,7 @@ class JiraIssues:
         return self._allowed_types
 
     def get(self, key: str, force_skip_cache: bool = False) -> JiraIssue:
-        if not self.client._no_read_cache and not force_skip_cache:
+        if not self.client.mantis._no_read_cache and not force_skip_cache:
             issue_data_from_cache = self.client.cache.get_issue(key)
             if issue_data_from_cache:
                 return JiraIssue(self.client, issue_data_from_cache)

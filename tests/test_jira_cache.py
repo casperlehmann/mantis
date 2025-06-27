@@ -15,7 +15,7 @@ class TestCache:
         self.issue_payload = minimal_issue_payload
 
     def test_cache_get_caches_jira_issue(self):
-        assert not self.jira._no_read_cache
+        assert not self.jira.mantis._no_read_cache
         assert self.jira.cache._get(self.jira.cache.issues, "TASK-1.json") is None
 
         with open(self.jira.cache.root / "issues/TASK-1.json", "w") as f:
@@ -27,7 +27,7 @@ class TestCache:
 
     def test_cache_get_issue_returns_none_when_no_read_cache_is_set(self):
         # Make sure nothing is cached
-        assert not self.jira._no_read_cache
+        assert not self.jira.mantis._no_read_cache
         assert self.jira.cache.get_issue("TASK-1") is None
 
         # cache something
@@ -37,7 +37,7 @@ class TestCache:
         assert something is not None
 
         # Deactivate the cache and make sure nothing is retrieved
-        self.jira._no_read_cache = True
+        self.jira.mantis._no_read_cache = True
         with pytest.raises(LookupError):
             nothing_2 = self.jira.cache.get_issue("TASK-1")
             assert nothing_2 is None

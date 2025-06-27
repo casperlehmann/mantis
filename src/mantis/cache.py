@@ -66,7 +66,7 @@ class Cache:
         return self.system / "editmeta"
 
     def _get(self, path: Path, filename: str) -> dict | None:
-        if self.client._no_read_cache:
+        if self.mantis._no_read_cache:
             raise LookupError('Attempted to access cache when _no_read_cache is set')
         if not (path / filename).exists():
             return None
@@ -74,17 +74,17 @@ class Cache:
             return json.load(f)
 
     def get_issue(self, key: str) -> dict | None:
-        if self.client._no_read_cache:
+        if self.mantis._no_read_cache:
             raise LookupError('Attempted to access cache when _no_read_cache is set')
         return self._get(self.issues, f"{key}.json")
 
     def get_from_system_cache(self, filename: str) -> dict[str, Any] | list[dict[str, Any]] | None:
-        if self.client._no_read_cache:
+        if self.mantis._no_read_cache:
             raise LookupError('Attempted to access cache when _no_read_cache is set')
         return self._get(self.system, filename)
 
     def get_projects_from_system_cache(self) -> dict[str, Any] | list[dict[str, Any]] | None:
-        if self.client._no_read_cache:
+        if self.mantis._no_read_cache:
             raise LookupError('Attempted to access cache when _no_read_cache is set')
         projects = self.get_from_system_cache(f"projects.json")
         if not projects:
@@ -93,7 +93,7 @@ class Cache:
         return projects
 
     def get_issuetypes_from_system_cache(self) -> dict[str, Any] | None:
-        if self.client._no_read_cache:
+        if self.mantis._no_read_cache:
             raise LookupError('Attempted to access cache when _no_read_cache is set')
         issuetypes = self.get_from_system_cache("issuetypes.json")
         if not issuetypes:

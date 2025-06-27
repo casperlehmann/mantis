@@ -62,13 +62,10 @@ class JiraClient:
 
     _project_id: None | str = None
 
-    def __init__(
-        self, mantis: 'MantisClient', auth: "JiraAuth", no_read_cache: bool = False
-    ):
+    def __init__(self, mantis: 'MantisClient', auth: "JiraAuth"):
         self.mantis = mantis
         self.auth = auth.auth
         self.no_verify_ssl = auth.no_verify_ssl
-        self._no_read_cache = no_read_cache
         self.cache = Cache(mantis, self)
         self.system_config_loader = JiraSystemConfigLoader(self)
         self.issues = JiraIssues(self)

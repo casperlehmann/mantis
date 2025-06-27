@@ -21,7 +21,7 @@ class TestJiraIssues:
 
 
     def test_jira_issues_get_mocked(self, fake_jira: JiraClient, with_no_read_cache, minimal_issue_payload):
-        assert fake_jira._no_read_cache is True
+        assert fake_jira.mantis._no_read_cache is True
         expected = minimal_issue_payload
         mock_response = Mock()
         mock_response.status_code = 200
@@ -152,7 +152,7 @@ class TestJiraIssues:
 
 
     def test_jira_issues_get_does_retrieve_from_cache(self, fake_jira: JiraClient, minimal_issue_payload):
-        fake_jira._no_read_cache = False
+        fake_jira.mantis._no_read_cache = False
         with open(fake_jira.cache.issues / "TASK-1.json", "w") as f:
             json.dump(minimal_issue_payload, f)
         issue = fake_jira.issues.get("TASK-1")

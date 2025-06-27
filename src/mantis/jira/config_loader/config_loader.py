@@ -48,7 +48,7 @@ class JiraSystemConfigLoader:
             yield file
 
     def get_projects(self, force_skip_cache: bool = False) -> list[dict[str, Any]]:
-        if not self.client._no_read_cache or force_skip_cache:
+        if not self.client.mantis._no_read_cache or force_skip_cache:
             projects = self.cache.get_projects_from_system_cache()
             if projects:
                 assert isinstance(projects, list), f"To satisfy the type checker. Got: {projects}"
@@ -58,7 +58,7 @@ class JiraSystemConfigLoader:
         return projects
 
     def get_issuetypes(self, force_skip_cache: bool = False) -> dict[str, list[dict[str, Any]]]:
-        if not self.client._no_read_cache or force_skip_cache:
+        if not self.client.mantis._no_read_cache or force_skip_cache:
             from_cache = self.cache.get_issuetypes_from_system_cache()
             if from_cache:
                 return from_cache
@@ -72,7 +72,7 @@ class JiraSystemConfigLoader:
         return issuetypes
 
     def get_createmeta(self, issuetype_name: str, force_skip_cache: bool = False) -> dict[str, int | list[dict[str, Any]]]:
-        if not self.client._no_read_cache or force_skip_cache:
+        if not self.client.mantis._no_read_cache or force_skip_cache:
             from_cache = self.cache.get_createmeta_from_cache(issuetype_name)
             if from_cache:
                 return from_cache
@@ -89,7 +89,7 @@ class JiraSystemConfigLoader:
         return createmeta
 
     def get_editmeta(self, issue_key: str, force_skip_cache: bool = False) -> dict[str, int | list[dict[str, Any]]]:
-        if not self.client._no_read_cache or force_skip_cache:
+        if not self.client.mantis._no_read_cache or force_skip_cache:
             from_cache = self.cache.get_editmeta_from_cache(issue_key)
             if from_cache:
                 return from_cache
