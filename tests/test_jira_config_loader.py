@@ -112,11 +112,11 @@ class TestConfigLoader:
     @pytest.mark.slow
     def test_compile_plugins(self, fake_jira: JiraClient, requests_mock):
         requests_mock.get(f'{fake_jira.mantis.http.api_url}/project', json={"name": "Testtype"})
-        assert str(fake_jira.plugins_dir) != ".jira_cache_test"
+        assert str(fake_jira.mantis.plugins_dir) != ".jira_cache_test"
 
         with open(fake_jira.mantis.cache.createmeta / "Testtype.json", "w") as f:
             f.write('{"name": "Testtype"}')
 
-        assert (len(list(fake_jira.plugins_dir.iterdir())) == 0), f"Not empty: {fake_jira.plugins_dir}"
+        assert (len(list(fake_jira.mantis.plugins_dir.iterdir())) == 0), f"Not empty: {fake_jira.mantis.plugins_dir}"
         fake_jira.system_config_loader.compile_plugins()
-        assert len(list(fake_jira.plugins_dir.iterdir())) == 1
+        assert len(list(fake_jira.mantis.plugins_dir.iterdir())) == 1

@@ -65,7 +65,7 @@ def opts_from_fake_cli(fake_cli):
 @pytest.fixture
 def jira_client_from_fake_cli(opts_from_fake_cli):
     mantis = MantisClient(opts_from_fake_cli)
-    return JiraClient(mantis)
+    return mantis.jira
 
 
 @pytest.fixture
@@ -119,6 +119,6 @@ def fake_jira(
 ):
     jira = jira_client_from_fake_cli
     assert str(jira.mantis.cache.root) != ".jira_cache_test"
-    assert str(jira.drafts_dir) != "drafts_test"
-    assert str(jira.plugins_dir) != "plugins_test"
+    assert str(jira.mantis.drafts_dir) != "drafts_test"
+    assert str(jira.mantis.plugins_dir) != "plugins_test"
     return jira

@@ -143,7 +143,7 @@ class CreatemetaModelFactory(MetaModelFactory):
 
     def __init__(self, metadata: Dict[str, Any], issuetype_name: str, client: "JiraClient", write_plugin: bool=True) -> None:
         super().__init__(metadata)
-        self.client = client
+        self.jira = client
         self.issuetype_name = issuetype_name
         if isinstance(self.meta_fields, dict):
             raise ValueError('CreatemetaModelFactory.meta_fields should be of type list. '
@@ -157,8 +157,8 @@ class CreatemetaModelFactory(MetaModelFactory):
 
     def _write_plugin(self) -> None:
         schema = self.model.model_json_schema()
-        self.client.mantis.cache.write_createmeta_schema(self.issuetype_name, schema)
-        output_plugin = self.client.plugins_dir / f'{self.issuetype_name.lower()}_createmeta.py'
+        self.jira.mantis.cache.write_createmeta_schema(self.issuetype_name, schema)
+        output_plugin = self.jira.mantis.plugins_dir / f'{self.issuetype_name.lower()}_createmeta.py'
         warnings.filterwarnings("ignore", category=PydanticDeprecatedSince20)
         generate(
             json.dumps(schema),

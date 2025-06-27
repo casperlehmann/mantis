@@ -14,18 +14,18 @@ class TestJiraDraft:
 
         minimal_issue_payload['fields']['assignee'] = {"displayName": "Bobby Goodsky"}
         assert str(fake_jira.mantis.cache.root) != ".jira_cache_test"
-        assert str(fake_jira.drafts_dir) != "drafts_test"
+        assert str(fake_jira.mantis.drafts_dir) != "drafts_test"
         
-        assert len(list(fake_jira.drafts_dir.iterdir())) == 0
+        assert len(list(fake_jira.mantis.drafts_dir.iterdir())) == 0
         task_1 = fake_jira.issues.get("ECS-1")
-        assert len([*fake_jira.drafts_dir.iterdir()]) == 1
+        assert len([*fake_jira.mantis.drafts_dir.iterdir()]) == 1
         assert isinstance(task_1, JiraIssue)
 
         minimal_issue_payload['key'] = "ECS-2"
         task_2 = fake_jira.issues.get("ECS-2")
-        assert len([*fake_jira.drafts_dir.iterdir()]) == 2
+        assert len([*fake_jira.mantis.drafts_dir.iterdir()]) == 2
 
-        with open(fake_jira.drafts_dir / "ECS-1.md", "r") as f:
+        with open(fake_jira.mantis.drafts_dir / "ECS-1.md", "r") as f:
             content = f.read()
         assert "assignee: Bobby Goodsky" in content
         assert "Bobby Goodsky" == fake_jira.issues.get('ECS-1').draft.issue.get_field("assignee", {}).get(
@@ -48,7 +48,7 @@ class TestJiraDraft:
             "",
             "Implement user authentication for the checkout system.",
         )
-        with open(fake_jira.drafts_dir / "ECS-1.md", "r") as f:
+        with open(fake_jira.mantis.drafts_dir / "ECS-1.md", "r") as f:
             for content in f.readlines():
                 assert content.strip() in expectations, f"content.strip() ({[content.strip()]}) not in expectations in:\n\t{expectations}"
 

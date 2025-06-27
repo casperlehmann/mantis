@@ -15,7 +15,7 @@ class Draft:
     def __init__(self, mantis: 'MantisClient', issue: "JiraIssue") -> None:
         self.mantis = mantis
         self.template = self._load_template()
-        assert self.mantis.jira.drafts_dir
+        assert self.mantis.drafts_dir
         self.issue = issue
         self.summary = self.issue.get_field("summary", "")
         assert self._required_frontmatter == ['header', 'project', 'parent', 'summary', 'status', 'issuetype', 'assignee', 'reporter']
@@ -23,7 +23,7 @@ class Draft:
 
     @property
     def draft_path(self):
-        return self.mantis.jira.drafts_dir / f"{self.key}.md"
+        return self.mantis.drafts_dir / f"{self.key}.md"
 
     @property
     def key(self) -> dict:

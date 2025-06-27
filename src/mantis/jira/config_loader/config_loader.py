@@ -136,7 +136,7 @@ class JiraSystemConfigLoader:
                 content = f.read()
             # Remove the .json extension
             name = input_file.name[:-5].replace("-", "_").replace("_", "_").lower()
-            output_path = self.jira.plugins_dir / f"{name}.py"
+            output_path = self.jira.mantis.plugins_dir / f"{name}.py"
             warnings.filterwarnings("ignore", category=PydanticDeprecatedSince20)
             generate(
                 content,

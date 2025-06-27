@@ -45,14 +45,6 @@ class JiraClient:
         return JiraAuth(self.mantis.options)
 
     @property
-    def drafts_dir(self) -> Path:
-        return self.mantis.drafts_dir
-
-    @property
-    def plugins_dir(self) -> Path:
-        return self.mantis.plugins_dir
-
-    @property
     def project_name(self) -> str:
         return self.mantis.options.project
     
