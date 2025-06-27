@@ -157,7 +157,7 @@ class CreatemetaModelFactory(MetaModelFactory):
 
     def _write_plugin(self) -> None:
         schema = self.model.model_json_schema()
-        self.client.cache.write_createmeta_schema(self.issuetype_name, schema)
+        self.client.mantis.cache.write_createmeta_schema(self.issuetype_name, schema)
         output_plugin = self.client.plugins_dir / f'{self.issuetype_name.lower()}_createmeta.py'
         warnings.filterwarnings("ignore", category=PydanticDeprecatedSince20)
         generate(
@@ -201,7 +201,7 @@ class EditmetaModelFactory(MetaModelFactory):
 
     def _write_plugin(self) -> None:
         schema = self.model.model_json_schema()
-        self.client.cache.write_editmeta_schema(self.issue_key, schema)
+        self.client.mantis.cache.write_editmeta_schema(self.issue_key, schema)
         output_plugin = self.client.plugins_dir / f'{self.issue_key.lower()}_editmeta.py'
         warnings.filterwarnings("ignore", category=PydanticDeprecatedSince20)
         generate(

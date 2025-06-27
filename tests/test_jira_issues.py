@@ -141,19 +141,19 @@ class TestJiraIssues:
             assert fake_jira.issues._allowed_types
 
     def test_jira_issues_get_does_write_to_cache(self, fake_jira: JiraClient, requests_mock):
-        assert fake_jira.cache.get_issue("ECS-1") is None
+        assert fake_jira.mantis.cache.get_issue("ECS-1") is None
         requests_mock.get(f'{fake_jira.mantis.http.api_url}/issue/ECS-1', json=CacheData().ecs_1)
         issue = fake_jira.issues.get("ECS-1")
-        assert fake_jira.cache.get_issue("ECS-1")
-        assert len([file for file in fake_jira.cache.issues.iterdir()]) == 1
-        with open(fake_jira.cache.issues / "ECS-1.json", "r") as f:
+        assert fake_jira.mantis.cache.get_issue("ECS-1")
+        assert len([file for file in fake_jira.mantis.cache.issues.iterdir()]) == 1
+        with open(fake_jira.mantis.cache.issues / "ECS-1.json", "r") as f:
             data = json.load(f)
         assert data["key"] == "ECS-1"
 
 
     def test_jira_issues_get_does_retrieve_from_cache(self, fake_jira: JiraClient, minimal_issue_payload):
         fake_jira.mantis._no_read_cache = False
-        with open(fake_jira.cache.issues / "TASK-1.json", "w") as f:
+        with open(fake_jira.mantis.cache.issues / "TASK-1.json", "w") as f:
             json.dump(minimal_issue_payload, f)
         issue = fake_jira.issues.get("TASK-1")
         assert issue.get_field("summary") == "redacted"

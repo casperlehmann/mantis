@@ -13,7 +13,7 @@ class TestJiraDraft:
         requests_mock.get(f'{fake_jira.mantis.http.api_url}/issue/ECS-2', json=CacheData().ecs_2)
 
         minimal_issue_payload['fields']['assignee'] = {"displayName": "Bobby Goodsky"}
-        assert str(fake_jira.cache.root) != ".jira_cache_test"
+        assert str(fake_jira.mantis.cache.root) != ".jira_cache_test"
         assert str(fake_jira.drafts_dir) != "drafts_test"
         
         assert len(list(fake_jira.drafts_dir.iterdir())) == 0

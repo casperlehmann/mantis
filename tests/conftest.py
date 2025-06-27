@@ -118,7 +118,7 @@ def fake_jira(
     minimal_issue_payload,
 ):
     jira = jira_client_from_fake_cli
-    assert str(jira.cache.root) != ".jira_cache_test"
+    assert str(jira.mantis.cache.root) != ".jira_cache_test"
     assert str(jira.drafts_dir) != "drafts_test"
     assert str(jira.plugins_dir) != "plugins_test"
     return jira

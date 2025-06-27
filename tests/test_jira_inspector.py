@@ -39,7 +39,7 @@ class TestInspector:
         with pytest.raises(CacheMissException):
             Inspector.get_createmeta_models(fake_jira)
 
-        with open(fake_jira.cache.createmeta / "createmeta_test.json", "w") as f:
+        with open(fake_jira.mantis.cache.createmeta / "createmeta_test.json", "w") as f:
             json.dump(CacheData().createmeta_epic, f)
         from_cache = Inspector.get_createmeta_models(fake_jira)
         assert from_cache

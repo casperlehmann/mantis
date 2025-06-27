@@ -20,7 +20,7 @@ def main() -> None:
     elif options.action == 'fetch-issuetypes':
         jira.system_config_loader.get_issuetypes()
         print('Updated local cache for issuetypes:')
-        pprint(jira.cache.get_issuetypes_from_system_cache())
+        pprint(mantis.cache.get_issuetypes_from_system_cache())
     elif options.action == 'fetch-types':
         x = jira.system_config_loader.get_issuetypes()
         pprint (x)
@@ -187,7 +187,7 @@ def main() -> None:
         print(IssueModel(**ecs_1))
         print(IssueModel.model_validate(ecs_1))
     elif options.action == 'invalidate-cache':
-        jira.cache.invalidate()
+        mantis.cache.invalidate()
     elif options.action == 'reset':
         jira.warmup(delete_drafts=False)
     elif options.action == 'warmup-issues':

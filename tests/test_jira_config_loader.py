@@ -6,7 +6,7 @@ from tests.data import get_issuetypes_response, update_projects_cache_response, 
 
 
 def list_system_cache_contents(fake_jira: JiraClient) -> set[str]:
-        return {str(_).split('/')[-1] for _ in fake_jira.cache.system.iterdir()}
+        return {str(_).split('/')[-1] for _ in fake_jira.mantis.cache.system.iterdir()}
 
 
 class TestConfigLoader:
@@ -20,13 +20,13 @@ class TestConfigLoader:
         fake_jira.system_config_loader.get_issuetypes(force_skip_cache = True)
         set_with_issuetypes = list_system_cache_contents(fake_jira)
         assert set_with_issuetypes == {'createmeta', 'editmeta', 'createmeta_schemas', 'issuetypes.json', 'editmeta_schemas'}, (
-            f"System cache expected 3 values. Got: {fake_jira.cache.system}")
+            f"System cache expected 3 values. Got: {fake_jira.mantis.cache.system}")
 
     def test_config_loader_loop_yields_files(self, fake_jira: JiraClient, requests_mock):
         requests_mock.get(f'{fake_jira.mantis.http.api_url}/issue/createmeta/TEST/issuetypes', json=get_issuetypes_response)
         assert len(list(fake_jira.system_config_loader.loop_createmeta())) == 0
         # cache something
-        with open(fake_jira.cache.createmeta / f"some_file.json", "w") as f:
+        with open(fake_jira.mantis.cache.createmeta / f"some_file.json", "w") as f:
             f.write("{}")
         assert len(list(fake_jira.system_config_loader.loop_createmeta())) == 1
 
@@ -34,7 +34,7 @@ class TestConfigLoader:
         requests_mock.get(f'{fake_jira.mantis.http.api_url}/project', json=update_projects_cache_response)
 
         # Test initial state
-        if (fake_jira.cache.system / 'projects.json').exists():
+        if (fake_jira.mantis.cache.system / 'projects.json').exists():
             raise FileExistsError('File "projects.json" should not exist yet')
         assert fake_jira._project_id == None
 
@@ -45,7 +45,7 @@ class TestConfigLoader:
         assert {_['id'] for _ in got_projects} == {'10000', '10001'}
 
         # Check side-effect
-        if not (fake_jira.cache.system / 'projects.json').exists():
+        if not (fake_jira.mantis.cache.system / 'projects.json').exists():
             raise FileNotFoundError('File "projects.json" should have been created')
         
         # Note: Private jira._project_id is still None, even after the file has been written.
@@ -64,7 +64,7 @@ class TestConfigLoader:
         requests_mock.get(f'{fake_jira.mantis.http.api_url}/issue/createmeta/TEST/issuetypes', json=CacheData().issuetypes)
 
         # Fetch and cache issuetypes data
-        if (fake_jira.cache.system / 'issuetypes.json').exists():
+        if (fake_jira.mantis.cache.system / 'issuetypes.json').exists():
             raise FileExistsError('File "issuetypes.json" should not exist yet')
         
         got_issuetypes = fake_jira.system_config_loader.get_issuetypes()
@@ -77,7 +77,7 @@ class TestConfigLoader:
 
         assert len(got_issuetypes['issueTypes']) == 5, f'Expected 5 issueTypes. Got {len(got_issuetypes)}: {got_issuetypes}'
         assert got_issue_ids_as_ints == expected_issue_ids
-        if not (fake_jira.cache.system / 'issuetypes.json').exists():
+        if not (fake_jira.mantis.cache.system / 'issuetypes.json').exists():
             raise FileNotFoundError('File "issuetypes.json" should have been created')
 
     @pytest.mark.slow
@@ -89,16 +89,16 @@ class TestConfigLoader:
         requests_mock.get(f'{fake_jira.mantis.http.api_url}/issue/createmeta/TEST/issuetypes/10004', json=CacheData().createmeta_story)
         requests_mock.get(f'{fake_jira.mantis.http.api_url}/issue/createmeta/TEST/issuetypes/10005', json=CacheData().createmeta_bug)
 
-        if (fake_jira.cache.createmeta / 'createmeta_story.json').exists():
+        if (fake_jira.mantis.cache.createmeta / 'createmeta_story.json').exists():
             raise FileExistsError('File "createmeta_story.json" should not exist yet')
         allowed_types = fake_jira.system_config_loader.fetch_and_update_all_createmeta()
-        if not (fake_jira.cache.createmeta / 'createmeta_story.json').exists():
+        if not (fake_jira.mantis.cache.createmeta / 'createmeta_story.json').exists():
             raise FileNotFoundError('File "createmeta_story.json" should have been created')
         
         assert set(allowed_types) == set(['Epic', 'Subtask', 'Task', 'Story', 'Bug'])
 
         def get_allowed_issuetype_name(filename):
-            with open(fake_jira.cache.createmeta / filename, "r") as f:
+            with open(fake_jira.mantis.cache.createmeta / filename, "r") as f:
                 createmeta_story = json.load(f)
             issuetype = [field for field in createmeta_story["fields"] if field['key'] == 'issuetype'][0]
             return issuetype['allowedValues'][0]['name']
@@ -114,7 +114,7 @@ class TestConfigLoader:
         requests_mock.get(f'{fake_jira.mantis.http.api_url}/project', json={"name": "Testtype"})
         assert str(fake_jira.plugins_dir) != ".jira_cache_test"
 
-        with open(fake_jira.cache.createmeta / "Testtype.json", "w") as f:
+        with open(fake_jira.mantis.cache.createmeta / "Testtype.json", "w") as f:
             f.write('{"name": "Testtype"}')
 
         assert (len(list(fake_jira.plugins_dir.iterdir())) == 0), f"Not empty: {fake_jira.plugins_dir}"

@@ -195,11 +195,11 @@ class JiraIssues:
 
     def get(self, key: str, force_skip_cache: bool = False) -> JiraIssue:
         if not self.client.mantis._no_read_cache and not force_skip_cache:
-            issue_data_from_cache = self.client.cache.get_issue(key)
+            issue_data_from_cache = self.client.mantis.cache.get_issue(key)
             if issue_data_from_cache:
                 return JiraIssue(self.client, issue_data_from_cache)
         data = self.client.get_issue(key)
-        self.client.cache.write_issue(key, data)
+        self.client.mantis.cache.write_issue(key, data)
         return JiraIssue(self.client, data)
 
     def create(self, issuetype: str, title: str, data: dict) -> dict:

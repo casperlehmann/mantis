@@ -39,7 +39,6 @@ class JiraClient:
 
     def __init__(self, mantis: 'MantisClient'):
         self.mantis = mantis
-        self.cache = Cache(mantis, self)
         self.system_config_loader = JiraSystemConfigLoader(self)
         self.issues = JiraIssues(self)
         self.auto_complete = AutoComplete(self)
@@ -146,11 +145,11 @@ class JiraClient:
                 # This violently removes everything. Don't store anything important in the drafts_dir.
                 shutil.rmtree(self.drafts_dir)
                 self.drafts_dir.mkdir(exist_ok=True)
-        self.cache.invalidate()
+        self.mantis.cache.invalidate()
         self.system_config_loader.get_projects(force_skip_cache = True)
-        assert not self.cache.get_issuetypes_from_system_cache()
+        assert not self.mantis.cache.get_issuetypes_from_system_cache()
         self.system_config_loader.get_issuetypes(force_skip_cache = True)
-        assert self.cache.get_issuetypes_from_system_cache()
+        assert self.mantis.cache.get_issuetypes_from_system_cache()
         resp = self.system_config_loader.fetch_and_update_all_createmeta()
         pprint(resp)
 

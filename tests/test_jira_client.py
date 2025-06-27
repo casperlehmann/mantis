@@ -24,12 +24,12 @@ class TestJiraClient:
         assert captured.err == ""
 
     def test_cache_exists(self, fake_jira: JiraClient):
-        assert str(fake_jira.cache.root) != ".jira_cache_test"
-        list_of = [str(_).split('/')[-1] for _ in fake_jira.cache.root.iterdir()]
-        assert len(list(fake_jira.cache.root.iterdir())) == 2, f'Iter root expected two values, got: {list_of}'
-        assert {item.name for item in fake_jira.cache.root.iterdir()} == {"system", "issues"}
-        assert len(list(fake_jira.cache.system.iterdir())) == 4
-        assert {item.name for item in fake_jira.cache.system.iterdir()} == {"createmeta", 'createmeta_schemas', "editmeta", 'editmeta_schemas'}
+        assert str(fake_jira.mantis.cache.root) != ".jira_cache_test"
+        list_of = [str(_).split('/')[-1] for _ in fake_jira.mantis.cache.root.iterdir()]
+        assert len(list(fake_jira.mantis.cache.root.iterdir())) == 2, f'Iter root expected two values, got: {list_of}'
+        assert {item.name for item in fake_jira.mantis.cache.root.iterdir()} == {"system", "issues"}
+        assert len(list(fake_jira.mantis.cache.system.iterdir())) == 4
+        assert {item.name for item in fake_jira.mantis.cache.system.iterdir()} == {"createmeta", 'createmeta_schemas', "editmeta", 'editmeta_schemas'}
 
     def test_get_current_user(self, fake_jira: JiraClient, requests_mock):
         requests_mock.get(f'{fake_jira.mantis.http.api_url}/myself', json=CacheData().placeholder_account)

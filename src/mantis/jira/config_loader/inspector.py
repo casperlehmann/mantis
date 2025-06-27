@@ -46,14 +46,14 @@ class Inspector:
         print_header_footer()
 
     @staticmethod
-    def get_createmeta_models(client: 'JiraClient') -> dict[str, CreatemetaModelFactory]:
+    def get_createmeta_models(jira: 'JiraClient') -> dict[str, CreatemetaModelFactory]:
         d: dict[str, CreatemetaModelFactory] = {}
-        for issuetype in client.issues.allowed_types:
-            metadata = client.cache.get_createmeta_from_cache(issuetype)
+        for issuetype in jira.issues.allowed_types:
+            metadata = jira.mantis.cache.get_createmeta_from_cache(issuetype)
             if not metadata:
                 raise CacheMissException(f"{issuetype}")
             assert isinstance(metadata, dict)
-            d[issuetype] = CreatemetaModelFactory(metadata, issuetype, client)
+            d[issuetype] = CreatemetaModelFactory(metadata, issuetype, jira)
         return d
 
     @staticmethod

@@ -1,4 +1,5 @@
 from pathlib import Path
+from mantis.cache import Cache
 from mantis.http import Http
 from mantis.jira.jira_client import JiraClient
 from mantis.options_loader import OptionsLoader
@@ -15,6 +16,7 @@ class MantisClient:
         self.http = Http(self, no_read_cache)
         self.drafts_dir.mkdir(exist_ok=True)
         self.plugins_dir.mkdir(exist_ok=True)
+        self.cache = Cache(self)
 
     @property
     def drafts_dir(self) -> Path:

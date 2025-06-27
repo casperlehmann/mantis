@@ -5,7 +5,6 @@ import shutil
 from typing import TYPE_CHECKING, Any, Generator
 
 if TYPE_CHECKING:
-    from mantis.jira.jira_client import JiraClient
     from mantis.mantis_client import MantisClient
 
 
@@ -14,9 +13,8 @@ class CacheMissException(Exception):
 
 
 class Cache:
-    def __init__(self, mantis: 'MantisClient', jira_client: "JiraClient") -> None:
+    def __init__(self, mantis: 'MantisClient') -> None:
         self.mantis = mantis
-        self.client = jira_client
         self.root.mkdir(exist_ok=True)
         self.issues.mkdir(exist_ok=True)
         self.system.mkdir(exist_ok=True)
