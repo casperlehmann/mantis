@@ -12,13 +12,13 @@ class MantisClient:
     def __init__(self, options: "OptionsLoader", no_read_cache: bool = False):
         self.options = options
         self._no_read_cache = no_read_cache
-        self.jira = JiraClient(self)
         self.drafts_dir.mkdir(exist_ok=True)
         self.plugins_dir.mkdir(exist_ok=True)
-        self.http = Http(self, no_read_cache)
         self.drafts_dir.mkdir(exist_ok=True)
         self.plugins_dir.mkdir(exist_ok=True)
         self.cache = Cache(self)
+        self.jira = JiraClient(self)
+        self.http = Http(self, no_read_cache)
         self.assistant = Assistant(self)
         self.open_ai_client = OpenAIClient(self)
 
