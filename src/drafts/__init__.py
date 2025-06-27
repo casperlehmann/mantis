@@ -2,7 +2,7 @@ from pathlib import Path
 import re
 from typing import Any, Callable, TYPE_CHECKING, Generator
 
-import frontmatter
+import frontmatter  # type: ignore
 
 # To-do: Create converter for Jira syntax to markdown.
 j2m: Callable[[str], str] = lambda x: x
