@@ -4,14 +4,12 @@ from openai import OpenAI
 
 
 if TYPE_CHECKING:
-    from mantis.jira.jira_client import JiraClient
     from mantis.mantis_client import MantisClient
 
 
 class OpenAIClient:
-    def __init__(self, mantis: 'MantisClient', jira_client: 'JiraClient') -> None:
+    def __init__(self, mantis: 'MantisClient') -> None:
         self.mantis = mantis
-        self.jira_client = jira_client
         self.disabled = not self.mantis.options.chat_gpt_activated
         self.client = OpenAI(base_url=self.mantis.options.chat_gpt_base_url, api_key=self.mantis.options.chat_gpt_api_key)
         

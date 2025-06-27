@@ -196,7 +196,7 @@ def main() -> None:
     elif options.action == 'attempt':
         jira.system_config_loader.attempt(issue_id = "ECS-1", issuetype_name = "epic")
     elif options.action == 'convert-markdown-to-jira':
-        converted = jira.assistant.convert_text_format("# This is a header\n\nThis is a paragraph with **bold** text and *italic* text.", TextFormat.JIRA)
+        converted = mantis.assistant.convert_text_format("# This is a header\n\nThis is a paragraph with **bold** text and *italic* text.", TextFormat.JIRA)
         print(converted)
     elif options.action == 'validate-draft':
         data_ = jira.issues.get("ECS-1")

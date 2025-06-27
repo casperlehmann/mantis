@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 
 if TYPE_CHECKING:
-    from mantis.jira.jira_client import JiraClient
+    from mantis.mantis_client import MantisClient
 
 I_HAVE_A_QUESTION = "I have a question: "
 NO_CHANGES_NEEDED = "No changes needed"
@@ -32,8 +32,8 @@ class TextFormat(Enum):
 
 
 class Assistant:
-    def __init__(self, jira_client: 'JiraClient'):
-        self.jira_client = jira_client
+    def __init__(self, mantis: 'MantisClient'):
+        self.mantis = mantis
         self.TextFormat = TextFormat
 
     def convert_text_format(self, input_text: str, target_format: TextFormat) -> str:
@@ -51,7 +51,7 @@ class Assistant:
             NO_CHANGES_NEEDED=NO_CHANGES_NEEDED,
             I_HAVE_A_QUESTION=I_HAVE_A_QUESTION
         )
-        response = self.jira_client.open_ai_client.get_completion(input_text, prompt)
+        response = self.mantis.open_ai_client.get_completion(input_text, prompt)
         if response.strip(' ').strip('.') == NO_CHANGES_NEEDED:
             return input_text
         elif response.startswith(I_HAVE_A_QUESTION):
@@ -61,7 +61,7 @@ class Assistant:
             return response
 
     def make_verbose(self, input_text: str) -> str:
-        response = self.jira_client.open_ai_client.get_completion(input_text, VERBOSITY_PROMPT_TEMPLATE)
+        response = self.mantis.open_ai_client.get_completion(input_text, VERBOSITY_PROMPT_TEMPLATE)
         if response.strip(' ').strip('.') == NO_CHANGES_NEEDED:
             return input_text
         elif response.startswith(I_HAVE_A_QUESTION):

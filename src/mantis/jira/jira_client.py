@@ -6,13 +6,10 @@ import requests
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from assistant import Assistant
-from mantis.cache import Cache
 from mantis.jira.auto_complete import AutoComplete, Suggestion
 from mantis.jira.jira_issues import JiraIssues
 from mantis.jira.config_loader import JiraSystemConfigLoader
 from mantis.jira.jira_auth import JiraAuth
-from mantis.openai_client import OpenAIClient
 
 if TYPE_CHECKING:
     from mantis.mantis_client import MantisClient
@@ -42,8 +39,6 @@ class JiraClient:
         self.system_config_loader = JiraSystemConfigLoader(self)
         self.issues = JiraIssues(self)
         self.auto_complete = AutoComplete(self)
-        self.open_ai_client = OpenAIClient(mantis, self)
-        self.assistant = Assistant(self)
 
     @property
     def auth(self) -> JiraAuth:
