@@ -57,24 +57,24 @@ class Inspector:
         return d
 
     @staticmethod
-    def get_editmeta_models(client: 'JiraClient', issue_keys: list[str]) -> dict[str, EditmetaModelFactory]:    
+    def get_editmeta_models(jira: 'JiraClient', issue_keys: list[str]) -> dict[str, EditmetaModelFactory]:    
         d: dict[str, EditmetaModelFactory] = {}
         for issue_key in issue_keys:
-            issue = client.issues.get(issue_key)
+            issue = jira.issues.get(issue_key)
             metadata = issue.editmeta_data
             if not metadata:
                 raise CacheMissException(f"{issue_key}")
             assert isinstance(metadata, dict), f'Editmeta for {issue_key} is not a dict. Got: {type(metadata)}): {metadata}'
             assert 'fields' in metadata.keys()
-            d[issue_key] = EditmetaModelFactory(metadata, issue.issuetype, client, issue.key)
+            d[issue_key] = EditmetaModelFactory(metadata, issue.issuetype, jira, issue.key)
         return d
 
     @classmethod
-    def inspect(cls, client: 'JiraClient') -> None:
-        createmeta_model_data = cls.get_createmeta_models(client)
+    def inspect(cls, jira: 'JiraClient') -> None:
+        createmeta_model_data = cls.get_createmeta_models(jira)
         createmeta_all_keys = cls.get_field_names_from_all_types(createmeta_model_data)
-        cls.print_table(client.issues.allowed_types, createmeta_all_keys, createmeta_model_data)
+        cls.print_table(jira.issues.allowed_types, createmeta_all_keys, createmeta_model_data)
         print()
-        editmeta_model_data = cls.get_editmeta_models(client, ['ECS-1', 'ECS-2', 'ECS-3', 'ECS-4', 'ECS-5'])
+        editmeta_model_data = cls.get_editmeta_models(jira, ['ECS-1', 'ECS-2', 'ECS-3', 'ECS-4', 'ECS-5'])
         editmeta_all_keys = cls.get_field_names_from_all_types(editmeta_model_data)
         cls.print_table(['ECS-1', 'ECS-2', 'ECS-3', 'ECS-4', 'ECS-5'], editmeta_all_keys, editmeta_model_data)

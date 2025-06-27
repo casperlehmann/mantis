@@ -163,12 +163,12 @@ class JiraIssue:
 class JiraIssues:
     _allowed_types: list[str] | None = None
 
-    def __init__(self, client: "JiraClient"):
-        self.client = client
+    def __init__(self, jira: "JiraClient"):
+        self.jira = jira
 
     def load_allowed_types(self) -> list[str]:
         issuetypes = (
-            self.client.system_config_loader.get_issuetypes()
+            self.jira.system_config_loader.get_issuetypes()
         )
         if not issuetypes:
             raise ValueError('No values retrieved for issuetypes')
@@ -194,13 +194,13 @@ class JiraIssues:
         return self._allowed_types
 
     def get(self, key: str, force_skip_cache: bool = False) -> JiraIssue:
-        if not self.client.mantis._no_read_cache and not force_skip_cache:
-            issue_data_from_cache = self.client.mantis.cache.get_issue(key)
+        if not self.jira.mantis._no_read_cache and not force_skip_cache:
+            issue_data_from_cache = self.jira.mantis.cache.get_issue(key)
             if issue_data_from_cache:
-                return JiraIssue(self.client, issue_data_from_cache)
-        data = self.client.get_issue(key)
-        self.client.mantis.cache.write_issue(key, data)
-        return JiraIssue(self.client, data)
+                return JiraIssue(self.jira, issue_data_from_cache)
+        data = self.jira.get_issue(key)
+        self.jira.mantis.cache.write_issue(key, data)
+        return JiraIssue(self.jira, data)
 
     def create(self, issuetype: str, title: str, data: dict) -> dict:
         assert issuetype in self.allowed_types
@@ -208,6 +208,6 @@ class JiraIssues:
             raise ValueError("The data object is an empty payload")
         print(f"Create issue ({issuetype}): {title}")
 
-        response = self.client.post_issue(data)
+        response = self.jira.post_issue(data)
         pprint(response)
         return response

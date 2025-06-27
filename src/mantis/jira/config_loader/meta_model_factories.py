@@ -141,9 +141,9 @@ class CreatemetaModelFactory(MetaModelFactory):
         "timespent",
     }
 
-    def __init__(self, metadata: Dict[str, Any], issuetype_name: str, client: "JiraClient", write_plugin: bool=True) -> None:
+    def __init__(self, metadata: Dict[str, Any], issuetype_name: str, jira: "JiraClient", write_plugin: bool=True) -> None:
         super().__init__(metadata)
-        self.jira = client
+        self.jira = jira
         self.issuetype_name = issuetype_name
         if isinstance(self.meta_fields, dict):
             raise ValueError('CreatemetaModelFactory.meta_fields should be of type list. '
@@ -180,9 +180,9 @@ class EditmetaModelFactory(MetaModelFactory):
         "environment"
     }
 
-    def __init__(self, metadata: Dict[str, Any], issuetype_name: str, client: "JiraClient", issue_key: str, write_plugin: bool=True) -> None:
+    def __init__(self, metadata: Dict[str, Any], issuetype_name: str, jira: "JiraClient", issue_key: str, write_plugin: bool=True) -> None:
         super().__init__(metadata)
-        self.client = client
+        self.jira = jira
         self.issuetype_name = issuetype_name
         self.issue_key = issue_key
         if isinstance(self.meta_fields, list):
@@ -201,8 +201,8 @@ class EditmetaModelFactory(MetaModelFactory):
 
     def _write_plugin(self) -> None:
         schema = self.model.model_json_schema()
-        self.client.mantis.cache.write_editmeta_schema(self.issue_key, schema)
-        output_plugin = self.client.plugins_dir / f'{self.issue_key.lower()}_editmeta.py'
+        self.jira.mantis.cache.write_editmeta_schema(self.issue_key, schema)
+        output_plugin = self.jira.mantis.plugins_dir / f'{self.issue_key.lower()}_editmeta.py'
         warnings.filterwarnings("ignore", category=PydanticDeprecatedSince20)
         generate(
             json.dumps(schema),

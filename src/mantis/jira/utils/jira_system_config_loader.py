@@ -143,9 +143,9 @@ class CreatemetaModelFactory(MetaModelFactory):
         "timespent",
     }
 
-    def __init__(self, metadata: Dict[str, Any], issuetype_name: str, client: "JiraClient", write_plugin: bool=True) -> None:
+    def __init__(self, metadata: Dict[str, Any], issuetype_name: str, jira: "JiraClient", write_plugin: bool=True) -> None:
         super().__init__(metadata)
-        self.client = client
+        self.jira = jira
         self.issuetype_name = issuetype_name
         if isinstance(self.meta_fields, dict):
             raise ValueError('CreatemetaModelFactory.meta_fields should be of type list. '
@@ -159,8 +159,8 @@ class CreatemetaModelFactory(MetaModelFactory):
 
     def _write_plugin(self) -> None:
         schema = self.model.model_json_schema()
-        self.client.mantis.cache.write_createmeta_schema(self.issuetype_name, schema)
-        output_plugin = self.client.plugins_dir / f'{self.issuetype_name.lower()}_createmeta.py'
+        self.jira.mantis.cache.write_createmeta_schema(self.issuetype_name, schema)
+        output_plugin = self.jira.plugins_dir / f'{self.issuetype_name.lower()}_createmeta.py'
         warnings.filterwarnings("ignore", category=PydanticDeprecatedSince20)
         generate(
             json.dumps(schema),
@@ -182,9 +182,9 @@ class EditmetaModelFactory(MetaModelFactory):
         "environment"
     }
 
-    def __init__(self, metadata: Dict[str, Any], issuetype_name: str, client: "JiraClient", issue_key: str, write_plugin: bool=True) -> None:
+    def __init__(self, metadata: Dict[str, Any], issuetype_name: str, jira: "JiraClient", issue_key: str, write_plugin: bool=True) -> None:
         super().__init__(metadata)
-        self.client = client
+        self.jira = jira
         self.issuetype_name = issuetype_name
         self.issue_key = issue_key
         if isinstance(self.meta_fields, list):
@@ -203,8 +203,8 @@ class EditmetaModelFactory(MetaModelFactory):
 
     def _write_plugin(self) -> None:
         schema = self.model.model_json_schema()
-        self.client.mantis.cache.write_editmeta_schema(self.issue_key, schema)
-        output_plugin = self.client.plugins_dir / f'{self.issue_key.lower()}_editmeta.py'
+        self.jira.mantis.cache.write_editmeta_schema(self.issue_key, schema)
+        output_plugin = self.jira.plugins_dir / f'{self.issue_key.lower()}_editmeta.py'
         warnings.filterwarnings("ignore", category=PydanticDeprecatedSince20)
         generate(
             json.dumps(schema),
@@ -215,18 +215,18 @@ class EditmetaModelFactory(MetaModelFactory):
 
 
 class JiraSystemConfigLoader:
-    def __init__(self, client: "JiraClient") -> None:
-        self.client = client
+    def __init__(self, jira: "JiraClient") -> None:
+        self.jira = jira
 
     def attempt(self, issue_id: str, issuetype_name: str) -> None:
         with open(f".jira_cache/issues/{issue_id}.json", "r") as f:
             data = json.load(f)
 
-        metadata = self.client.mantis.cache.get_createmeta_from_cache(issuetype_name)
+        metadata = self.jira.mantis.cache.get_createmeta_from_cache(issuetype_name)
         if not metadata:
             raise CacheMissException(f"{issuetype_name}")
         assert isinstance(metadata, dict)
-        fields = CreatemetaModelFactory(metadata, issuetype_name, self.client)
+        fields = CreatemetaModelFactory(metadata, issuetype_name, self.jira)
         loaded = fields.make(data)
         assert loaded.key == issue_id  # type: ignore
         print(loaded.key)  # type: ignore
@@ -235,7 +235,7 @@ class JiraSystemConfigLoader:
 
     @property
     def cache(self) -> 'Cache':
-        return self.client.mantis.cache
+        return self.jira.mantis.cache
 
     def loop_createmeta(self) -> Generator[Path, Any, None]:
         for file in self.cache.createmeta.iterdir():
@@ -246,21 +246,21 @@ class JiraSystemConfigLoader:
             yield file
 
     def get_projects(self, force_skip_cache: bool = False) -> list[dict[str, Any]]:
-        if not self.client._no_read_cache or force_skip_cache:
+        if not self.jira._no_read_cache or force_skip_cache:
             projects = self.cache.get_projects_from_system_cache()
             if projects:
                 assert isinstance(projects, list), f"To satisfy the type checker. Got: {projects}"
                 return projects
-        projects = self.client.get_projects()
+        projects = self.jira.get_projects()
         self.cache.write_to_system_cache("projects.json", json.dumps(projects))
         return projects
 
     def get_issuetypes(self, force_skip_cache: bool = False) -> dict[str, list[dict[str, Any]]]:
-        if not self.client._no_read_cache or force_skip_cache:
+        if not self.jira._no_read_cache or force_skip_cache:
             from_cache = self.cache.get_issuetypes_from_system_cache()
             if from_cache:
                 return from_cache
-        issuetypes = self.client.get_issuetypes()
+        issuetypes = self.jira.get_issuetypes()
         assert isinstance(issuetypes, dict)
         if len(issuetypes.keys()) == 0:
             raise ValueError(
@@ -270,12 +270,12 @@ class JiraSystemConfigLoader:
         return issuetypes
 
     def get_createmeta(self, issuetype_name: str, force_skip_cache: bool = False) -> dict[str, int | list[dict[str, Any]]]:
-        if not self.client._no_read_cache or force_skip_cache:
+        if not self.jira._no_read_cache or force_skip_cache:
             from_cache = self.cache.get_createmeta_from_cache(issuetype_name)
             if from_cache:
                 return from_cache
-        issuetype_id = self.client.issuetype_name_to_id(issuetype_name)
-        createmeta = self.client.get_createmeta(issuetype_id)
+        issuetype_id = self.jira.issuetype_name_to_id(issuetype_name)
+        createmeta = self.jira.get_createmeta(issuetype_id)
         if not isinstance(createmeta, dict):
             raise ValueError(f'The createmeta object should be a dict. Got: {type(createmeta)}')
         if len(createmeta.keys()) == 0:
@@ -287,11 +287,11 @@ class JiraSystemConfigLoader:
         return createmeta
 
     def get_editmeta(self, issue_key: str, force_skip_cache: bool = False) -> dict[str, int | list[dict[str, Any]]]:
-        if not self.client._no_read_cache or force_skip_cache:
+        if not self.jira._no_read_cache or force_skip_cache:
             from_cache = self.cache.get_editmeta_from_cache(issue_key)
             if from_cache:
                 return from_cache
-        editmeta = self.client.get_editmeta(issue_key)
+        editmeta = self.jira.get_editmeta(issue_key)
         if not isinstance(editmeta, dict):
             raise ValueError(f'The editmeta object should be a dict. Got: {type(editmeta)}')
         if len(editmeta.keys()) == 0:
@@ -312,8 +312,8 @@ class JiraSystemConfigLoader:
             issuetype_name: str = issuetype_data['name']
             data = self._update_single_createmeta(issuetype_name)
             # Run CreatemetaModelFactory to dump schemas
-            fields = CreatemetaModelFactory(data, issuetype_name, self.client)
-        return self.client.issues.load_allowed_types()
+            fields = CreatemetaModelFactory(data, issuetype_name, self.jira)
+        return self.jira.issues.load_allowed_types()
 
     def _update_single_createmeta(self, issuetype_name: str) -> dict[str, Any]:
         data: dict[str, Any] = self.get_createmeta(issuetype_name)
@@ -323,7 +323,7 @@ class JiraSystemConfigLoader:
 
     def _update_single_editmeta(self, issue_key: str) -> dict[str, Any]:
         print(f'Getting editmeta for {issue_key}')
-        data: dict[str, Any] = self.client.get_editmeta(issue_key)
+        data: dict[str, Any] = self.jira.get_editmeta(issue_key)
         assert isinstance(data, dict)
         self.cache.write_editmeta(issue_key, data)
         return data
@@ -334,7 +334,7 @@ class JiraSystemConfigLoader:
                 content = f.read()
             # Remove the .json extension
             name = input_file.name[:-5].replace("-", "_").replace("_", "_").lower()
-            output_path = self.client.plugins_dir / f"{name}.py"
+            output_path = self.jira.plugins_dir / f"{name}.py"
             warnings.filterwarnings("ignore", category=PydanticDeprecatedSince20)
             generate(
                 content,
@@ -343,13 +343,13 @@ class JiraSystemConfigLoader:
                 output=output_path,
                 output_model_type=DataModelType.PydanticV2BaseModel,
             )
-        for input_file in self.client.mantis.cache.iter_dir("issues"):
+        for input_file in self.jira.mantis.cache.iter_dir("issues"):
             print(f'input_file: {input_file}')
             with open(input_file, "r") as f:
                 content = f.read()
             # Remove the .json extension
             name = input_file.name[:-5].replace("-", "_").replace("_", "_").lower()
-            output_path = self.client.plugins_dir / f"{name}.py"
+            output_path = self.jira.plugins_dir / f"{name}.py"
             warnings.filterwarnings("ignore", category=PydanticDeprecatedSince20)
             generate(
                 content,
@@ -360,7 +360,7 @@ class JiraSystemConfigLoader:
             )
 
     def inspect(self) -> None:
-        Inspector.inspect(self.client)
+        Inspector.inspect(self.jira)
 
 
 class Inspector:
@@ -402,35 +402,35 @@ class Inspector:
         print_header_footer()
 
     @staticmethod
-    def get_createmeta_models(client: 'JiraClient') -> dict[str, CreatemetaModelFactory]:
+    def get_createmeta_models(jira: 'JiraClient') -> dict[str, CreatemetaModelFactory]:
         d: dict[str, CreatemetaModelFactory] = {}
-        for issuetype in client.issues.allowed_types:
-            metadata = client.mantis.cache.get_createmeta_from_cache(issuetype)
+        for issuetype in jira.issues.allowed_types:
+            metadata = jira.mantis.cache.get_createmeta_from_cache(issuetype)
             if not metadata:
                 raise CacheMissException(f"{issuetype}")
             assert isinstance(metadata, dict)
-            d[issuetype] = CreatemetaModelFactory(metadata, issuetype, client)
+            d[issuetype] = CreatemetaModelFactory(metadata, issuetype, jira)
         return d
 
     @staticmethod
-    def get_editmeta_models(client: 'JiraClient', issue_keys: list[str]) -> dict[str, EditmetaModelFactory]:    
+    def get_editmeta_models(jira: 'JiraClient', issue_keys: list[str]) -> dict[str, EditmetaModelFactory]:    
         d: dict[str, EditmetaModelFactory] = {}
         for issue_key in issue_keys:
-            issue = client.issues.get(issue_key)
+            issue = jira.issues.get(issue_key)
             metadata = issue.editmeta_data
             if not metadata:
                 raise CacheMissException(f"{issue_key}")
             assert isinstance(metadata, dict), f'Editmeta for {issue_key} is not a dict. Got: {type(metadata)}): {metadata}'
             assert 'fields' in metadata.keys()
-            d[issue_key] = EditmetaModelFactory(metadata, issue.issuetype, client, issue.key)
+            d[issue_key] = EditmetaModelFactory(metadata, issue.issuetype, jira, issue.key)
         return d
 
     @classmethod
-    def inspect(cls, client: 'JiraClient') -> None:
-        createmeta_model_data = cls.get_createmeta_models(client)
+    def inspect(cls, jira: 'JiraClient') -> None:
+        createmeta_model_data = cls.get_createmeta_models(jira)
         createmeta_all_keys = cls.get_field_names_from_all_types(createmeta_model_data)
-        cls.print_table(client.issues.allowed_types, createmeta_all_keys, createmeta_model_data)
+        cls.print_table(jira.issues.allowed_types, createmeta_all_keys, createmeta_model_data)
         print()
-        editmeta_model_data = cls.get_editmeta_models(client, ['ECS-1', 'ECS-2', 'ECS-3', 'ECS-4', 'ECS-5'])
+        editmeta_model_data = cls.get_editmeta_models(jira, ['ECS-1', 'ECS-2', 'ECS-3', 'ECS-4', 'ECS-5'])
         editmeta_all_keys = cls.get_field_names_from_all_types(editmeta_model_data)
         cls.print_table(['ECS-1', 'ECS-2', 'ECS-3', 'ECS-4', 'ECS-5'], editmeta_all_keys, editmeta_model_data)
