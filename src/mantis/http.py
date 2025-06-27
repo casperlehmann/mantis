@@ -14,7 +14,10 @@ class Http:
     def __init__(self, mantis: 'MantisClient', no_read_cache: bool = False):
         self.mantis = mantis
         self.options = mantis.options
-        self.requests_kwargs: dict[str, 'HTTPBasicAuth | bool | dict[str, Any]'] = {
+
+    @property
+    def requests_kwargs(self) -> dict[str, 'HTTPBasicAuth | bool | dict[str, Any]']:
+        return {
             "auth": self.mantis.jira.auth.auth,
             "headers": {"Content-Type": "application/json"},
             "verify": (not self.mantis.jira.auth.no_verify_ssl),
