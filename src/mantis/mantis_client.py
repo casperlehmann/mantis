@@ -11,7 +11,7 @@ class MantisClient:
         self.options = options
         self.jira_auth = JiraAuth(options)
         self._no_read_cache = no_read_cache
-        self.jira = JiraClient(self, self.jira_auth)
+        self.jira = JiraClient(self)
         self.drafts_dir.mkdir(exist_ok=True)
         self.plugins_dir.mkdir(exist_ok=True)
         self.http = Http(self, self.jira_auth, no_read_cache)

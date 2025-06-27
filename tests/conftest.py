@@ -66,7 +66,7 @@ def opts_from_fake_cli(fake_cli):
 def jira_client_from_fake_cli(opts_from_fake_cli):
     mantis = MantisClient(opts_from_fake_cli)
     auth = JiraAuth(opts_from_fake_cli)
-    return JiraClient(mantis, auth)
+    return JiraClient(mantis)
 
 
 @pytest.fixture
