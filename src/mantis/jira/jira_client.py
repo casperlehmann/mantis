@@ -36,10 +36,11 @@ def process_key(key: str, exception: Exception) -> tuple[str, str]:
 
 
 class OpenAIClient:
-    def __init__(self, jira_client: 'JiraClient') -> None:
+    def __init__(self, mantis: 'MantisClient', jira_client: 'JiraClient') -> None:
+        self.mantis = mantis
         self.jira_client = jira_client
-        self.disabled = not self.jira_client.options.chat_gpt_activated
-        self.client = OpenAI(base_url=self.jira_client.options.chat_gpt_base_url, api_key=self.jira_client.options.chat_gpt_api_key)
+        self.disabled = not self.mantis.options.chat_gpt_activated
+        self.client = OpenAI(base_url=self.mantis.options.chat_gpt_base_url, api_key=self.mantis.options.chat_gpt_api_key)
         
     def get_completion(self, input_text: str, prompt: str, model: str = 'gpt-4.1') -> str:
         if self.disabled:
@@ -62,10 +63,9 @@ class JiraClient:
     _project_id: None | str = None
 
     def __init__(
-        self, mantis: 'MantisClient', jira_options: "OptionsLoader", auth: "JiraAuth", no_read_cache: bool = False
+        self, mantis: 'MantisClient', auth: "JiraAuth", no_read_cache: bool = False
     ):
         self.mantis = mantis
-        self.options = jira_options
         self.auth = auth.auth
         self.no_verify_ssl = auth.no_verify_ssl
         self._no_read_cache = no_read_cache
@@ -74,11 +74,11 @@ class JiraClient:
             "headers": {"Content-Type": "application/json"},
             "verify": (not self.no_verify_ssl),
         }
-        self.cache = Cache(self)
+        self.cache = Cache(mantis, self)
         self.system_config_loader = JiraSystemConfigLoader(self)
         self.issues = JiraIssues(self)
         self.auto_complete = AutoComplete(self)
-        self.open_ai_client = OpenAIClient(self)
+        self.open_ai_client = OpenAIClient(mantis, self)
         self.assistant = Assistant(self)
 
     @property
@@ -91,7 +91,7 @@ class JiraClient:
 
     @property
     def project_name(self) -> str:
-        return self.options.project
+        return self.mantis.options.project
     
     @property
     def project_id(self) -> str:
@@ -287,11 +287,11 @@ class JiraClient:
                     raise ValueError(
                         f'Issue number "{task_no_from_key}" in key "{key}" must be numeric'
                     ) from exception
-                elif self.options.project not in key:
+                elif self.mantis.options.project not in key:
                     raise ValueError(
                         f"The requested issue does not exist. Note that the "
                         f'provided key "{key}" does not appear to match '
-                        f'your configured project "{self.options.project}"'
+                        f'your configured project "{self.mantis.options.project}"'
                     ) from exception
                 else:
                     raise ValueError(

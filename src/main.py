@@ -13,7 +13,7 @@ def main() -> None:
     options = OptionsLoader(parse_args(), 'options.toml')
     mantis = MantisClient(options)
     auth = JiraAuth(options)
-    jira = JiraClient(mantis, options, auth)
+    jira = JiraClient(mantis, auth)
 
     if options.action == 'test-auth':
         jira.test_auth()

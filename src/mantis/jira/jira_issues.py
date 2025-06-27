@@ -32,7 +32,7 @@ class JiraIssue:
         self.client = client
         self.data = raw_data
         # Only writes if not exists.
-        self.draft = Draft(self.client, self)
+        self.draft = Draft(self.client.mantis, self.client, self)
         self._createmeta_factory: CreatemetaModelFactory | None = None
         self._editmeta_factory: EditmetaModelFactory | None = None
         self._editmeta: Any | None = None

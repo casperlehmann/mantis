@@ -1,7 +1,7 @@
 import re
 from typing import Any, Callable, TYPE_CHECKING, Generator
 
-import frontmatter  # type: ignore
+import frontmatter
 
 # To-do: Create converter for Jira syntax to markdown.
 j2m: Callable[[str], str] = lambda x: x
@@ -9,10 +9,12 @@ j2m: Callable[[str], str] = lambda x: x
 if TYPE_CHECKING:
     from mantis.jira import JiraIssue
     from mantis.jira.jira_client import JiraClient
+    from mantis.mantis_client import MantisClient
 
 
 class Draft:
-    def __init__(self, jira: "JiraClient", issue: "JiraIssue") -> None:
+    def __init__(self, mantis: 'MantisClient', jira: "JiraClient", issue: "JiraIssue") -> None:
+        self.mantis = mantis
         self.template = self._load_template()
         assert jira.drafts_dir
         self.jira = jira
@@ -67,7 +69,7 @@ class Draft:
 
     def _generate_body(self) -> None:
         description = self.issue.get_field("description") or "Placeholder description"
-        if self.jira.options.chat_gpt_activated:
+        if self.mantis.options.chat_gpt_activated:
             description = self.jira.assistant.convert_text_format(
                 input_text=description,
                 target_format=self.jira.assistant.TextFormat.MARKDOWN
