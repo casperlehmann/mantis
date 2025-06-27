@@ -12,12 +12,10 @@ from mantis.cache import Cache
 from mantis.jira.auto_complete import AutoComplete, Suggestion
 from mantis.jira.jira_issues import JiraIssues
 from mantis.jira.config_loader import JiraSystemConfigLoader
+from mantis.jira.jira_auth import JiraAuth
 
 if TYPE_CHECKING:
     from mantis.mantis_client import MantisClient
-    from mantis.jira.jira_auth import JiraAuth
-    from mantis.options_loader import OptionsLoader
-    from requests.auth import HTTPBasicAuth
 
 
 def process_key(key: str, exception: Exception) -> tuple[str, str]:
@@ -70,6 +68,10 @@ class JiraClient:
         self.auto_complete = AutoComplete(self)
         self.open_ai_client = OpenAIClient(mantis, self)
         self.assistant = Assistant(self)
+
+    @property
+    def auth(self) -> JiraAuth:
+        return JiraAuth(self.mantis.options)
 
     @property
     def drafts_dir(self) -> Path:

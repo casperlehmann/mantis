@@ -2,8 +2,6 @@ import requests
 
 from typing import TYPE_CHECKING, Any
 
-from mantis.jira.jira_auth import JiraAuth
-
 if TYPE_CHECKING:
     from requests.auth import HTTPBasicAuth
     from mantis.mantis_client import MantisClient
@@ -13,16 +11,13 @@ class Http:
     A class to handle HTTP requests and responses.
     """
 
-    def __init__(
-        self, mantis: 'MantisClient', auth: 'JiraAuth', no_read_cache: bool = False
-    ):
+    def __init__(self, mantis: 'MantisClient', no_read_cache: bool = False):
+        self.mantis = mantis
         self.options = mantis.options
-        self.auth = auth.auth
-        self.no_verify_ssl = auth.no_verify_ssl
         self.requests_kwargs: dict[str, 'HTTPBasicAuth | bool | dict[str, Any]'] = {
-            "auth": self.auth,
+            "auth": self.mantis.jira.auth.auth,
             "headers": {"Content-Type": "application/json"},
-            "verify": (not self.no_verify_ssl),
+            "verify": (not self.mantis.jira.auth.no_verify_ssl),
         }
 
     @property
@@ -42,6 +37,7 @@ class Http:
         return requests.get(url, params=params, **self.requests_kwargs)  # type: ignore
 
 
+    @staticmethod
     def post(url: str, data: dict = None) -> str:
         """
         Perform a POST request to the specified URL with optional data.

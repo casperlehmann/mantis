@@ -4,7 +4,6 @@ import json
 from pprint import pprint
 
 from assistant import TextFormat
-from mantis.jira import JiraAuth, JiraClient
 from mantis.jira.issue_field import IssueField
 from mantis.mantis_client import MantisClient
 from mantis.options_loader import OptionsLoader, parse_args
@@ -12,8 +11,7 @@ from mantis.options_loader import OptionsLoader, parse_args
 def main() -> None:
     options = OptionsLoader(parse_args(), 'options.toml')
     mantis = MantisClient(options)
-    auth = JiraAuth(options)
-    jira = JiraClient(mantis, auth)
+    jira = mantis.jira
 
     if options.action == 'test-auth':
         jira.test_auth()
@@ -32,7 +30,7 @@ def main() -> None:
             key = issue.get('key', 'N/A')
             title = issue.get_field('summary')
             print(f'[{key}] {title}')
-        jira._no_read_cache = False
+        mantis._no_read_cache = False
     elif options.action == 'validate-values':
         search_name = 'Casper'
         search_field = 'reporter'
@@ -51,12 +49,12 @@ def main() -> None:
                 }
             }
             issue.update_field(data)
-            jira._no_read_cache = True
+            mantis._no_read_cache = True
             issue = jira.issues.get(key=issue_key, force_skip_cache=True)
             key = issue.get('key', 'N/A')
             title = issue.get_field('summary')
             print(f'[{key}] {title}')
-            jira._no_read_cache = False
+            mantis._no_read_cache = False
     elif options.action == 'compare':
         for issue_key in options.issues:
             issue = jira.issues.get(key=issue_key)
