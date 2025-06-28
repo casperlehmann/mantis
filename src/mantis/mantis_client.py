@@ -14,8 +14,6 @@ class MantisClient:
         self._no_read_cache = no_read_cache
         self.drafts_dir.mkdir(exist_ok=True)
         self.plugins_dir.mkdir(exist_ok=True)
-        self.drafts_dir.mkdir(exist_ok=True)
-        self.plugins_dir.mkdir(exist_ok=True)
         self.cache = Cache(self)
         self.jira = JiraClient(self)
         self.http = Http(self, no_read_cache)
