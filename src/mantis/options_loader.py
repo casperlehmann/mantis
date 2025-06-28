@@ -6,7 +6,7 @@ class OptionsLoader:
     """Collects options from toml file, allowing for command line overrides
     """
 
-    default_toml_source = "options.toml"
+    default_toml_source = "mantis.toml"
 
     def __init__(
         self,
@@ -19,7 +19,7 @@ class OptionsLoader:
             with open(toml_source, "rb") as f:
                 options = tomllib.load(f)
         except FileNotFoundError:
-            print('No toml_source provided and default "options.toml" does not exist')
+            print('No toml_source provided and default "mantis.toml" does not exist')
             toml_source = None
             options = {}
         self.user = parser and parser.user or options.get("jira", {}).get("user")

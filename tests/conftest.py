@@ -47,7 +47,7 @@ def fake_toml(tmpdir):
             "",
         )
     )
-    toml = tmpdir / "options.toml"
+    toml = tmpdir / "mantis.toml"
     toml.write(toml_contents)
     return toml
 
