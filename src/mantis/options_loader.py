@@ -2,11 +2,12 @@ import argparse
 import tomllib
 
 
-class OptionsLoader:
-    """Collects options from toml file, allowing for command line overrides
-    """
+MANTIS_TOML = "mantis.toml"
 
-    default_toml_source = "mantis.toml"
+
+class OptionsLoader:
+    """Collects options from toml file, allowing for command line overrides"""
+
 
     def __init__(
         self,
@@ -14,7 +15,7 @@ class OptionsLoader:
         toml_source: str | None = None,
     ):
         if not toml_source:
-            toml_source = self.default_toml_source
+            toml_source = MANTIS_TOML
         try:
             with open(toml_source, "rb") as f:
                 options = tomllib.load(f)
