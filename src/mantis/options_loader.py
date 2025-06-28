@@ -1,5 +1,8 @@
 import argparse
+from pathlib import Path
 import tomllib
+
+from xdg_base_dirs import xdg_config_home
 
 
 MANTIS_TOML = "mantis.toml"
@@ -7,7 +10,26 @@ MANTIS_TOML = "mantis.toml"
 
 class OptionsLoader:
     """Collects options from toml file, allowing for command line overrides"""
+    
+    def load_toml(self, toml_path: Path) -> dict:
+        """Load options from a TOML file."""
+        if not toml_path.is_file():
+            return {}
+        try:
+            with open(toml_path, "rb") as f:
+                return tomllib.load(f)
+        except Exception as e:
+            print(f"Error loading {toml_path}: {e}")
+            return {}
 
+    def default_toml(self):
+        """Get the mantis directory under either XDG config home or user home"""
+        config_home = xdg_config_home()
+        return self.load_toml(config_home / MANTIS_TOML)
+
+    def cwd_toml(self):
+        """Get the mantis directory under either XDG config home or user home"""
+        return self.load_toml(Path.cwd() / MANTIS_TOML)
 
     def __init__(
         self,
