@@ -37,7 +37,7 @@ class Cache:
 
     @property
     def root(self) -> Path:
-        return Path(self.mantis.options.cache_dir)
+        return Path(self.mantis.cache_dir)
 
     @property
     def issues(self) -> Path:
