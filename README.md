@@ -23,14 +23,14 @@ click on `Create API token`
 and [API tokens](https://support.atlassian.com/atlassian-account/docs/manage-api-tokens-for-your-atlassian-account/)
 if you need more information.
 
-### Fill out the options toml:
+### Fill out the mantis toml:
 
 ```sh
-$ cp options-example.toml options.toml
-$ vi options.toml
+$ cp mantis-example.toml mantis.toml
+$ vi mantis.toml
 ```
 
-Your `options.toml` needs to be filled out with your personal data,
+Your `mantis.toml` needs to be filled out with your personal data,
 including the Jira token you just created.
 It should **not** be added to source control.
 You new file should look something like the following example:

@@ -9,7 +9,7 @@ from mantis.mantis_client import MantisClient
 from mantis.options_loader import OptionsLoader, parse_args
 
 def main() -> None:
-    options = OptionsLoader(parse_args(), 'options.toml')
+    options = OptionsLoader(parse_args(), 'mantis.toml')
     mantis = MantisClient(options)
     jira = mantis.jira
 

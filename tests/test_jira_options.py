@@ -22,11 +22,11 @@ class TestJiraOptions:
 
 
     def test_options_not_set(self, tmpdir, capfd):
-        toml = tmpdir / "options.toml"
+        toml = tmpdir / "mantis.toml"
         with pytest.raises(AssertionError):
             OptionsLoader(toml_source=toml)
         out, _ = capfd.readouterr()
-        assert out == 'No toml_source provided and default "options.toml" does not exist\n'
+        assert out == 'No toml_source provided and default "mantis.toml" does not exist\n'
         toml.write("")
         with pytest.raises(AssertionError) as execution_error:
             OptionsLoader(toml_source=toml)
