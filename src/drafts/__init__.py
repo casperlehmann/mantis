@@ -1,3 +1,5 @@
+from .template_md import template
+
 from pathlib import Path
 import re
 from typing import Any, Callable, TYPE_CHECKING, Generator
@@ -19,7 +21,7 @@ class Draft:
         assert self.mantis.drafts_dir
         self.issue = issue
         self.summary = self.issue.get_field("summary", "")
-        assert self._required_frontmatter == ['header', 'project', 'parent', 'summary', 'status', 'issuetype', 'assignee', 'reporter']
+        assert self._required_frontmatter == ['header', 'project', 'parent', 'summary', 'status', 'issuetype', 'assignee', 'reporter'], f'Unexpected required frontmatter: {self._required_frontmatter}'
         self._materialize()
 
     @property
@@ -42,8 +44,7 @@ class Draft:
         return list(self.template.metadata.keys())
 
     def _load_template(self) -> frontmatter.Post:
-        with open('src/drafts/template.md', 'r') as f:
-            return frontmatter.load(f)
+        return frontmatter.loads(template)
 
     def _generate_frontmatter(self) -> None:
         for field_name in self._required_frontmatter:

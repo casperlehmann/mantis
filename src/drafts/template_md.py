@@ -1,3 +1,4 @@
+template ='''\
 ---
 header: "Will be set dynamically"
 project: {project}
@@ -12,3 +13,4 @@ reporter: {reporter}
 
 {description}
 
+'''
