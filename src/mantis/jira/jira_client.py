@@ -40,6 +40,12 @@ class JiraClient:
         self.issues = JiraIssues(self)
         self.auto_complete = AutoComplete(self)
 
+    def web(self) -> None:
+        """Print the web URL of the Jira instance."""
+        if not self.mantis.options.url:
+            raise ValueError('Jira URL must be set in options')
+        print(self.mantis.options.url)
+
     @property
     def auth(self) -> JiraAuth:
         return JiraAuth(self.mantis.options)
