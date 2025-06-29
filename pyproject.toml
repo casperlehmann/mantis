@@ -1,6 +1,6 @@
 [project]
 name = "mantis"
-version = "0.2.7"
+version = "0.2.8"
 description = "CLI for locally managing Jira issues"
 authors = [
     {name = "casperlehmann",email = "6682833+casperlehmann@users.noreply.github.com"}
