@@ -10,7 +10,7 @@ MANTIS_TOML = "mantis.toml"
 
 class OptionsLoader:
     """Collects options from toml file, allowing for command line overrides"""
-    def __init__(self, parser: "argparse.Namespace | None" = None):
+    def __init__(self, parser: "argparse.Namespace | None" = None) -> None:
         self.options = {}
         self.options.update(self.default_toml())
         self.options.update(self.cwd_toml())
@@ -24,16 +24,16 @@ class OptionsLoader:
         with open(toml_path, "rb") as f:
             return tomllib.load(f)
 
-    def default_toml(self):
+    def default_toml(self) -> dict:
         """Get the mantis directory under either XDG config home or user home"""
         config_home = xdg_config_home()
         return self.load_toml(config_home / MANTIS_TOML)
 
-    def cwd_toml(self):
+    def cwd_toml(self) -> dict:
         """Get the mantis directory under either XDG config home or user home"""
         return self.load_toml(Path.cwd() / MANTIS_TOML)
 
-    def sanity_check(self):
+    def sanity_check(self) -> None:
         """Check that all required options are set."""
         assert self.user, "OptionsLoader.user not set"
         assert self.personal_access_token, "OptionsLoader.personal_access_token not set"
@@ -47,11 +47,13 @@ class OptionsLoader:
             assert self.chat_gpt_api_key, f"ChatGPT is activated, but OptionsLoader.chat_gpt_api_key not set {self.options}"
 
     @property
-    def user(self):
-        return self.parser and self.parser.user or self.options.get("jira", {}).get("user")
+    def user(self) -> str:
+        val = self.parser and self.parser.user or self.options.get("jira", {}).get("user")
+        assert val, "OptionsLoader.user not set"
+        return val
 
     @property
-    def personal_access_token(self):
+    def personal_access_token(self) -> str | None:
         return (
             self.parser
             and self.parser.personal_access_token
@@ -59,17 +61,17 @@ class OptionsLoader:
         )
 
     @property
-    def url(self):
+    def url(self) -> str | None:
         return self.parser and self.parser.url or self.options.get("jira", {}).get("url")
 
     @property
-    def project(self):
-        return (
-            self.parser and self.parser.project or self.options.get("jira", {}).get("project")
-        )
+    def project(self) -> str:
+        val = self.parser and self.parser.project or self.options.get("jira", {}).get("project")
+        assert val, "OptionsLoader.project not set"
+        return val
 
     @property
-    def no_verify_ssl(self):
+    def no_verify_ssl(self) -> bool:
         return bool(
             self.parser
             and self.parser.no_verify_ssl
@@ -77,46 +79,46 @@ class OptionsLoader:
         )
 
     @property
-    def cache_dir(self):
-        return (
-            self.parser and self.parser.cache_dir or self.options.get("jira", {}).get("cache-dir")
-        )
+    def cache_dir(self) -> str:
+        val = self.parser and self.parser.cache_dir or self.options.get("jira", {}).get("cache-dir")
+        assert val, "OptionsLoader.cache_dir not set"
+        return val
         
     @cache_dir.setter
-    def cache_dir(self, value):
+    def cache_dir(self, value: str) -> None:
         if self.parser:
             self.parser.cache_dir = value
         else:
             self.options["jira"]["cache-dir"] = value
 
     @property
-    def drafts_dir(self):
-        return (
-            self.parser and self.parser.drafts_dir or self.options.get("jira", {}).get("drafts-dir")
-        )
+    def drafts_dir(self) -> str:
+        val = self.parser and self.parser.drafts_dir or self.options.get("jira", {}).get("drafts-dir")
+        assert val, "OptionsLoader.drafts_dir not set"
+        return val
 
     @drafts_dir.setter
-    def drafts_dir(self, value):
+    def drafts_dir(self, value: str) -> None:
         if self.parser:
             self.parser.drafts_dir = value
         else:
             self.options["jira"]["drafts-dir"] = value
 
     @property
-    def plugins_dir(self):
-        return (
-            self.parser and self.parser.plugins_dir or self.options.get("jira", {}).get("plugins-dir")
-        )
+    def plugins_dir(self) -> str:
+        val = self.parser and self.parser.plugins_dir or self.options.get("jira", {}).get("plugins-dir")
+        assert val, "OptionsLoader.plugins_dir not set"
+        return val
 
     @plugins_dir.setter
-    def plugins_dir(self, value):
+    def plugins_dir(self, value: str) -> None:
         if self.parser:
             self.parser.plugins_dir = value
         else:
             self.options["jira"]["plugins-dir"] = value
 
     @property
-    def type_id_cutoff(self):
+    def type_id_cutoff(self) -> int:
         return int(
             self.parser
             and self.parser.type_id_cutoff
@@ -125,7 +127,7 @@ class OptionsLoader:
 
 
     @property
-    def chat_gpt_base_url(self):
+    def chat_gpt_base_url(self) -> str | None:
         return (
             self.parser
             and self.parser.chat_gpt_base_url
@@ -133,7 +135,7 @@ class OptionsLoader:
         )
 
     @property
-    def chat_gpt_api_key(self):
+    def chat_gpt_api_key(self) -> str | None:
         return (
             self.parser
             and self.parser.chat_gpt_api_key
@@ -141,7 +143,7 @@ class OptionsLoader:
         )
 
     @property
-    def chat_gpt_activated(self):
+    def chat_gpt_activated(self) -> bool:
         return bool(
             # Since a bool can be False, we can't rely on the truthiness of the value and use "or" like in the other cases.
             self.parser.chat_gpt_activated if self.parser and isinstance(self.parser.chat_gpt_activated, bool)
@@ -149,7 +151,7 @@ class OptionsLoader:
         )
 
     @property
-    def action(self):
+    def action(self) -> str:
         return self.parser and self.parser.action or ""
 
     @property

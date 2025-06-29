@@ -9,7 +9,7 @@ from mantis.options_loader import OptionsLoader
 
 class MantisClient:
 
-    def __init__(self, options: "OptionsLoader", no_read_cache: bool = False):
+    def __init__(self, options: "OptionsLoader", no_read_cache: bool = False) -> None:
         self.options = options
         self._no_read_cache = no_read_cache
         self.cache_dir.mkdir(exist_ok=True)

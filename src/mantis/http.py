@@ -11,7 +11,7 @@ class Http:
     A class to handle HTTP requests and responses.
     """
 
-    def __init__(self, mantis: 'MantisClient', no_read_cache: bool = False):
+    def __init__(self, mantis: 'MantisClient', no_read_cache: bool = False) -> None:
         self.mantis = mantis
         self.options = mantis.options
 
