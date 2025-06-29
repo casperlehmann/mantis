@@ -26,7 +26,7 @@ class Draft:
         return self.mantis.drafts_dir / f"{self.key}.md"
 
     @property
-    def key(self) -> dict:
+    def key(self) -> str:
         key = self.issue.get("key")
         assert key, "No key in issue"
         assert (len(key) < 20), f'The length of the key is suspiciously long: "{key[:20]}..."'
