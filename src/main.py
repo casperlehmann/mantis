@@ -208,6 +208,12 @@ def main() -> None:
         data_ = jira.issues.get("ECS-1")
         changes = data_.draft.make_verbose()
         pprint(changes)
+    elif options.action == 'new':
+        issue_type = options.args.pop(0).title() if options.args else 'Task'
+        issue_title = ' '.join(options.args) or f'New {issue_type}'
+        if issue_type not in jira.issues.allowed_types:
+            raise ValueError(f'Issue type {issue_type} is not allowed. Allowed types: {jira.issues.allowed_types}')
+        data = jira.issues.create(issuetype=issue_type, title=issue_title, data={})
     elif options.action == 'open-jira':
         jira.web()
     else:
