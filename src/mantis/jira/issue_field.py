@@ -154,6 +154,7 @@ class IssueField:
             raise NotImplementedError(f'Type: {self.editmeta_type}')
 
     def update_field_from_draft(self) -> None:
+        """Update a single field in the issue from the draft. Not suited for bulk updates."""
         data = {
             "fields": {
                 self.key: self.payload
@@ -163,6 +164,14 @@ class IssueField:
         self.issue.update_field(data)
         print(f'Reloading {self.key}')
         self.issue.reload_issue()
+        
+    def collect_field_for_update(self) -> dict[str, Any]:
+        """Collect field that need to be updated."""
+        if not self.updated:
+            return {}
+        return {
+            self.key: self.payload
+        }
     
     @property
     def updated(self) -> bool:
