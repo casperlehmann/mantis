@@ -111,6 +111,10 @@ class JiraIssue:
         return default if value is None else value
 
     def update_field(self, data: dict[str, Any]) -> None:
+        """Update a field in the issue with the given data
+        
+        https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/#api-rest-api-3-issue-issueidorkey-put
+        """
         self.jira.update_field(self.key, data)
 
     def update_from_draft(self) -> None:
@@ -211,11 +215,23 @@ class JiraIssues:
         return JiraIssue(self.jira, data)
 
     def create(self, issuetype: str, title: str, data: dict) -> dict:
+        """Create a new issue in Jira
+        
+        https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/#api-rest-api-3-issue-post
+        """
         assert issuetype in self.allowed_types
-        if len(data.keys()) == 0:
-            raise ValueError("The data object is an empty payload")
-        print(f"Create issue ({issuetype}): {title}")
-
-        response = self.jira.post_issue(data)
+        issuetype_id = self.jira.issuetype_name_to_id(issuetype)
+        if 'issuetype' not in data:
+            data['issuetype'] = {'id': issuetype_id}
+        if 'summary' not in data:
+            data['summary'] = title
+        data['project'] = {'id': self.jira.project_id}
+        assert title == data['summary'], 'The "title" parameter must match the "summary" in the data object'
+        print(f"Creating issue ({issuetype}): {title}")
+        response = self.jira.post_issue({'fields': data})
+        issue_key = response["key"]
+        print(f'Created issue: [{issue_key}]')
         pprint(response)
+        print(f'Reloading {issue_key}')
+        self.get(issue_key).reload_issue()
         return response

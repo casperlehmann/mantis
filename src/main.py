@@ -25,7 +25,7 @@ def main() -> None:
         x = jira.system_config_loader.get_issuetypes()
         pprint (x)
     elif options.action == 'get-issue':
-        for issue_key in options.issues:
+        for issue_key in options.args:
             issue = jira.issues.get(key=issue_key)
             key = issue.get('key', 'N/A')
             title = issue.get_field('summary')
@@ -40,7 +40,7 @@ def main() -> None:
 
         validated_input = jira.validate_input(search_field, search_name)
     elif options.action == 'update-issue':
-        for issue_key in options.issues:
+        for issue_key in options.args:
             issue = jira.issues.get(key=issue_key)
             data = {
                 "fields": {
@@ -56,7 +56,7 @@ def main() -> None:
             print(f'[{key}] {title}')
             mantis._no_read_cache = False
     elif options.action == 'compare':
-        for issue_key in options.issues:
+        for issue_key in options.args:
             issue = jira.issues.get(key=issue_key)
             print(f'Type: {issue.issuetype}')
             draft_data = issue.draft.read_draft()
@@ -102,7 +102,7 @@ def main() -> None:
             print(f'{'create':^10} {'edit':^10} {'issue':^10} {'draft':^10} {'creat_fact':^10} {'edit_fact':^10}')
 
     elif options.action == 'view-key':
-        for issue_key in options.issues:
+        for issue_key in options.args:
             issue = jira.issues.get(key=issue_key)
             draft_data = issue.draft.read_draft()
 
@@ -150,16 +150,16 @@ def main() -> None:
         auto_complete_suggestions = jira.auto_complete.get_suggestions("reporter", 'Casper')
         print(auto_complete_suggestions)
     elif options.action == 'check-field':
-        for issue_key in options.issues:
+        for issue_key in options.args:
             issue = jira.issues.get(key=issue_key)
             field = IssueField(issue, 'assignee')
             field.check_field()
     elif options.action == 'update-issue-from-draft':
-        for issue_key in options.issues:
+        for issue_key in options.args:
             issue = jira.issues.get(key=issue_key)
             issue.update_from_draft()
     elif options.action == 'diff-issue-from-draft':
-        for issue_key in options.issues:
+        for issue_key in options.args:
             issue = jira.issues.get(key=issue_key)
             issue.diff_issue_from_draft()
     elif options.action == 'get-project-keys':
@@ -208,10 +208,16 @@ def main() -> None:
         data_ = jira.issues.get("ECS-1")
         changes = data_.draft.make_verbose()
         pprint(changes)
+    elif options.action == 'new':
+        issue_type = options.args.pop(0).title() if options.args else 'Task'
+        issue_title = ' '.join(options.args) or f'New {issue_type}'
+        if issue_type not in jira.issues.allowed_types:
+            raise ValueError(f'Issue type {issue_type} is not allowed. Allowed types: {jira.issues.allowed_types}')
+        data = jira.issues.create(issuetype=issue_type, title=issue_title, data={})
     elif options.action == 'open-jira':
         jira.web()
     else:
         print(f'Action {options.action} not recognized')
-    
+
 if __name__ == '__main__':
     main()

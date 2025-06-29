@@ -92,6 +92,15 @@ Overwrite description of issue [TASK-1] "Setup Jira with style"? (y/n): y
 Updating description with data: ({'description': 'Setup Jira with style'})
 Reloading TASK-1
 
+# Create a new issue. First argument is a type (task|story|bug|epic), the rest get concatenated into a title.
+$ mantis new epic A new epic title
+Creating issue (epic): A new epic title
+{'id': '10033',
+ 'key': 'TASK-7',
+ 'self': 'https://testaccount.atlassian.net/rest/api/latest/issue/10033'}
+Created issue: [TASK-7]
+Reloading TASK-7
+
 # Re-fetches config files
 $ mantis reset
 ['Epic', 'Subtask', 'Task', 'Story', 'Bug']

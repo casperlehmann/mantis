@@ -39,7 +39,6 @@ class Http:
         url = f"{self.api_url}/{uri}"
         return requests.get(url, params=params, **self.requests_kwargs)  # type: ignore
 
-
     @staticmethod
     def post(url: str, data: dict | None = None) -> str:
         """

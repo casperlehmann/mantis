@@ -86,7 +86,7 @@ class JiraClient:
         issuetypes: dict[str, list[dict[str, Any]]] = response.json()
         assert isinstance(issuetypes, dict), f'issuetypes is not a dict: {issuetypes}'
         assert 'issueTypes' in issuetypes, f"'issueTypes' not in issuetypes. Got keys: {list(issuetypes.keys())}"
-        assert isinstance(issuetypes['issueTypes'], list), "issuetypes['issueTypes'] is not a list. Got: {issuetypes}"
+        assert isinstance(issuetypes['issueTypes'], list), f"issuetypes['issueTypes'] is not a list. Got: {issuetypes}"
         li = issuetypes['issueTypes']
         assert isinstance(li, list), f"issuetypes['issueTypes'] is not a list. Got: {issuetypes}"
         for x in li:
@@ -130,8 +130,14 @@ class JiraClient:
         return issue_data
 
     def post_issue(self, data: dict) -> dict:
+        """Post a new issue to Jira"""
         response = self.mantis.http._post("issue", data=data)
-        response.raise_for_status()
+        try:
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            print(e.response.reason)
+            print(e.response.json())
+            exit()
         return response.json()
 
     def warmup(self, delete_drafts: bool=False) -> None:
