@@ -119,6 +119,9 @@ class JiraIssue:
         for draft_field_key, value_from_draft in self.draft.iter_draft_field_items():
             field = IssueField(self, draft_field_key)
             fields.update(field.collect_field_for_update())
+        # To-do: Check whether the description has been updated before posting it
+        if input(f'Overwrite description of issue [{self.key}] "{self.get_field('description')}"? (y/n): ').lower() in ('y', 'yes'):
+            fields['description'] = self.draft.content
         if fields:
             print(f'Updating {fields.keys()} with data: ({fields})')
             data = {
