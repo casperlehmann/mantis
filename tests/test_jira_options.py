@@ -28,7 +28,7 @@ class TestJiraOptions:
             OptionsLoader()
         assert str(execution_error.value) == "OptionsLoader.user not set"
         out, err = capfd.readouterr()
-        assert out == ""
+        assert 'No mantis.toml found in either XDG config home or home dir' in out
         assert err == ""
 
     def test_parse_args_issues(self):

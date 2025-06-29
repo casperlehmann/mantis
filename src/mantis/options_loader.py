@@ -27,7 +27,10 @@ class OptionsLoader:
     def default_toml(self) -> dict:
         """Get the mantis directory under either XDG config home or user home"""
         config_home = xdg_config_home()
-        return self.load_toml(config_home / MANTIS_TOML)
+        values = self.load_toml(config_home / 'mantis' / MANTIS_TOML)
+        if not values:
+            print(f'# Warning: No mantis.toml found in either XDG config home or home dir. Please see readme and create a file at {config_home / 'mantis' / MANTIS_TOML}')
+        return values
 
     def cwd_toml(self) -> dict:
         """Get the mantis directory under either XDG config home or user home"""
