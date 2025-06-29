@@ -163,7 +163,7 @@ class OptionsLoader:
         return self.parser and self.parser.action or ""
 
     @property
-    def issues(self) -> list[str]:
+    def args(self) -> list[str]:
         return self.parser and self.parser.issues or []
     
 
