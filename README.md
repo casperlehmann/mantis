@@ -83,13 +83,14 @@ Connected as user: Admin9000
 $ mantis get-issue TASK-1
 [TASK-1] Setup Jira
 
-$ mantis fetch-issuetypes
-Updated local cache for issuetypes:
-[{'description': 'Created by Jira Agile - do not edit or delete. Issue type '
-                 'for a user story.',
-  'id': 6,
-  'name': 'Story'},
-[...]
+$ vim drafts/TASK-1.md
+# Edit the description
+
+# Send changes to upstream Jira
+$ mantis update-issue-from-draft task-1
+Overwrite description of issue [TASK-1] "Setup Jira with style"? (y/n): y
+Updating description with data: ({'description': 'Setup Jira with style'})
+Reloading TASK-1
 
 # Re-fetches config files
 $ mantis reset
