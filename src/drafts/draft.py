@@ -163,7 +163,8 @@ class Draft:
         """Return the content of the draft."""
         return self.read_draft().content
 
-    def update_content(self, new_content: str) -> None:
+    @content.setter
+    def content(self, new_content: str) -> None:
         self._validate_draft()
         if not self.draft_path.exists():
             raise FileNotFoundError(f'Draft file at {self.draft_path} does not exist.')
@@ -177,5 +178,5 @@ class Draft:
         """Expand the content of the draft using the assistant."""
         original_content = self.content
         verbose_content = self.mantis.assistant.make_verbose(original_content)
-        self.update_content(verbose_content)
+        self.content = verbose_content
         return {'original_content': original_content, 'verbose_content': verbose_content}
