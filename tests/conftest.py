@@ -80,12 +80,6 @@ def opts_from_fake_cli(fake_cli):
 
 
 @pytest.fixture
-def jira_client_from_fake_cli(opts_from_fake_cli):
-    mantis = MantisClient(opts_from_fake_cli)
-    return mantis.jira
-
-
-@pytest.fixture
 def with_no_read_cache(fake_jira: JiraClient):
     fake_jira.mantis._no_read_cache = True
 
@@ -133,11 +127,11 @@ def fake_jira(
     with_fake_drafts_dir,
     with_fake_plugins_dir,
     patch_load_toml,
-    jira_client_from_fake_cli,
+    opts_from_fake_cli,
     minimal_issue_payload,
 ):
-    jira = jira_client_from_fake_cli
-    assert str(jira.mantis.cache.root) != ".jira_cache_test"
-    assert str(jira.mantis.drafts_dir) != "drafts_test"
-    assert str(jira.mantis.plugins_dir) != "plugins_test"
-    return jira
+    mantis = MantisClient(opts_from_fake_cli)
+    assert str(mantis.jira.mantis.cache.root) != ".jira_cache_test"
+    assert str(mantis.jira.mantis.drafts_dir) != "drafts_test"
+    assert str(mantis.jira.mantis.plugins_dir) != "plugins_test"
+    return mantis.jira
