@@ -9,6 +9,10 @@ This project must be installed using [Poetry](python-poetry.org):
 
 ```sh
 $ poetry install
+$ poetry env info --path
+# Grab the path
+$ export PATH="/Users/user/code/mantis/.venv/bin:$PATH"
+# Also add this to your dotfiles
 ```
 
 ### Generate a Jira token:
