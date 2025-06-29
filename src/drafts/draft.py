@@ -15,13 +15,17 @@ class Draft:
     """Represents a draft file for a Jira issue."""
     # Local custom fields that are not in Jira.
     LOCAL_VARS = {'header'}
+    REQUIRED_FRONTMATTER = ['header', 'project', 'parent', 'summary', 'status', 'issuetype', 'assignee', 'reporter']
+
     def __init__(self, mantis: 'MantisClient', issue: "JiraIssue") -> None:
         self.mantis = mantis
-        self.template = self._load_template()
-        assert self.mantis.drafts_dir
         self.issue = issue
+        self.template = self._load_template()
         self.summary = self.issue.get_field("summary", "")
-        assert self._required_frontmatter == ['header', 'project', 'parent', 'summary', 'status', 'issuetype', 'assignee', 'reporter'], f'Unexpected required frontmatter: {self._required_frontmatter}'
+        assert self.mantis.drafts_dir
+        assert self._required_frontmatter == self.REQUIRED_FRONTMATTER, (
+            f'Unexpected required frontmatter: {self._required_frontmatter}'
+        )
         self._materialize()
 
     @property
@@ -32,7 +36,7 @@ class Draft:
     def key(self) -> str:
         key = self.issue.get("key")
         assert key, "No key in issue"
-        assert (len(key) < 20), f'The length of the key is suspiciously long: "{key[:20]}..."'
+        assert len(key) < 20, f'The length of the key is suspiciously long: "{key[:20]}..."'
         return key
 
     @property
@@ -94,9 +98,11 @@ class Draft:
                 frontmatter.dump(self.template, f)
 
     def _validate_draft(self) -> None:
-        if '---' not in self.raw_draft:
-            raise ValueError(f'Draft file at {self.draft_path} does not contain the expected separator: "---": {self.raw_draft}')
-        if f'# {self.summary}' not in self.raw_draft:
+        """Ensure the draft file has the expected structure."""
+        raw = self.raw_draft
+        if '---' not in raw:
+            raise ValueError(f'Draft file at {self.draft_path} does not contain the expected separator: "---": {raw}')
+        if f'# {self.summary}' not in raw:
             raise ValueError(f'Draft file at {self.draft_path} does not contain the expected header: "# {self.summary}"')
 
     def _remove_draft_header(self, post: frontmatter.Post) -> frontmatter.Post:
@@ -124,7 +130,7 @@ class Draft:
             raise ValueError('Draft file is empty')
         if not header.startswith('# '):
             raise ValueError(f'Expected draft to start with a markdown header ("#"). Got: "{header}"')
-        if not header == f'# {self.summary}':
+        if header != f'# {self.summary}':
             raise ValueError(f'Expected draft header to match summary. Got: "{header}" || "{self.summary}"')
         return header
 
