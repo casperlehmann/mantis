@@ -3,9 +3,9 @@ import pytest
 
 from typing import Any
 
-from mantis.jira import JiraClient
 from mantis.cache import CacheMissException
 from mantis.jira.config_loader.config_loader import Inspector
+from mantis.mantis_client import MantisClient
 from tests.data import CacheData
 
 
@@ -34,12 +34,12 @@ class TestInspector:
             Inspector.print_table(["non-existent"], {"placeholder"}, issuetype_field_map)
 
     @pytest.mark.slow
-    def test_get_project_field_keys_from_cache(self, fake_jira: JiraClient):
-        fake_jira.issues._allowed_types = ["Test"] # To avoid calling load_allowed_types
+    def test_get_project_field_keys_from_cache(self, fake_mantis: MantisClient):
+        fake_mantis.jira.issues._allowed_types = ["Test"] # To avoid calling load_allowed_types
         with pytest.raises(CacheMissException):
-            Inspector.get_createmeta_models(fake_jira)
+            Inspector.get_createmeta_models(fake_mantis.jira)
 
-        with open(fake_jira.mantis.cache.createmeta / "createmeta_test.json", "w") as f:
+        with open(fake_mantis.cache.createmeta / "createmeta_test.json", "w") as f:
             json.dump(CacheData().createmeta_epic, f)
-        from_cache = Inspector.get_createmeta_models(fake_jira)
+        from_cache = Inspector.get_createmeta_models(fake_mantis.jira)
         assert from_cache

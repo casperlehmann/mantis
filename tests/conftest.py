@@ -4,7 +4,6 @@ from pathlib import Path
 import pytest
 from unittest.mock import patch
 
-from mantis.jira import JiraClient
 from mantis.mantis_client import MantisClient
 from mantis.options_loader import OptionsLoader
 
@@ -80,8 +79,8 @@ def opts_from_fake_cli(fake_cli):
 
 
 @pytest.fixture
-def with_no_read_cache(fake_jira: JiraClient):
-    fake_jira.mantis._no_read_cache = True
+def with_no_read_cache(fake_mantis: MantisClient):
+    fake_mantis._no_read_cache = True
 
 
 @pytest.fixture
@@ -122,7 +121,7 @@ def minimal_issue_payload():
 
 # The execution order is determined by the fixture dependency graph, not by the order in the file or the order in the function signature. Pytest always sets up dependencies first, from the leaves up to the fixture requested by the test.
 @pytest.fixture
-def fake_jira(
+def fake_mantis(
     with_fake_cache,
     with_fake_drafts_dir,
     with_fake_plugins_dir,
@@ -134,4 +133,4 @@ def fake_jira(
     assert str(mantis.jira.mantis.cache.root) != ".jira_cache_test"
     assert str(mantis.jira.mantis.drafts_dir) != "drafts_test"
     assert str(mantis.jira.mantis.plugins_dir) != "plugins_test"
-    return mantis.jira
+    return mantis
