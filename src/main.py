@@ -203,7 +203,7 @@ def main() -> None:
         data_.draft._validate_draft()
     elif options.action == 'update-draft':
         data_ = jira.issues.get("ECS-1")
-        data_.draft.update_content('Trolololo')
+        data_.draft.content = 'Trolololo'
     elif options.action == 'make-verbose':
         data_ = jira.issues.get("ECS-1")
         changes = data_.draft.make_verbose()
