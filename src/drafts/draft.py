@@ -105,10 +105,12 @@ class Draft:
         if f'# {self.summary}' not in raw:
             raise ValueError(f'Draft file at {self.draft_path} does not contain the expected header: "# {self.summary}"')
 
-    def _remove_draft_header(self, post: frontmatter.Post) -> frontmatter.Post:
+    def _remove_draft_header(self) -> str:
+        """Remove the extra header from the draft file content and return the result as a string."""
         extra_header = f'# {self.summary}'
-        post.content = re.sub("^" + re.escape(extra_header)+'\\n*', '', post.content)
-        return post
+        content = self.load_frontmatter().content
+        new_content = re.sub(rf"^{re.escape(extra_header)}\n*", '', content)
+        return new_content
 
     @property
     def raw_draft(self) -> str:
@@ -134,10 +136,14 @@ class Draft:
             raise ValueError(f'Expected draft header to match summary. Got: "{header}" || "{self.summary}"')
         return header
 
-    def read_draft(self) -> frontmatter.Post:
+    def load_frontmatter(self) -> frontmatter.Post:
+        """Load the frontmatter from the draft file."""
         with open(self.draft_path, "r") as f:
-            draft_data = frontmatter.load(f)
-        draft_data = self._remove_draft_header(draft_data)
+            return frontmatter.load(f)
+            
+    def read_draft(self) -> frontmatter.Post:
+        draft_data = self.load_frontmatter()
+        draft_data.content = self._remove_draft_header()
         return draft_data
 
     def iter_draft_field_items(self) -> Generator[tuple[str, Any], None, None]:

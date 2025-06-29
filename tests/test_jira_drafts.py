@@ -83,3 +83,25 @@ class TestJiraDraft:
         draft_content = issue.draft.content
         assert isinstance(draft_content, str)
         assert draft_content == "Implement user authentication for the checkout system."
+
+import frontmatter
+
+def test_remove_draft_header(fake_mantis, requests_mock, tmp_path):
+    requests_mock.get(f'{fake_mantis.http.api_url}/issue/ECS-1', json=CacheData().ecs_1)
+    issue = fake_mantis.jira.issues.get(key="ECS-1")
+    draft = issue.draft
+    header = f"# {draft.summary}"
+    body = "Some content\nMore content"
+    # Write a draft file with the header
+    draft_path = draft.draft_path
+    with open(draft_path, "w") as f:
+        f.write(f"{header}\n{body}")
+    # Should remove the header
+    result = draft._remove_draft_header()
+    assert result == body
+    # Write a draft file with a non-matching header
+    with open(draft_path, "w") as f:
+        f.write(f"# Not a header\n{body}")
+    # Should not remove the header
+    result2 = draft._remove_draft_header()
+    assert result2 == f"# Not a header\n{body}"
