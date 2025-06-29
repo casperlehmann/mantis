@@ -52,8 +52,26 @@ $ poetry run pytest
 
 ## Installing
 
+For a system-wide editable installation, run `poetry install` to install the dependencies into the virtual environment. Then add that virtual environment to the system path.
+
 ```sh
 $ poetry install
+$ poetry env info --path
+# Grab the path
+$ export PATH="/Users/user/code/mantis/.venv/bin:$PATH"
+# Also add this to your dotfiles
+```
+
+For a global installation, it makes sense to add global config as well (assuming you already created it):
+
+```sh
+$ if [ -n "$XDG_CONFIG_HOME" ]; then
+    mkdir -p "$XDG_CONFIG_HOME/mantis"
+    cp mantis.toml "$XDG_CONFIG_HOME/mantis/mantis.toml"
+  else
+    mkdir -p "$HOME/mantis"
+    cp mantis.toml "$HOME/mantis/mantis.toml"
+  fi
 ```
 
 ## Running the CLI
