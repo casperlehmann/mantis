@@ -165,7 +165,6 @@ class OptionsLoader:
     @property
     def args(self) -> list[str]:
         return self.parser and self.parser.issues or []
-    
 
 
 def parse_args(args_overwrite: list[str] | None = None) -> argparse.Namespace:
