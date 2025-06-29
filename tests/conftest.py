@@ -8,24 +8,6 @@ from mantis.mantis_client import MantisClient
 from mantis.options_loader import OptionsLoader
 
 
-@dataclass
-class Cli:
-    user = "user_1@domain.com"
-    url = "https://account_1.atlassian-host.net"
-    personal_access_token = "SECRET_1"
-    project = "TEST"
-    no_verify_ssl = False
-    cache_dir = ".jira_cache_test"
-    drafts_dir = "drafts_test"
-    plugins_dir = "plugins_test"
-    type_id_cutoff = "10100"
-    action = ""
-    issues = [""]
-    chat_gpt_activated = False
-    chat_gpt_base_url = "https://api.fakeai.com/v1"
-    chat_gpt_api_key = "socks_off_full_throttle_$%^"
-
-
 @pytest.fixture
 def fake_toml(tmpdir):
     toml_contents = "\n".join(
@@ -52,8 +34,27 @@ def fake_toml(tmpdir):
     return toml
 
 
+@dataclass
+class Cli:
+    user = "user_1@domain.com"
+    url = "https://account_1.atlassian-host.net"
+    personal_access_token = "SECRET_1"
+    project = "TEST"
+    no_verify_ssl = False
+    cache_dir = ".jira_cache_test"
+    drafts_dir = "drafts_test"
+    plugins_dir = "plugins_test"
+    type_id_cutoff = "10100"
+    action = ""
+    issues = [""]
+    chat_gpt_activated = False
+    chat_gpt_base_url = "https://api.fakeai.com/v1"
+    chat_gpt_api_key = "socks_off_full_throttle_$%^"
+
+
 @pytest.fixture
 def fake_cli():
+    """Create a fake CLI object with default values for testing option overrides"""
     return Cli()
 
 
