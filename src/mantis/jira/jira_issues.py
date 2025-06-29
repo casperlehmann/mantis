@@ -115,13 +115,19 @@ class JiraIssue:
 
     def update_from_draft(self) -> None:
         """Update the issue in Jira, using the data from its draft."""
+        print ('enter update_from_draft')
+        fields = {}
         for draft_field_key, value_from_draft in self.draft.iter_draft_field_items():
-            value_from_cache = self.get_field(draft_field_key, None)
             field = IssueField(self, draft_field_key)
-            # print(f'Updated ({draft_field_key}): {field.updated}')
-            if field.updated:
-                print(f'Updating ({draft_field_key})')
-                field.update_field_from_draft()
+            fields.update(field.collect_field_for_update())
+        if fields:
+            print(f'Updating {fields.keys()} with data: ({fields})')
+            data = {
+                "fields": fields
+            }
+            self.update_field(data)
+            print(f'Reloading {self.key}')
+            self.reload_issue()
 
     def diff_issue_from_draft(self) -> None:
         for draft_field_key, value_from_draft in self.draft.iter_draft_field_items():
