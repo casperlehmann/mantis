@@ -22,7 +22,7 @@ class Draft:
         self._materialize()
 
     @property
-    def draft_path(self) -> 'Path':
+    def draft_path(self) -> Path:
         return self.mantis.drafts_dir / f"{self.key}.md"
 
     @property
