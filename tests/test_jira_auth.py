@@ -6,7 +6,7 @@ from mantis.options_loader import OptionsLoader
 
 
 class TestJiraAuth:
-    def test_creates_jira_auth_settings(self):
+    def test_creates_jira_auth_settings(self, patch_load_toml):
         opts = OptionsLoader()
         auth = JiraAuth(opts)
         assert isinstance(auth.auth, HTTPBasicAuth)
