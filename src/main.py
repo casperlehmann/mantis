@@ -216,6 +216,10 @@ def main() -> None:
         data = jira.issues.create(issuetype=issue_type, title=issue_title, data={})
     elif options.action == 'open-jira':
         jira.web()
+    elif options.action == 'get-field-names':
+        for issue_key in options.args:
+            names = jira.get_field_names(issue_key)
+            pprint(names['names'])
     else:
         print(f'Action {options.action} not recognized')
 

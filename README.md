@@ -101,6 +101,25 @@ Creating issue (epic): A new epic title
 Created issue: [TASK-7]
 Reloading TASK-7
 
+# Output the field names for an issue (useful for working with custom fields)
+$ mantis get-field-names ecs-1
+{'aggregateprogress': 'Σ Progress',
+ 'aggregatetimeestimate': 'Σ Remaining Estimate',
+ 'aggregatetimeoriginalestimate': 'Σ Original Estimate',
+ 'aggregatetimespent': 'Σ Time Spent',
+ 'assignee': 'Assignee',
+ ...
+ 'customfield_10001': 'Team',
+ 'customfield_10015': 'Start date',
+ 'customfield_10017': 'Issue color',
+ 'customfield_10019': 'Rank',
+ 'customfield_10021': 'Flagged',
+ 'customfield_10035': 'Design',
+ 'description': 'Description',
+ 'duedate': 'Due date',
+ ...
+}
+
 # Re-fetches config files
 $ mantis reset
 ['Epic', 'Subtask', 'Task', 'Story', 'Bug']
