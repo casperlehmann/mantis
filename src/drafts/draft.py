@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from mantis.mantis_client import MantisClient
 
 class Draft:
+    """Represents a draft file for a Jira issue."""
     # Local custom fields that are not in Jira.
     LOCAL_VARS = {'header'}
     def __init__(self, mantis: 'MantisClient', issue: "JiraIssue") -> None:
@@ -46,6 +47,7 @@ class Draft:
         return frontmatter.loads(template)
 
     def _generate_frontmatter(self) -> None:
+        """Populate the template's metadata with values from the issue."""
         for field_name in self._required_frontmatter:
             value = self.issue.get_field(field_name, None)
             template_value = self.template.metadata.get(field_name)
@@ -70,6 +72,7 @@ class Draft:
         self.template.metadata['header'] = self.formatted_header
 
     def _generate_body(self) -> None:
+        """Fill in the template body with summary and description."""
         description = self.issue.get_field("description") or "Placeholder description"
         if self.mantis.options.chat_gpt_activated:
             description = self.mantis.assistant.convert_text_format(
@@ -83,7 +86,7 @@ class Draft:
         )
 
     def _materialize(self) -> None:
-        # Only write if not exists!
+        """Write the draft file if it does not already exist."""
         if not self.draft_path.exists():
             self._generate_frontmatter()
             self._generate_body()
@@ -165,7 +168,7 @@ class Draft:
             frontmatter.dump(data, f)
 
     def make_verbose(self) -> dict[str, str]:
-        """Expand the content of the draft."""
+        """Expand the content of the draft using the assistant."""
         original_content = self.content
         verbose_content = self.mantis.assistant.make_verbose(original_content)
         self.update_content(verbose_content)
