@@ -126,6 +126,7 @@ def minimal_issue_payload():
         }
     }
 
+# The execution order is determined by the fixture dependency graph, not by the order in the file or the order in the function signature. Pytest always sets up dependencies first, from the leaves up to the fixture requested by the test.
 @pytest.fixture
 def fake_jira(
     with_fake_cache,
