@@ -109,7 +109,7 @@ class Draft:
         """Remove the extra header from the draft file content and return the result as a string."""
         extra_header = f'# {self.summary}'
         content = self.load_frontmatter().content
-        new_content = re.sub("^" + re.escape(extra_header)+'\\n*', '', post.content)
+        new_content = re.sub(rf"^{re.escape(extra_header)}\n*", '', content)
         return new_content
 
     @property
