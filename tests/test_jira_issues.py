@@ -5,23 +5,22 @@ from unittest.mock import Mock, patch
 import pytest
 from requests.models import HTTPError
 
-from mantis.jira import JiraClient
 from mantis.jira.jira_client import process_key
 from mantis.jira.jira_issues import JiraIssues
+from mantis.mantis_client import MantisClient
 from tests.data import CacheData
 
 
 class TestJiraIssues:
-    def test_jira_issues_get_fake(self, fake_jira: JiraClient, requests_mock):
-        requests_mock.get(f'{fake_jira.mantis.http.api_url}/issue/ECS-1', json=CacheData().ecs_1)
+    def test_jira_issues_get_fake(self, fake_mantis: MantisClient, requests_mock):
+        requests_mock.get(f'{fake_mantis.http.api_url}/issue/ECS-1', json=CacheData().ecs_1)
 
-        task_1 = fake_jira.issues.get("ECS-1")
+        task_1 = fake_mantis.jira.issues.get("ECS-1")
         assert task_1.get("key") == "ECS-1"
         assert task_1.get("fields", {})["status"]['name'] == "In Progress"
 
-
-    def test_jira_issues_get_mocked(self, fake_jira: JiraClient, with_no_read_cache, minimal_issue_payload):
-        assert fake_jira.mantis._no_read_cache is True
+    def test_jira_issues_get_mocked(self, fake_mantis: MantisClient, with_no_read_cache, minimal_issue_payload):
+        assert fake_mantis._no_read_cache is True
         expected = minimal_issue_payload
         mock_response = Mock()
         mock_response.status_code = 200
@@ -30,12 +29,11 @@ class TestJiraIssues:
         mock_response.headers = {"Content-Type": "text/plain"}
         mock_response.text = "Description"
         with patch("requests.get", return_value=mock_response):
-            task_1 = fake_jira.issues.get("TASK-1")
+            task_1 = fake_mantis.jira.issues.get("TASK-1")
         assert task_1.get("key") == "TASK-1"
         assert task_1.get("fields", {}).get("status") == {"name": "resolved"}
 
-
-    def test_jira_issues_get_non_existent(self, with_no_read_cache, fake_jira: JiraClient):
+    def test_jira_issues_get_non_existent(self, with_no_read_cache, fake_mantis: MantisClient):
         mock_response = Mock()
         mock_response.reason = "Not Found"
         mock_response.raise_for_status.side_effect = HTTPError()
@@ -47,14 +45,14 @@ class TestJiraIssues:
                 ValueError,
                 match=('The issue "TEST-999" does not exists in ' 'the project "TEST"'),
             ):
-                fake_jira.issues.get("TEST-999")
+                fake_mantis.jira.issues.get("TEST-999")
             with pytest.raises(
                 ValueError,
                 match="The requested issue does not exist. Note "
                 'that the provided key "NONEXISTENT-1" does not '
                 'appear to match your configured project "TEST"',
             ):
-                fake_jira.issues.get("NONEXISTENT-1")
+                fake_mantis.jira.issues.get("NONEXISTENT-1")
             with pytest.raises(
                 NotImplementedError,
                 match=(
@@ -62,26 +60,25 @@ class TestJiraIssues:
                     'provide the full key for your issue: "PROJ-11"'
                 ),
             ):
-                fake_jira.issues.get("11")
+                fake_mantis.jira.issues.get("11")
             with pytest.raises(
                 ValueError, match=('Issue number "PROJ" in key "1-PROJ" must ' "be numeric")
             ):
-                fake_jira.issues.get("1-PROJ")
+                fake_mantis.jira.issues.get("1-PROJ")
             with pytest.raises(
                 ValueError,
                 match=re.escape("Whitespace in key is not allowed " '("PROJ-1 ")'),
             ):
-                fake_jira.issues.get("PROJ-1 ")
+                fake_mantis.jira.issues.get("PROJ-1 ")
 
-
-    def test_jira_issues_create(self, fake_jira: JiraClient, minimal_issue_payload, requests_mock):
-        fake_jira.issues._allowed_types = ["Story", "Subtask", "Epic", "Bug", "Task"]
-        requests_mock.post(f'{fake_jira.mantis.http.api_url}/issue', json={})
+    def test_jira_issues_create(self, fake_mantis: MantisClient, minimal_issue_payload, requests_mock):
+        fake_mantis.jira.issues._allowed_types = ["Story", "Subtask", "Epic", "Bug", "Task"]
+        requests_mock.post(f'{fake_mantis.http.api_url}/issue', json={})
         with pytest.raises(ValueError):
-            issue = fake_jira.issues.create(issuetype="Bug", title="Tester", data={})
+            issue = fake_mantis.jira.issues.create(issuetype="Bug", title="Tester", data={})
         minimal_issue_payload['fields']['issuetype']['name'] = 'Bug'
-        requests_mock.post(f'{fake_jira.mantis.http.api_url}/issue', json=minimal_issue_payload)
-        issue = fake_jira.issues.create(
+        requests_mock.post(f'{fake_mantis.http.api_url}/issue', json=minimal_issue_payload)
+        issue = fake_mantis.jira.issues.create(
             issuetype="Bug", title="Tester", data={"Summary": "a"}
         )
         fields = issue.get("fields", {})
@@ -92,7 +89,6 @@ class TestJiraIssues:
         assert name is not None, "Expected 'name' to be present in 'issuetype'"
         assert name == "Bug", "Expected issue type name to be 'Bug'"
 
-
     def test_process_key(self, ):
         with pytest.raises(NotImplementedError):
             try:
@@ -100,9 +96,8 @@ class TestJiraIssues:
             except HTTPError as e:
                 process_key(key="A-B-1", exception=e)
 
-
-    def test_handle_http_error_raises_generic_exception(self, fake_jira: "JiraClient", requests_mock):
-        requests_mock.get(f'{fake_jira.mantis.http.api_url}/issue/ECS-1', json=CacheData().ecs_1)
+    def test_handle_http_error_raises_generic_exception(self, fake_mantis: MantisClient, requests_mock):
+        requests_mock.get(f'{fake_mantis.http.api_url}/issue/ECS-1', json=CacheData().ecs_1)
         mock_response = Mock()
         mock_response.reason = "Unknown error"
         mock_response.raise_for_status.side_effect = HTTPError()
@@ -111,23 +106,21 @@ class TestJiraIssues:
         )
         with patch("requests.get", return_value=mock_response):
             try:
-                response = fake_jira.mantis.http._get("Task-3")
+                response = fake_mantis.http._get("Task-3")
                 response.raise_for_status()
             except HTTPError as e:
                 assert e.response.reason == "Unknown error"
                 with pytest.raises(AttributeError):
-                    fake_jira.handle_http_error(exception=e, key="A-1")
+                    fake_mantis.jira.handle_http_error(exception=e, key="A-1")
 
-
-    def test_jira_no_issues_fields_raises(self, fake_jira: JiraClient, requests_mock):
-        requests_mock.get(f'{fake_jira.mantis.http.api_url}/issue/ECS-1', json=CacheData().ecs_1)
-        issue = fake_jira.issues.get("ECS-1")
+    def test_jira_no_issues_fields_raises(self, fake_mantis: MantisClient, requests_mock):
+        requests_mock.get(f'{fake_mantis.http.api_url}/issue/ECS-1', json=CacheData().ecs_1)
+        issue = fake_mantis.jira.issues.get("ECS-1")
         issue.data["fields"] = None  # type: ignore since we are purely testing that it raises an error
         with pytest.raises(KeyError):
             assert issue.fields
 
-
-    def test_jira_issues_cached_issuetypes_parses_allowed_types(self, fake_jira: JiraClient):
+    def test_jira_issues_cached_issuetypes_parses_allowed_types(self, fake_mantis: MantisClient):
         cached_issuetypes = {
             "issueTypes": [
                 {"id": '1', "name": "Bug", 'scope': {'project': {'id': '10000'}}},
@@ -135,25 +128,24 @@ class TestJiraIssues:
             ]
         }
         with patch('mantis.jira.config_loader.JiraSystemConfigLoader.get_issuetypes', return_value=cached_issuetypes):
-            fake_jira.issues = JiraIssues(fake_jira)
-            assert fake_jira.issues._allowed_types is None
-            assert fake_jira.issues.allowed_types == ["Bug", "Task"], f'Unexpected allowed types: {fake_jira.issues._allowed_types}'
-            assert fake_jira.issues._allowed_types
+            fake_mantis.jira.issues = JiraIssues(fake_mantis.jira)
+            assert fake_mantis.jira.issues._allowed_types is None
+            assert fake_mantis.jira.issues.allowed_types == ["Bug", "Task"], f'Unexpected allowed types: {fake_mantis.jira.issues._allowed_types}'
+            assert fake_mantis.jira.issues._allowed_types
 
-    def test_jira_issues_get_does_write_to_cache(self, fake_jira: JiraClient, requests_mock):
-        assert fake_jira.mantis.cache.get_issue("ECS-1") is None
-        requests_mock.get(f'{fake_jira.mantis.http.api_url}/issue/ECS-1', json=CacheData().ecs_1)
-        issue = fake_jira.issues.get("ECS-1")
-        assert fake_jira.mantis.cache.get_issue("ECS-1")
-        assert len([file for file in fake_jira.mantis.cache.issues.iterdir()]) == 1
-        with open(fake_jira.mantis.cache.issues / "ECS-1.json", "r") as f:
+    def test_jira_issues_get_does_write_to_cache(self, fake_mantis: MantisClient, requests_mock):
+        assert fake_mantis.cache.get_issue("ECS-1") is None
+        requests_mock.get(f'{fake_mantis.http.api_url}/issue/ECS-1', json=CacheData().ecs_1)
+        issue = fake_mantis.jira.issues.get("ECS-1")
+        assert fake_mantis.cache.get_issue("ECS-1")
+        assert len([file for file in fake_mantis.cache.issues.iterdir()]) == 1
+        with open(fake_mantis.cache.issues / "ECS-1.json", "r") as f:
             data = json.load(f)
         assert data["key"] == "ECS-1"
 
-
-    def test_jira_issues_get_does_retrieve_from_cache(self, fake_jira: JiraClient, minimal_issue_payload):
-        fake_jira.mantis._no_read_cache = False
-        with open(fake_jira.mantis.cache.issues / "TASK-1.json", "w") as f:
+    def test_jira_issues_get_does_retrieve_from_cache(self, fake_mantis: MantisClient, minimal_issue_payload):
+        fake_mantis._no_read_cache = False
+        with open(fake_mantis.cache.issues / "TASK-1.json", "w") as f:
             json.dump(minimal_issue_payload, f)
-        issue = fake_jira.issues.get("TASK-1")
+        issue = fake_mantis.jira.issues.get("TASK-1")
         assert issue.get_field("summary") == "redacted"
