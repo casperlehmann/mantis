@@ -208,6 +208,8 @@ def main() -> None:
         data_ = jira.issues.get("ECS-1")
         changes = data_.draft.make_verbose()
         pprint(changes)
+    elif options.action == 'open-jira':
+        jira.web()
     else:
         print(f'Action {options.action} not recognized')
     
