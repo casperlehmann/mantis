@@ -49,7 +49,8 @@ class OptionsLoader:
     @property
     def user(self) -> str:
         val = self.parser and self.parser.user or self.options.get("jira", {}).get("user")
-        assert val, "OptionsLoader.user not set"
+        if not val:
+            raise ValueError('OptionsLoader.user not set')
         return val
 
     @property
@@ -67,7 +68,8 @@ class OptionsLoader:
     @property
     def project(self) -> str:
         val = self.parser and self.parser.project or self.options.get("jira", {}).get("project")
-        assert val, "OptionsLoader.project not set"
+        if not val:
+            raise ValueError('OptionsLoader.project not set')
         return val
 
     @property
@@ -81,7 +83,8 @@ class OptionsLoader:
     @property
     def cache_dir(self) -> str:
         val = self.parser and self.parser.cache_dir or self.options.get("jira", {}).get("cache-dir")
-        assert val, "OptionsLoader.cache_dir not set"
+        if not val:
+            raise ValueError('OptionsLoader.cache_dir not set')
         return val
         
     @cache_dir.setter
@@ -94,7 +97,8 @@ class OptionsLoader:
     @property
     def drafts_dir(self) -> str:
         val = self.parser and self.parser.drafts_dir or self.options.get("jira", {}).get("drafts-dir")
-        assert val, "OptionsLoader.drafts_dir not set"
+        if not val:
+            raise ValueError('OptionsLoader.drafts_dir not set')
         return val
 
     @drafts_dir.setter
@@ -107,7 +111,8 @@ class OptionsLoader:
     @property
     def plugins_dir(self) -> str:
         val = self.parser and self.parser.plugins_dir or self.options.get("jira", {}).get("plugins-dir")
-        assert val, "OptionsLoader.plugins_dir not set"
+        if not val:
+            raise ValueError('OptionsLoader.plugins_dir not set')
         return val
 
     @plugins_dir.setter

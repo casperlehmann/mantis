@@ -24,7 +24,7 @@ class TestJiraOptions:
     def test_options_not_set(self, tmpdir, patch_load_toml, capfd):
         toml = tmpdir / "mantis.toml"
         toml.write("")
-        with pytest.raises(AssertionError) as execution_error:
+        with pytest.raises(ValueError) as execution_error:
             OptionsLoader()
         assert str(execution_error.value) == "OptionsLoader.user not set"
         out, err = capfd.readouterr()
