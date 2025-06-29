@@ -17,10 +17,14 @@ class JiraAuth:
 
     @property
     def user(self) -> str:
+        if not self.options.user:
+            raise PermissionError('User must be set in options')
         return self.options.user
 
     @property
     def personal_access_token(self) -> str:
+        if not self.options.personal_access_token:
+            raise PermissionError('Personal access token must be set in options')
         return self.options.personal_access_token
 
     @property

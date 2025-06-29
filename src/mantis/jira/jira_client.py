@@ -46,6 +46,8 @@ class JiraClient:
 
     @property
     def project_name(self) -> str:
+        if not self.mantis.options.project:
+            raise ValueError('Project name must be set in options')
         return self.mantis.options.project
     
     @property

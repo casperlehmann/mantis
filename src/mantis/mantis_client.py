@@ -9,11 +9,10 @@ from mantis.options_loader import OptionsLoader
 
 class MantisClient:
 
-    def __init__(self, options: "OptionsLoader", no_read_cache: bool = False):
+    def __init__(self, options: "OptionsLoader", no_read_cache: bool = False) -> None:
         self.options = options
         self._no_read_cache = no_read_cache
-        self.drafts_dir.mkdir(exist_ok=True)
-        self.plugins_dir.mkdir(exist_ok=True)
+        self.cache_dir.mkdir(exist_ok=True)
         self.drafts_dir.mkdir(exist_ok=True)
         self.plugins_dir.mkdir(exist_ok=True)
         self.cache = Cache(self)
@@ -29,3 +28,7 @@ class MantisClient:
     @property
     def plugins_dir(self) -> Path:
         return Path(self.options.plugins_dir)
+
+    @property
+    def cache_dir(self) -> Path:
+        return Path(self.options.cache_dir)

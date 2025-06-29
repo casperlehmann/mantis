@@ -6,34 +6,30 @@ from mantis.options_loader import OptionsLoader, parse_args
 
 
 class TestJiraOptions:
-    def test_options(self, fake_toml):
-        opts = OptionsLoader(toml_source=fake_toml)
+    def test_options(self, patch_load_toml):
+        opts = OptionsLoader()
         assert opts.user == "user_2@domain.com"
         assert opts.url == "https://account_2.atlassian-host.net"
         assert opts.personal_access_token == "SECRET_2"
         assert opts.chat_gpt_base_url == 'https://api.fakeai.com/v1'
 
 
-    def test_options_override(self, fake_toml, fake_cli):
-        opts = OptionsLoader(toml_source=fake_toml, parser=fake_cli)
+    def test_options_override(self, fake_cli):
+        opts = OptionsLoader(parser=fake_cli)
         assert opts.user == "user_1@domain.com"
         assert opts.url == "https://account_1.atlassian-host.net"
         assert opts.personal_access_token == "SECRET_1"
 
 
-    def test_options_not_set(self, tmpdir, capfd):
+    def test_options_not_set(self, tmpdir, patch_load_toml, capfd):
         toml = tmpdir / "mantis.toml"
-        with pytest.raises(AssertionError):
-            OptionsLoader(toml_source=toml)
-        out, _ = capfd.readouterr()
-        assert out == 'No toml_source provided and default "mantis.toml" does not exist\n'
         toml.write("")
-        with pytest.raises(AssertionError) as execution_error:
-            OptionsLoader(toml_source=toml)
+        with pytest.raises(ValueError) as execution_error:
+            OptionsLoader()
+        assert str(execution_error.value) == "OptionsLoader.user not set"
         out, err = capfd.readouterr()
         assert out == ""
         assert err == ""
-        assert str(execution_error.value) == "OptionsLoader.user not set"
 
     def test_parse_args_issues(self):
         # We need to pass an empty list. If we didn't, pytest would default
