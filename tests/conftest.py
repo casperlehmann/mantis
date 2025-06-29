@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import pytest
+from unittest.mock import patch
 
 from mantis.jira import JiraClient
 from mantis.mantis_client import MantisClient
@@ -32,6 +33,21 @@ def fake_toml(tmpdir):
     toml = tmpdir / "mantis.toml"
     toml.write(toml_contents)
     return toml
+
+
+@pytest.fixture
+def patch_load_toml(tmpdir, fake_toml):
+    """
+    Patch OptionsLoader.load_toml so that it always reads the TOML file under tmpdir,
+    regardless of the toml_path parameter passed.
+    """
+    import tomllib
+    def _load_toml_patch(self, toml_path=None):
+        path = tmpdir / "mantis.toml"
+        with open(path, "rb") as f:
+            return tomllib.load(f)
+    with patch('mantis.options_loader.OptionsLoader.load_toml', new=_load_toml_patch):
+        yield
 
 
 @dataclass
@@ -115,6 +131,7 @@ def fake_jira(
     with_fake_cache,
     with_fake_drafts_dir,
     with_fake_plugins_dir,
+    patch_load_toml,
     jira_client_from_fake_cli,
     minimal_issue_payload,
 ):
