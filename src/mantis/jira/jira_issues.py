@@ -111,6 +111,10 @@ class JiraIssue:
         return default if value is None else value
 
     def update_field(self, data: dict[str, Any]) -> None:
+        """Update a field in the issue with the given data
+        
+        https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/#api-rest-api-3-issue-issueidorkey-put
+        """
         self.jira.update_field(self.key, data)
 
     def update_from_draft(self) -> None:
@@ -211,6 +215,10 @@ class JiraIssues:
         return JiraIssue(self.jira, data)
 
     def create(self, issuetype: str, title: str, data: dict) -> dict:
+        """Create a new issue in Jira
+        
+        https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/#api-rest-api-3-issue-post
+        """
         assert issuetype in self.allowed_types
         if len(data.keys()) == 0:
             raise ValueError("The data object is an empty payload")

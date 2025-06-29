@@ -130,6 +130,7 @@ class JiraClient:
         return issue_data
 
     def post_issue(self, data: dict) -> dict:
+        """Post a new issue to Jira"""
         response = self.mantis.http._post("issue", data=data)
         response.raise_for_status()
         return response.json()
