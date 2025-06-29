@@ -12,6 +12,8 @@ if TYPE_CHECKING:
     from mantis.mantis_client import MantisClient
 
 class Draft:
+    # Local custom fields that are not in Jira.
+    LOCAL_VARS = {'header'}
     def __init__(self, mantis: 'MantisClient', issue: "JiraIssue") -> None:
         self.mantis = mantis
         self.template = self._load_template()
@@ -130,23 +132,20 @@ class Draft:
         return draft_data
 
     def iter_draft_field_items(self) -> Generator[tuple[str, Any], None, None]:
-        local_vars = ('header')
         draft_data = self.read_draft()
         for draft_field_key in draft_data.keys():
-            if draft_field_key in local_vars:  # E.g. Local custom fields
+            if draft_field_key in self.LOCAL_VARS:
                 continue
             yield draft_field_key, draft_data.get(draft_field_key)
 
     def iter_draft_field_keys(self) -> Generator[str, None, None]:
-        local_vars = ('header')
         draft_data = self.read_draft()
         for draft_field_key in draft_data.keys():
-            if draft_field_key in local_vars:  # E.g. Local custom fields
+            if draft_field_key in self.LOCAL_VARS:
                 continue
             yield draft_field_key
 
     def get(self, key: str, default: Any = None) -> Any:
-        local_vars = ('header')
         draft_data = self.read_draft()
         return draft_data.get(key, default)
 
