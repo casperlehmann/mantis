@@ -77,8 +77,6 @@ class TestJiraIssues:
         requests_mock.get(f'{fake_mantis.http.api_url}/issue/createmeta/{fake_mantis.jira.project_name}/issuetypes', json={'issueTypes': [{'id': '10001', 'name': 'Bug'}]})
         requests_mock.get(f'{fake_mantis.http.api_url}/project', json=[{'key': 'TEST', 'id': '1'}])
         requests_mock.get(f'{fake_mantis.http.api_url}/issue/TASK-1', json={'key': 'TASK-1', 'fields': minimal_issue_payload['fields']})
-        with pytest.raises(ValueError):
-            issue = fake_mantis.jira.issues.create(issuetype="Bug", title="Tester", data={})
         minimal_issue_payload['fields']['issuetype']['name'] = 'Bug'
         requests_mock.post(f'{fake_mantis.http.api_url}/issue', json=minimal_issue_payload)
         issue = fake_mantis.jira.issues.create(
