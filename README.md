@@ -80,7 +80,7 @@ $ if [ -n "$XDG_CONFIG_HOME" ]; then
 $ mantis test-auth
 Connected as user: Admin9000
 
-$ mantis TASK-1
+$ mantis get-issue TASK-1
 [TASK-1] Setup Jira
 
 $ mantis fetch-issuetypes
