@@ -115,7 +115,6 @@ class JiraIssue:
 
     def update_from_draft(self) -> None:
         """Update the issue in Jira, using the data from its draft."""
-        print ('enter update_from_draft')
         fields = {}
         for draft_field_key, value_from_draft in self.draft.iter_draft_field_items():
             field = IssueField(self, draft_field_key)
