@@ -15,12 +15,8 @@ class OptionsLoader:
         """Load options from a TOML file."""
         if not toml_path.is_file():
             return {}
-        try:
-            with open(toml_path, "rb") as f:
-                return tomllib.load(f)
-        except Exception as e:
-            print(f"Error loading {toml_path}: {e}")
-            return {}
+        with open(toml_path, "rb") as f:
+            return tomllib.load(f)
 
     def default_toml(self):
         """Get the mantis directory under either XDG config home or user home"""
