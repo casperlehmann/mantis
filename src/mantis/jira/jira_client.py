@@ -132,7 +132,12 @@ class JiraClient:
     def post_issue(self, data: dict) -> dict:
         """Post a new issue to Jira"""
         response = self.mantis.http._post("issue", data=data)
-        response.raise_for_status()
+        try:
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            print(e.response.reason)
+            print(e.response.json())
+            exit()
         return response.json()
 
     def warmup(self, delete_drafts: bool=False) -> None:
