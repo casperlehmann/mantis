@@ -123,7 +123,7 @@ class JiraIssue:
         if input(f'Overwrite description of issue [{self.key}] "{self.get_field('description')}"? (y/n): ').lower() in ('y', 'yes'):
             fields['description'] = self.draft.content
         if fields:
-            print(f'Updating {fields.keys()} with data: ({fields})')
+            print(f'Updating {', '.join(fields.keys())} with data: ({fields})')
             data = {
                 "fields": fields
             }
