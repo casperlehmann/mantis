@@ -2,7 +2,7 @@ from pathlib import Path
 from assistant.assistant import Assistant
 from mantis.cache import Cache
 from mantis.http import Http
-from mantis.jira.jira_client import JiraClient
+from jira.jira_client import JiraClient
 from mantis.openai_client import OpenAIClient
 from mantis.options_loader import OptionsLoader
 

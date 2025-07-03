@@ -5,8 +5,8 @@ from unittest.mock import Mock, patch
 import pytest
 from requests.models import HTTPError
 
-from mantis.jira.jira_client import process_key
-from mantis.jira.jira_issues import JiraIssues
+from jira.jira_client import process_key
+from jira.jira_issues import JiraIssues
 from mantis.mantis_client import MantisClient
 from tests.data import CacheData
 
@@ -128,7 +128,7 @@ class TestJiraIssues:
                 {"id": '2', "name": "Task", 'scope': {'project': {'id': '10000'}}}
             ]
         }
-        with patch('mantis.jira.config_loader.JiraSystemConfigLoader.get_issuetypes', return_value=cached_issuetypes):
+        with patch('jira.config_loader.JiraSystemConfigLoader.get_issuetypes', return_value=cached_issuetypes):
             fake_mantis.jira.issues = JiraIssues(fake_mantis.jira)
             assert fake_mantis.jira.issues._allowed_types is None
             assert fake_mantis.jira.issues.allowed_types == ["Bug", "Task"], f'Unexpected allowed types: {fake_mantis.jira.issues._allowed_types}'

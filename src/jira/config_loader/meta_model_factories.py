@@ -7,10 +7,10 @@ import warnings
 from datamodel_code_generator import DataModelType, InputFileType, generate
 from pydantic import BaseModel, PydanticDeprecatedSince20, create_model
 
-from mantis.jira.config_loader.jira_types import JiraIssueFieldSchema
+from jira.config_loader.jira_types import JiraIssueFieldSchema
 
 if TYPE_CHECKING:
-    from mantis.jira.jira_client import JiraClient
+    from jira.jira_client import JiraClient
 
 
 class MetaModelFactory(ABC):

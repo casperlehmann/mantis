@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 
 
 if TYPE_CHECKING:
-    from mantis.jira.jira_client import JiraClient
+    from jira.jira_client import JiraClient
 
 
 class Suggestion:

@@ -1,7 +1,7 @@
 import pytest
 from requests.auth import HTTPBasicAuth
 
-from mantis.jira import JiraAuth
+from jira import JiraAuth
 from mantis.options_loader import OptionsLoader
 
 

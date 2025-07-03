@@ -1,10 +1,10 @@
 from typing import TYPE_CHECKING, Mapping
 
 from mantis.cache import CacheMissException
-from mantis.jira.config_loader.meta_model_factories import CreatemetaModelFactory, EditmetaModelFactory, MetaModelFactory
+from jira.config_loader.meta_model_factories import CreatemetaModelFactory, EditmetaModelFactory, MetaModelFactory
 
 if TYPE_CHECKING:
-    from mantis.jira.jira_client import JiraClient
+    from jira.jira_client import JiraClient
 
 
 class Inspector:

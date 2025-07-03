@@ -60,7 +60,7 @@ class TestJiraClient:
 
     def test_get_test_auth_connection_error(self, fake_mantis: MantisClient, capsys):
         with patch(
-            "mantis.jira.jira_client.requests.get",
+            "jira.jira_client.requests.get",
             side_effect=requests.exceptions.ConnectionError,
         ):
             with pytest.raises(SystemExit) as pytest_wrapped_e:
@@ -77,7 +77,7 @@ class TestJiraClient:
 
     def test_get_test_auth_generic_exception(self, fake_mantis: MantisClient, capsys):
         with patch(
-            "mantis.jira.jira_client.requests.get",
+            "jira.jira_client.requests.get",
             side_effect=requests.exceptions.RequestException,
         ):
             with pytest.raises(requests.exceptions.RequestException):

@@ -8,7 +8,7 @@ from .template_md import template
 j2m: Callable[[str], str] = lambda x: x
 
 if TYPE_CHECKING:
-    from mantis.jira import JiraIssue
+    from jira import JiraIssue
     from mantis.mantis_client import MantisClient
 
 class Draft:

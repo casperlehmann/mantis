@@ -6,10 +6,10 @@ import requests
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from mantis.jira.auto_complete import AutoComplete, Suggestion
-from mantis.jira.jira_issues import JiraIssues
-from mantis.jira.config_loader import JiraSystemConfigLoader
-from mantis.jira.jira_auth import JiraAuth
+from jira.auto_complete import AutoComplete, Suggestion
+from jira.jira_issues import JiraIssues
+from jira.config_loader import JiraSystemConfigLoader
+from jira.jira_auth import JiraAuth
 
 if TYPE_CHECKING:
     from mantis.mantis_client import MantisClient

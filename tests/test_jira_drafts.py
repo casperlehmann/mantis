@@ -1,6 +1,6 @@
 import pytest
 
-from mantis.jira.jira_issues import JiraIssue
+from jira.jira_issues import JiraIssue
 from mantis.mantis_client import MantisClient
 from tests.data import CacheData
 
