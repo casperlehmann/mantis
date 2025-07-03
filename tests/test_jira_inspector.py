@@ -4,7 +4,7 @@ import pytest
 from typing import Any
 
 from mantis.cache import CacheMissException
-from mantis.jira.config_loader.config_loader import Inspector
+from jira.config_loader.config_loader import Inspector
 from mantis.mantis_client import MantisClient
 from tests.data import CacheData
 

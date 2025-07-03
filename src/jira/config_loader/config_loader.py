@@ -8,11 +8,11 @@ from datamodel_code_generator import DataModelType, InputFileType, generate
 from pydantic import PydanticDeprecatedSince20
 
 from mantis.cache import CacheMissException
-from mantis.jira.config_loader.inspector import Inspector
-from mantis.jira.config_loader.meta_model_factories import CreatemetaModelFactory
+from jira.config_loader.inspector import Inspector
+from jira.config_loader.meta_model_factories import CreatemetaModelFactory
 
 if TYPE_CHECKING:
-    from mantis.jira.jira_client import JiraClient
+    from jira.jira_client import JiraClient
     from mantis.cache import Cache
 
 

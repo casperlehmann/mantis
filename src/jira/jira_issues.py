@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING, Any
 from pydantic import BaseModel
 
 from drafts import Draft
-from mantis.jira.config_loader.meta_model_factories import CreatemetaModelFactory, EditmetaModelFactory
-from mantis.jira.issue_field import IssueField
+from jira.config_loader.meta_model_factories import CreatemetaModelFactory, EditmetaModelFactory
+from jira.issue_field import IssueField
 
 if TYPE_CHECKING:
     from .jira_client import JiraClient
