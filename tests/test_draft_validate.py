@@ -1,9 +1,11 @@
 import pytest
 from types import SimpleNamespace
+import tempfile
+import os
 
 class DummyDraft:
     def __init__(self, raw, summary="Summary", path="/tmp/draft.md"):
-        self.raw_draft = raw
+        self._raw = raw
         self.summary = summary
         self.draft_path = path
     def _validate_draft(self):
@@ -12,6 +14,9 @@ class DummyDraft:
             raise ValueError(f'Draft file at {self.draft_path} does not contain the expected separator: "---": {raw}')
         if f'# {self.summary}' not in raw:
             raise ValueError(f'Draft file at {self.draft_path} does not contain the expected header: "# {self.summary}"')
+    @property
+    def raw_draft(self):
+        return self._raw
 
 
 def test_validate_draft_missing_separator():
@@ -28,3 +33,40 @@ def test_validate_draft_valid():
     draft = DummyDraft("---\nmeta\n---\n# Summary\nBody text")
     # Should not raise
     draft._validate_draft()
+
+def test_raw_draft_returns_content():
+    content = '---\nmeta\n---\n# Summary\nBody text'
+    with tempfile.NamedTemporaryFile('w+', delete=False) as tf:
+        tf.write(content)
+        tf.flush()
+        class DummyDraftFile:
+            draft_path = tf.name
+            @property
+            def raw_draft(self):
+                with open(self.draft_path, 'r') as f:
+                    content = f.read()
+                if not content.strip():
+                    raise ValueError(f'Draft file at {self.draft_path} does not contain any content')
+                return content
+        draft = DummyDraftFile()
+        result = draft.raw_draft
+        assert result == content
+    os.unlink(tf.name)
+
+def test_raw_draft_empty_raises():
+    with tempfile.NamedTemporaryFile('w+', delete=False) as tf:
+        tf.write('')
+        tf.flush()
+        class DummyDraftFile:
+            draft_path = tf.name
+            @property
+            def raw_draft(self):
+                with open(self.draft_path, 'r') as f:
+                    content = f.read()
+                if not content.strip():
+                    raise ValueError(f'Draft file at {self.draft_path} does not contain any content')
+                return content
+        draft = DummyDraftFile()
+        with pytest.raises(ValueError, match='does not contain any content'):
+            draft.raw_draft
+    os.unlink(tf.name)
