@@ -1,3 +1,4 @@
+import pytest
 
 from jira.jira_issues import JiraIssue
 from mantis.mantis_client import MantisClient
@@ -83,6 +84,7 @@ class TestJiraDraft:
         assert isinstance(draft_content, str)
         assert draft_content == "Implement user authentication for the checkout system."
 
+import frontmatter
 
 def test_remove_draft_header(fake_mantis, requests_mock, tmp_path):
     requests_mock.get(f'{fake_mantis.http.api_url}/issue/ECS-1', json=CacheData().ecs_1)

@@ -83,7 +83,7 @@ class JiraSystemConfigLoader:
         if len(createmeta.keys()) == 0:
             raise ValueError(
                 'No content in createmeta. Something is probably very wrong.')
-        if 'fields' not in createmeta:
+        if not 'fields' in createmeta:
             raise ValueError(f'The createmeta has no fields. Got: {createmeta.keys()}')
         self.cache.write_createmeta(issuetype_name, createmeta)
         return createmeta
@@ -99,7 +99,7 @@ class JiraSystemConfigLoader:
         if len(editmeta.keys()) == 0:
             raise ValueError(
                 'No content in editmeta. Something is probably very wrong.')
-        if 'fields' not in editmeta:
+        if not 'fields' in editmeta:
             raise ValueError(f'The editmeta has no fields. Got: {editmeta.keys()}')
         
         self.cache.write_editmeta(issue_key, editmeta)

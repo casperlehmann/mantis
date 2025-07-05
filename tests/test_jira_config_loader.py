@@ -26,7 +26,7 @@ class TestConfigLoader:
         requests_mock.get(f'{fake_mantis.http.api_url}/issue/createmeta/TEST/issuetypes', json=get_issuetypes_response)
         assert len(list(fake_mantis.jira.system_config_loader.loop_createmeta())) == 0
         # cache something
-        with open(fake_mantis.cache.createmeta / "some_file.json", "w") as f:
+        with open(fake_mantis.cache.createmeta / f"some_file.json", "w") as f:
             f.write("{}")
         assert len(list(fake_mantis.jira.system_config_loader.loop_createmeta())) == 1
 

@@ -84,7 +84,7 @@ class Cache:
     def get_projects_from_system_cache(self) -> dict[str, Any] | list[dict[str, Any]] | None:
         if self.mantis._no_read_cache:
             raise LookupError('Attempted to access cache when _no_read_cache is set')
-        projects = self.get_from_system_cache("projects.json")
+        projects = self.get_from_system_cache(f"projects.json")
         if not projects:
             return None
         assert isinstance(projects, list), f'{projects} should be of type list. Got: {type(projects)}: {projects}'
