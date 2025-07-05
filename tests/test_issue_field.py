@@ -15,7 +15,7 @@ class DummyIssue:
         self.non_editmeta_fields = non_editmeta_fields or set()
         self.non_createmeta_fields = non_createmeta_fields or set()
         self.non_meta_fields = non_meta_fields or set()
-        self.draft = {} if draft_value is None else {"summary": draft_value}
+        self.draft = {} if draft_value is None else draft_value
         self.editmeta_data = {'fields': {"summary": {}}}
         self.createmeta_data = {'fields': {"summary": {}}}
     def get_field(self, key):
@@ -91,14 +91,14 @@ def test_check_field_types_not_equal():
         field.check_field()
 
 def test_check_field_value_matches_draft(capsys):
-    issue = DummyIssue("foo", 'string', 'string', draft_value="foo")
+    issue = DummyIssue("foo", 'string', 'string', draft_value={"foo": "foo"})
     field = IssueField(issue, 'summary')
     assert field.check_field() is True
     out = capsys.readouterr().out
     assert 'summary' in out and '(type: string):' in out
 
 def test_check_field_value_differs_from_draft(capsys):
-    issue = DummyIssue("foo", 'string', 'string', draft_value="bar")
+    issue = DummyIssue("foo", 'string', 'string', draft_value={'summary': "bar"})
     field = IssueField(issue, 'summary')
     assert field.check_field() is True
     out = capsys.readouterr().out
