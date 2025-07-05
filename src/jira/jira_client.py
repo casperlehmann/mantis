@@ -238,7 +238,7 @@ class JiraClient:
         except requests.exceptions.ConnectionError:
             print("Connection error. Run it like this:")
             print("export JIRA_TOKEN=$(cat secret.txt)")
-            print("poetry run python main.py")
+            print("uv run python main.py")
             exit(1)
         except Exception as e:
             print("test_auth failed for unknown reasons.")
