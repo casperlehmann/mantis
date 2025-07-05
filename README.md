@@ -200,6 +200,13 @@ An example of the coverage report:
 
 ![Markdown coverage report](docs/img/pytest-coverage-html-report.png)
 
+## Running Ruff
+
+```sh
+$ ruff check .
+All checks passed!
+```
+
 ## Running MyPy
 
 Ensuring typehint coverage (this is also run during [GitHub Actions](.github/workflows/python-app-ci.yml)).

@@ -83,7 +83,7 @@ class JiraSystemConfigLoader:
         if len(createmeta.keys()) == 0:
             raise ValueError(
                 'No content in createmeta. Something is probably very wrong.')
-        if not 'fields' in createmeta:
+        if 'fields' not in createmeta:
             raise ValueError(f'The createmeta has no fields. Got: {createmeta.keys()}')
         self.cache.write_createmeta(issuetype_name, createmeta)
         return createmeta
@@ -99,7 +99,7 @@ class JiraSystemConfigLoader:
         if len(editmeta.keys()) == 0:
             raise ValueError(
                 'No content in editmeta. Something is probably very wrong.')
-        if not 'fields' in editmeta:
+        if 'fields' not in editmeta:
             raise ValueError(f'The editmeta has no fields. Got: {editmeta.keys()}')
         
         self.cache.write_editmeta(issue_key, editmeta)
@@ -114,7 +114,7 @@ class JiraSystemConfigLoader:
             issuetype_name: str = issuetype_data['name']
             data = self._update_single_createmeta(issuetype_name)
             # Run CreatemetaModelFactory to dump schemas
-            fields = CreatemetaModelFactory(data, issuetype_name, self.jira)
+            _ = CreatemetaModelFactory(data, issuetype_name, self.jira)
         return self.jira.issues.load_allowed_types()
 
     def _update_single_createmeta(self, issuetype_name: str) -> dict[str, Any]:
