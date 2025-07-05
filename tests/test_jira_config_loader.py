@@ -36,7 +36,7 @@ class TestConfigLoader:
         # Test initial state
         if (fake_mantis.cache.system / 'projects.json').exists():
             raise FileExistsError('File "projects.json" should not exist yet')
-        assert fake_mantis.jira._project_id is None
+        assert fake_mantis.jira._project_id == None
 
         # Fetch and cache projects data (without updating the object)
         got_projects = fake_mantis.jira.system_config_loader.get_projects(force_skip_cache = True)
@@ -49,7 +49,7 @@ class TestConfigLoader:
             raise FileNotFoundError('File "projects.json" should have been created')
         
         # Note: Private jira._project_id is still None, even after the file has been written.
-        assert fake_mantis.jira._project_id is None
+        assert fake_mantis.jira._project_id == None
         # Note: Only once the public jira.project_id is queried does the private one get updated
         assert fake_mantis.jira.project_id == '10000'
         assert fake_mantis.jira._project_id == '10000'

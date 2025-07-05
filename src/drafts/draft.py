@@ -1,12 +1,11 @@
 from pathlib import Path
 import re
-from typing import Any, TYPE_CHECKING, Generator
+from typing import Any, Callable, TYPE_CHECKING, Generator
 import frontmatter  # type: ignore
 from .template_md import template
 
 # To-do: Create converter for Jira syntax to markdown.
-def j2m(x: str) -> str:
-        return x
+j2m: Callable[[str], str] = lambda x: x
 
 if TYPE_CHECKING:
     from jira import JiraIssue

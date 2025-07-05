@@ -21,7 +21,7 @@ class TestJiraDraft:
         assert isinstance(task_1, JiraIssue)
 
         minimal_issue_payload['key'] = "ECS-2"
-        _ = fake_mantis.jira.issues.get("ECS-2")
+        task_2 = fake_mantis.jira.issues.get("ECS-2")
         assert len([*fake_mantis.drafts_dir.iterdir()]) == 2
 
         with open(fake_mantis.drafts_dir / "ECS-1.md", "r") as f:

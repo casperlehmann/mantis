@@ -65,7 +65,7 @@ class TestJiraClient:
         ):
             with pytest.raises(SystemExit) as pytest_wrapped_e:
                 fake_mantis.jira.test_auth()
-            assert pytest_wrapped_e.type is SystemExit
+            assert pytest_wrapped_e.type == SystemExit
             assert pytest_wrapped_e.value.code == 1
         captured = capsys.readouterr()
         assert captured.out == (

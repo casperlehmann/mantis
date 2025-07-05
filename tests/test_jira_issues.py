@@ -137,7 +137,7 @@ class TestJiraIssues:
     def test_jira_issues_get_does_write_to_cache(self, fake_mantis: MantisClient, requests_mock):
         assert fake_mantis.cache.get_issue("ECS-1") is None
         requests_mock.get(f'{fake_mantis.http.api_url}/issue/ECS-1', json=CacheData().ecs_1)
-        _ = fake_mantis.jira.issues.get("ECS-1")
+        issue = fake_mantis.jira.issues.get("ECS-1")
         assert fake_mantis.cache.get_issue("ECS-1")
         assert len([file for file in fake_mantis.cache.issues.iterdir()]) == 1
         with open(fake_mantis.cache.issues / "ECS-1.json", "r") as f:

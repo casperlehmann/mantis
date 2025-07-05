@@ -10,6 +10,7 @@ if TYPE_CHECKING:
 class Inspector:
     @staticmethod
     def get_field_names_from_all_types(data: Mapping[str, MetaModelFactory]) -> set[str]:
+        d: dict[str, set[str]] = {}
         all_field_keys: set[str] = set()
         for issuetype, factory in data.items():
             assert isinstance(factory, MetaModelFactory)

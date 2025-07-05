@@ -114,7 +114,7 @@ class JiraSystemConfigLoader:
             issuetype_name: str = issuetype_data['name']
             data = self._update_single_createmeta(issuetype_name)
             # Run CreatemetaModelFactory to dump schemas
-            _ = CreatemetaModelFactory(data, issuetype_name, self.jira)
+            fields = CreatemetaModelFactory(data, issuetype_name, self.jira)
         return self.jira.issues.load_allowed_types()
 
     def _update_single_createmeta(self, issuetype_name: str) -> dict[str, Any]:
