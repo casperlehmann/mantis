@@ -1,13 +1,11 @@
 [project]
 name = "mantis"
-version = "0.3.3"
+version = "0.3.4"
 description = "CLI for locally managing Jira issues"
-authors = [
-    {name = "casperlehmann",email = "6682833+casperlehmann@users.noreply.github.com"}
-]
-license = { file = "LICENSE.md" }
-readme = "README.md"
+authors = [{ name = "casperlehmann", email = "6682833+casperlehmann@users.noreply.github.com" }]
 requires-python = "<4.0,>=3.12"
+readme = "README.md"
+license = { file = "LICENSE.md" }
 dependencies = [
     "pytest (>=8.4.0,<9.0.0)",
     "requests (>=2.32.4,<3.0.0)",
@@ -22,21 +20,33 @@ dependencies = [
     "flake8 (>=7.2.0,<8.0.0)",
     "python-frontmatter (>=1.1.0,<2.0.0)",
     "openai (>=1.86.0,<2.0.0)",
-    "xdg-base-dirs (>=6.0.2,<7.0.0)"
+    "xdg-base-dirs (>=6.0.2,<7.0.0)",
 ]
 
-[tool.poetry]
-packages = [{ include = "mantis", from = "src" }]
-include = ["mantis/py.typed"]
+[project.scripts]
+mantis = "main:main"
 
-[tool.poetry.group.dev.dependencies]
+[dependency-groups]
+dev = []
 
-[tool.poetry.scripts]
-mantis = 'main:main'
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/mantis",
+    "mantis/py.typed",
+]
+
+[tool.hatch.build.targets.wheel]
+include = [
+    "src/mantis",
+    "mantis/py.typed",
+]
+
+[tool.hatch.build.targets.wheel.sources]
+"src/mantis" = "mantis"
 
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [mypy]
 

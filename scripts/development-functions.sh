@@ -26,23 +26,23 @@ get_and_fmt_with_issues_and_drafts() {
 }
 
 run_coverage() {
-  poetry run pytest --cov
+  uv run pytest --cov
 }
 
 run_tests() {
-  poetry run pytest -f -m "not slow"
+  uv run pytest -f -m "not slow"
 }
 
 run_mypy() {
-  poetry run mypy --disallow-untyped-calls --disallow-untyped-defs --disallow-incomplete-defs src
+  uv run mypy --disallow-untyped-calls --disallow-untyped-defs --disallow-incomplete-defs src
 }
 
 run_flake8_sparse() {
-  poetry run flake8 mantis --count --select=E9,F63,F7,F82 --show-source --statistics                 
+  uv run flake8 mantis --count --select=E9,F63,F7,F82 --show-source --statistics                 
 }
 
 run_flake8() {
-  poetry run flake8 mantis --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+  uv run flake8 mantis --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 }
 
 repo_health() {
@@ -55,7 +55,7 @@ repo_health() {
 }
 
 show_coverage() {
-  poetry run pytest --cov-report html --cov
+  uv run pytest --cov-report html --cov
   open htmlcov/index.html
 }
 
