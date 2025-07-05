@@ -36,6 +36,8 @@ jobs:
     #----------------------------------------------
     #              run test suite
     #----------------------------------------------
+    - name: Run ruff
+      run: uv run ruff check .
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
