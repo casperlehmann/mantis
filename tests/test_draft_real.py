@@ -47,6 +47,25 @@ def test_generate_frontmatter_true_false(tmp_path, monkeypatch):
     # The header is always set to the formatted header, not the string 'True'
     assert draft.template.metadata['header'] == '[KEY-1] summary-value'
 
+def test_generate_frontmatter_true_false_branch(tmp_path):
+    from src.drafts.draft import Draft
+    class Mantis:
+        drafts_dir = tmp_path
+        options = type('opt', (), {'chat_gpt_activated': False})()
+        assistant = None
+    class Issue:
+        def get_field(self, key, default=None):
+            if key == 'header': return 'should-not-be-used'
+            if key == 'summary': return 'summary-value'
+            return default
+        def get(self, key): return 'KEY-1'
+    import src.drafts.template_md as template_md
+    # Set header to string 'True' to trigger the branch
+    template_md.template = '---\nheader: True\nproject: p\nparent: pa\nsummary: s\nstatus: st\nissuetype: it\nassignee: a\nreporter: r\n---\n{summary}\n{description}'
+    draft = Draft(Mantis(), Issue())
+    # The template_value 'True' should be used, not the value from Issue
+    assert draft.template.metadata['header'] == '[KEY-1] summary-value'
+
 def test_generate_body_with_chatgpt(tmp_path, monkeypatch):
     from src.drafts.draft import Draft
     class Assistant:
