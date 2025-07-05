@@ -38,7 +38,7 @@ def main() -> None:
         search_name = 'Commerce'
         search_field = 'cf[10001]' # 'team'
 
-        validated_input = jira.validate_input(search_field, search_name)
+        _ = jira.validate_input(search_field, search_name)
     elif options.action == 'update-issue':
         for issue_key in options.args:
             issue = jira.issues.get(key=issue_key)
@@ -96,7 +96,8 @@ def main() -> None:
                     from_create_fact = '1' if createmeta_factory[key] else '0'  # type: ignore
                 except KeyError:
                     from_create_fact = line
-                if from_edit == from_create == line: continue
+                if from_edit == from_create == line:
+                    continue
                 print(f'{key[:20]:<20} {from_create:^10} {from_edit:^10} {from_issue:^10} {from_draft:^10} {from_create_fact:^10} {from_edit_fact:^10}')
             print(20*' ', end=' ')
             print(f'{'create':^10} {'edit':^10} {'issue':^10} {'draft':^10} {'creat_fact':^10} {'edit_fact':^10}')

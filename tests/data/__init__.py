@@ -84,3 +84,10 @@ class CacheData:
     def get_names(self) -> dict[str, Any]:
         # issue/ECS-2?expand=names
         return get_names
+
+all = {
+    "get_issuetypes_response": get_issuetypes_response,
+    "update_projects_cache_response": update_projects_cache_response,
+    # "CacheData": CacheData,
+    # "get_names": get_names,
+}
