@@ -49,7 +49,7 @@ class JiraIssue:
 
     @property
     def issuetype(self) -> str:
-        if 'issuetype' not in self.fields.keys():
+        if not 'issuetype' in self.fields.keys():
             raise ValueError(f'Field "issuetype" not in JiraIssue.data. Available keys: {list(self.data.keys())}')
         return self.data['fields']['issuetype']['name']
 

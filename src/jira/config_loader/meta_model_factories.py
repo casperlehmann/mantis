@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import json
 
-from typing import TYPE_CHECKING, Any, ClassVar, Dict, Generator, KeysView, Optional
+from typing import TYPE_CHECKING, Any, ClassVar, Dict, Generator, KeysView, Mapping, Optional
 import warnings
 
 from datamodel_code_generator import DataModelType, InputFileType, generate

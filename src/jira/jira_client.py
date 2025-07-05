@@ -3,6 +3,7 @@ import re
 import shutil
 import requests
 
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from jira.auto_complete import AutoComplete, Suggestion
@@ -194,7 +195,7 @@ class JiraClient:
         return True
 
     def jql_auto_complete(self, field_name: str, field_value: str) -> dict[str, Any]:
-        uri = "jql/autocompletedata/suggestions"
+        uri = f"jql/autocompletedata/suggestions"
         query = {
             'fieldName': field_name,
             'fieldValue': field_value,
