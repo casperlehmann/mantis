@@ -5,10 +5,10 @@ Edit locally in your preferred editor and sync to Jira when ready.
 
 ## Getting started
 
-This project must be installed using [Poetry](python-poetry.org):
+This project must be installed using [uv](https://github.com/astral-sh/uv):
 
 ```sh
-$ poetry install
+$ uv pip install
 ```
 
 ### Generate a Jira token:
@@ -47,16 +47,16 @@ cache-dir = ".jira_cache"
 ### Then run the tests:
 
 ```sh
-$ poetry run pytest
+$ uv run pytest
 ```
 
 ## Installing
 
-For a system-wide editable installation, run `poetry install` to install the dependencies into the virtual environment. Then add that virtual environment to the system path.
+For a system-wide editable installation, run `uv pip install -e .` to install the dependencies into the virtual environment. Then add that virtual environment to the system path.
 
 ```sh
-$ poetry install
-$ poetry env info --path
+$ uv pip install -e .
+$ echo "$(pwd)/.venv/bin"
 # Grab the path
 $ export PATH="/Users/user/code/mantis/.venv/bin:$PATH"
 # Also add this to your dotfiles
@@ -159,39 +159,39 @@ $ mantis \
 ## Extended testing
 
 ```sh
-$ poetry run pytest
+$ uv run pytest
 
 # Run tests every time a file changes (using `pytest-xdist`):
-$ poetry run pytest -f
+$ uv run pytest -f
 
 # Skip slow tests:
-$ poetry run pytest -m "not slow"
+$ uv run pytest -m "not slow"
 
 # Show test coverage for each file
-$ poetry run pytest --cov
+$ uv run pytest --cov
 
 # Generate coverage report (written to ./htmlcov)
-$ poetry run pytest --cov-report html --cov
+$ uv run pytest --cov-report html --cov
 
 # Measure slowest test
-$ poetry run pytest  --durations=3
+$ uv run pytest  --durations=3
 2.94s call     tests/test_jira_config_loader.py::TestConfigLoader::test_update_createmeta
 0.05s call     tests/test_jira_inspector.py::TestInspector::test_get_project_field_keys_from_cache
 0.05s teardown tests/test_jira_options.py::TestJiraOptions::test_jira_options_not_set
 
 # Skip tests marked with @pytest.mark.slow decorator
-$ poetry run pytest -m "not slow"
+$ uv run pytest -m "not slow"
 ```
 
 See functions in `development-functions.sh`:
 
 ```sh
 run_coverage() {
-  poetry run pytest --cov
+  uv run pytest --cov
 }
 
 show_coverage() {
-  poetry run pytest --cov-report html --cov
+  uv run pytest --cov-report html --cov
   open htmlcov/index.html
 }
 ```
@@ -205,16 +205,16 @@ An example of the coverage report:
 Ensuring typehint coverage (this is also run during [GitHub Actions](.github/workflows/python-app-ci.yml)).
 
 ```
-$ poetry run mypy --disallow-untyped-calls --disallow-untyped-defs --disallow-incomplete-defs src
+$ uv run mypy --disallow-untyped-calls --disallow-untyped-defs --disallow-incomplete-defs src
 Success: no issues found in 10 source files
 ```
 
 ## Running Flake8
 
 ```sh
-$ poetry run flake8 mantis --count --select=E9,F63,F7,F82 --show-source --statistics                 
+$ uv run flake8 src --count --select=E9,F63,F7,F82 --show-source --statistics                 
 0
-$ poetry run flake8 mantis --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+$ uv run flake8 src --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 mantis/jira/__init__.py:1:1: F401 '.jira_auth.JiraAuth' imported but unused
 mantis/jira/__init__.py:2:1: F401 '.jira_client.JiraClient' imported but unused
 mantis/jira/__init__.py:3:1: F401 '.jira_issues.JiraIssue' imported but unused
