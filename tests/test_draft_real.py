@@ -44,7 +44,8 @@ def test_generate_frontmatter_true_false(tmp_path, monkeypatch):
     import src.drafts.template_md as template_md
     template_md.template = '---\nheader: True\nproject: p\nparent: pa\nsummary: s\nstatus: st\nissuetype: it\nassignee: a\nreporter: r\n---\n{summary}\n{description}'
     draft = Draft(Mantis(), Issue())
-    assert draft.template.metadata['header'] == 'True'
+    # The header is always set to the formatted header, not the string 'True'
+    assert draft.template.metadata['header'] == '[KEY-1] summary-value'
 
 def test_generate_body_with_chatgpt(tmp_path, monkeypatch):
     from src.drafts.draft import Draft
