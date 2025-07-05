@@ -66,6 +66,7 @@ def test_inspect_runs():
     assert out or err or code != 0
 
 
+@pytest.mark.slow
 def test_compile_plugins_runs():
     code, out, err = run_main(["compile-plugins"])
     assert out or err or code != 0
