@@ -103,3 +103,38 @@ def test_check_field_value_differs_from_draft(capsys):
     assert field.check_field() is True
     out = capsys.readouterr().out
     assert 'foo -> bar' in out
+
+# payload tests
+
+def test_payload_parent():
+    issue = DummyIssue("irrelevant", 'parent', 'parent', draft_value={'parent': 'PARENT-1'})
+    field = IssueField(issue, 'parent')
+    assert field.payload == {'key': 'PARENT-1'}
+
+def test_payload_string():
+    issue = DummyIssue("irrelevant", 'string', 'string', draft_value={'summary': "abc"})
+    field = IssueField(issue, 'summary')
+    assert field.payload == 'abc'
+
+def test_payload_issuetype_name():
+    issue = DummyIssue("irrelevant", 'issuetype', 'issuetype', draft_value={'issuetype': "Bug"})
+    # issue = DummyIssue("irrelevant", 'issuetype', 'issuetype', draft_value={'issuetype': "Bug"})
+    field = IssueField(issue, 'issuetype')
+    assert field.payload == {'name': 'Bug'}
+
+def test_payload_issuetype_id():
+    issue = DummyIssue("irrelevant", 'user', 'user', draft_value={'reporter': '1234'})
+    field = IssueField(issue, 'reporter')
+    assert field.payload == {'id': '1234'}
+
+def test_payload_team_not_implemented():
+    issue = DummyIssue("irrelevant", 'team', 'team', draft_value={'team': "TeamX"})
+    field = IssueField(issue, 'team')
+    with pytest.raises(NotImplementedError, match='Convert team name to id.'):
+        field.payload
+
+def test_payload_unknown_type():
+    issue = DummyIssue("irrelevant", 'unknown', 'unknown', draft_value={'key': "val"})
+    field = IssueField(issue, 'custom')
+    with pytest.raises(NotImplementedError, match='Type: unknown'):
+        field.payload
