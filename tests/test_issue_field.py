@@ -69,3 +69,37 @@ def test_extract_fallback_name():
     issue = DummyIssue({'name': 'Fallback'}, 'custom', 'custom')
     field = IssueField(issue, 'custom')
     assert field._extract_name_from_cached_object() == 'Fallback'
+
+# check_field tests
+
+def test_check_field_both_na_in_non_meta_fields():
+    issue = DummyIssue("irrelevant", 'N/A', 'N/A', draft_value=None, non_meta_fields={"summary"})
+    field = IssueField(issue, 'summary')
+    with pytest.raises(ValueError, match='cannot be set'):
+        field.check_field()
+
+def test_check_field_both_na_not_in_non_meta_fields():
+    issue = DummyIssue("irrelevant", 'N/A', 'N/A', draft_value=None, non_meta_fields=set())
+    field = IssueField(issue, 'summary')
+    with pytest.raises(ValueError, match='neither createmeta nor editmeta schema'):
+        field.check_field()
+
+def test_check_field_types_not_equal():
+    issue = DummyIssue("irrelevant", 'string', 'user', draft_value=None)
+    field = IssueField(issue, 'summary')
+    with pytest.raises(ValueError, match='not equal'):
+        field.check_field()
+
+def test_check_field_value_matches_draft(capsys):
+    issue = DummyIssue("foo", 'string', 'string', draft_value="foo")
+    field = IssueField(issue, 'summary')
+    assert field.check_field() is True
+    out = capsys.readouterr().out
+    assert 'summary' in out and '(type: string):' in out
+
+def test_check_field_value_differs_from_draft(capsys):
+    issue = DummyIssue("foo", 'string', 'string', draft_value="bar")
+    field = IssueField(issue, 'summary')
+    assert field.check_field() is True
+    out = capsys.readouterr().out
+    assert 'foo -> bar' in out
