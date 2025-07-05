@@ -304,3 +304,13 @@ update_test_data() {
     anonymize_test_data
 }
 ```
+
+# Contributing
+
+We use semantic versioning, where all commits get their own patch version.
+All PRs must be versioned, but there is no automation implemented to automate this.
+For now, manually bumping the version number in `pyproject.toml` and `uv.lock` with with the following command:
+
+```
+$ uv version --bump patch|minor|major
+```
