@@ -38,7 +38,7 @@ def main() -> None:
         search_name = 'Commerce'
         search_field = 'cf[10001]' # 'team'
 
-        validated_input = jira.validate_input(search_field, search_name)
+        _ = jira.validate_input(search_field, search_name)
     elif options.action == 'update-issue':
         for issue_key in options.args:
             issue = jira.issues.get(key=issue_key)
