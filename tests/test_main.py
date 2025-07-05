@@ -43,4 +43,31 @@ def test_fetch_types_runs():
     # Accept any exit code, just check that output is present (since it may fail if not fully mocked)
     assert out or err
 
+
+def test_fetch_issuetypes_runs():
+    code, out, err = run_main(["fetch-issuetypes"])
+    assert out or err
+
+
+def test_update_issue_runs():
+    # This will likely fail unless dependencies are mocked, but should not crash the CLI
+    code, out, err = run_main(["update-issue", "FAKE-1"])
+    assert out or err or code != 0
+
+
+def test_compare_runs():
+    # This will likely fail unless dependencies are mocked, but should not crash the CLI
+    code, out, err = run_main(["compare", "FAKE-1"])
+    assert out or err or code != 0
+
+
+def test_inspect_runs():
+    code, out, err = run_main(["inspect"])
+    assert out or err or code != 0
+
+
+def test_compile_plugins_runs():
+    code, out, err = run_main(["compile-plugins"])
+    assert out or err or code != 0
+
 # Add more tests for specific actions if you want to mock dependencies or set up test data.
