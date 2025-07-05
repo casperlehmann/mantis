@@ -1,21 +1,36 @@
 import pytest
 from src.drafts.draft import Draft
 import src.drafts.template_md as template_md
+from mantis.mantis_client import MantisClient
 
-class DummyMantis:
-    options = type('opt', (), {'chat_gpt_activated': False})()
-    assistant = None
+class MinimalJiraIssue:
+    def __init__(self, content_dict=None):
+        self._content = content_dict or {}
+    def get_field(self, key, default=None):
+        return self._content.get(key, default)
+    def get(self, key):
+        if key == 'key':
+            return self._content.get('key', 'KEY-1')
+        return self._content.get(key)
+
 
 def make_draft(tmp_path, content_dict=None):
-    class Issue:
-        def get_field(self, key, default=None):
-            return content_dict.get(key, default) if content_dict else default
-        def get(self, key):
-            return 'KEY-1'
+    class DummyOptions:
+        drafts_dir = str(tmp_path)
+        cache_dir = str(tmp_path / 'cache')
+        plugins_dir = str(tmp_path / 'plugins')
+        chat_gpt_activated = False
+        chat_gpt_base_url = 'https://api.fakeai.com/v1'
+        chat_gpt_api_key = 'dummy'
+    options = DummyOptions()
+    mantis = MantisClient(options)  # type: ignore
+    # Ensure the content_dict has a 'key' for Draft
+    if content_dict is not None and 'key' not in content_dict:
+        content_dict = dict(content_dict)
+        content_dict['key'] = 'KEY-1'
+    issue = MinimalJiraIssue(content_dict)
     template_md.template = '---\nheader: h\nproject: p\nparent: pa\nsummary: s\nstatus: st\nissuetype: it\nassignee: a\nreporter: r\n---\n{summary}\n{description}'
-    mantis = DummyMantis()
-    mantis.drafts_dir = tmp_path
-    return Draft(mantis, Issue())
+    return Draft(mantis, issue)  # type: ignore
 
 def test_iter_draft_field_items_and_keys(tmp_path):
     # Write a draft file with extra fields
