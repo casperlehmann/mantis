@@ -10,11 +10,13 @@ MAIN_PATH = Path(__file__).parent.parent / "src" / "main.py"
 
 def run_main(args):
     """Run main.py with the given arguments and return (exit_code, stdout, stderr)."""
+    # Use a minimal, clean environment for subprocess
+    env = {"PYTHONUNBUFFERED": "1", "PATH": os.environ.get("PATH", "")}
     result = subprocess.run(
         [sys.executable, str(MAIN_PATH)] + args,
         capture_output=True,
         text=True,
-        env={**os.environ, "PYTHONUNBUFFERED": "1"},
+        env=env,
     )
     return result.returncode, result.stdout, result.stderr
 
