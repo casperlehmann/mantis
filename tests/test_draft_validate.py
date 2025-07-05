@@ -2,6 +2,7 @@ import pytest
 from types import SimpleNamespace
 import tempfile
 import os
+from src.drafts.draft import Draft
 
 class DummyDraft:
     def __init__(self, raw, summary="Summary", path="/tmp/draft.md"):
@@ -70,3 +71,69 @@ def test_raw_draft_empty_raises():
         with pytest.raises(ValueError, match='does not contain any content'):
             draft.raw_draft
     os.unlink(tf.name)
+
+# test header_from_raw
+
+def test_header_from_raw_valid():
+    class DummyDraft(Draft):
+        def __init__(self): pass
+        @property
+        def raw_draft(self):
+            return "---\nmeta\n---\n# Summary\nBody text"
+        @property
+        def summary(self):
+            return "Summary"
+    draft = DummyDraft()
+    assert draft.header_from_raw == '# Summary'
+
+def test_header_from_raw_no_content():
+    class DummyDraft(Draft):
+        def __init__(self): pass
+        @property
+        def raw_draft(self):
+            return "---\nmeta\n---"
+        @property
+        def summary(self):
+            return "Summary"
+    draft = DummyDraft()
+    with pytest.raises(ValueError, match='markdown header'):
+        draft.header_from_raw
+
+def test_header_from_raw_empty():
+    class DummyDraft(Draft):
+        def __init__(self): pass
+        @property
+        def raw_draft(self):
+            return "---\nmeta\n---\n"
+        @property
+        def summary(self):
+            return "Summary"
+    draft = DummyDraft()
+    with pytest.raises(ValueError, match='markdown header'):
+        draft.header_from_raw
+
+def test_header_from_raw_not_markdown():
+    class DummyDraft(Draft):
+        def __init__(self): pass
+        @property
+        def raw_draft(self):
+            return "---\nmeta\n---\nNotAHeader\nBody text"
+        @property
+        def summary(self):
+            return "Summary"
+    draft = DummyDraft()
+    with pytest.raises(ValueError, match='markdown header'):
+        draft.header_from_raw
+
+def test_header_from_raw_mismatch():
+    class DummyDraft(Draft):
+        def __init__(self): pass
+        @property
+        def raw_draft(self):
+            return "---\nmeta\n---\n# NotTheSummary\nBody text"
+        @property
+        def summary(self):
+            return "Summary"
+    draft = DummyDraft()
+    with pytest.raises(ValueError, match='header to match summary'):
+        draft.header_from_raw
