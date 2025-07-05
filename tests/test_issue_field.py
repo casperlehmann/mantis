@@ -8,15 +8,16 @@ class DummyFactory:
         return {'schema': {'type': self._schema_type}}
 
 class DummyIssue:
-    def __init__(self, field_value, editmeta_type, createmeta_type, non_editmeta_fields=None, non_createmeta_fields=None):
+    def __init__(self, field_value, editmeta_type, createmeta_type, draft_value=None, non_meta_fields=None, non_editmeta_fields=None, non_createmeta_fields=None):
         self._field_value = field_value
         self.editmeta_factory = DummyFactory(editmeta_type)
         self.createmeta_factory = DummyFactory(createmeta_type)
         self.non_editmeta_fields = non_editmeta_fields or set()
         self.non_createmeta_fields = non_createmeta_fields or set()
-        self.draft = {}
-        self.editmeta_data = {'fields': {}}
-        self.createmeta_data = {'fields': {}}
+        self.non_meta_fields = non_meta_fields or set()
+        self.draft = {} if draft_value is None else {"summary": draft_value}
+        self.editmeta_data = {'fields': {"summary": {}}}
+        self.createmeta_data = {'fields': {"summary": {}}}
     def get_field(self, key):
         return self._field_value
     def update_field(self, data):
