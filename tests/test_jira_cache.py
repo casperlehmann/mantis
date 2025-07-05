@@ -88,6 +88,6 @@ class TestCache:
                 f'retrieved: {retrieved}')
 
     def test_persisted_issuetypes_data(self):
-        selector = lambda field_name: {_[field_name] for _ in CacheData().issuetypes.get("issueTypes", {field_name: ''})}
+        selector = lambda field_name: {_[field_name] for _ in CacheData().issuetypes.get("issueTypes", [{field_name: ''}])}
         assert len(CacheData().issuetypes.get("issueTypes", [])) == 5
         assert selector('name') == {'Subtask', 'Story', 'Bug', 'Task', 'Epic'}
