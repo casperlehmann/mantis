@@ -12,7 +12,6 @@ class IssueField:
 
     def _extract_name_from_cached_object(self) -> Any | None:
         value_from_cache = self.issue.get_field(self.key)
-        assert self.editmeta_type == self.createmeta_type
         if value_from_cache is None:
             #raise ValueError(f'value_from_cache is None for key: {self.key}')
             return None
@@ -29,7 +28,9 @@ class IssueField:
             raise ValueError(
                 f"Both editmeta_type and createmeta_type are N/A. This field ('{self.key}') probably shouldn't be updated like this. editmeta_type: '{self.editmeta_type}'. createmeta_type: '{self.createmeta_type}'.")
         elif self.editmeta_type == 'N/A' or self.createmeta_type == 'N/A':
-            raise NotImplementedError(f"editmeta_type == 'N/A' or createmeta_type == 'N/A' for '{self.key}'")
+            raise NotImplementedError(f"editmeta_type ({self.editmeta_type}) or createmeta_type ({self.createmeta_type}) is 'N/A' for '{self.key}'")
+        elif self.editmeta_type != self.createmeta_type:
+            raise ValueError(f'editmeta_type ({self.editmeta_type}) and createmeta_type ({self.createmeta_type}) are not equal for key: {self.key}')
         else:
             return value_from_cache.get('name')
 
