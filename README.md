@@ -1,4 +1,4 @@
-[![Coverage Status](https://coveralls.io/repos/github/casperlehmann/mantis/badge.svg)](https://coveralls.io/github/casperlehmann/mantis)
+[![Coverage Status](https://coveralls.io/repos/github/casperlehmann/mantis/badge.svg?no-cache-please=1234)](https://coveralls.io/github/casperlehmann/mantis)
 
 # Mantis
 
