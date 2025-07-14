@@ -1,3 +1,5 @@
+[![Coverage Status](https://coveralls.io/repos/github/casperlehmann/mantis/badge.svg)](https://coveralls.io/github/casperlehmann/mantis)
+
 # Mantis
 
 Command line interface for writing and maintaining your Jira tasks from the command line.
