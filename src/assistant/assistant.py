@@ -1,5 +1,6 @@
-from enum import Enum
 from typing import TYPE_CHECKING
+
+from enums.text_format import TextFormat
 
 
 if TYPE_CHECKING:
@@ -25,10 +26,6 @@ If no changes are needed, say '{NO_CHANGES_NEEDED}'.
 If you have a question or a request, simply say, '{I_HAVE_A_QUESTION}' followed by your question, then we will raise it to the developers.
 Don't make any other comments.
 """
-
-class TextFormat(Enum):
-    JIRA = "Jira format"
-    MARKDOWN = "Markdown"
 
 
 class Assistant:

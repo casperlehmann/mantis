@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import MagicMock
-from src.assistant.assistant import Assistant, TextFormat
+from enums.text_format import TextFormat
 
 class DummyMantis:
     def __init__(self):
