@@ -200,6 +200,10 @@ An example of the coverage report:
 
 ![Markdown coverage report](docs/img/pytest-coverage-html-report.png)
 
+## Coveralls
+
+For online coverage reporting we use [Coveralls](https://coveralls.io/github/casperlehmann/mantis) to generate badges.
+
 ## Running Ruff
 
 ```sh
