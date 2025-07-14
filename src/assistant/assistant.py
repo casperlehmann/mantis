@@ -34,10 +34,10 @@ class Assistant:
         self.TextFormat = TextFormat
 
     def convert_text_format(self, input_text: str, target_format: TextFormat) -> str:
-        if target_format == TextFormat.MARKDOWN:
+        if target_format is TextFormat.MARKDOWN:
             FROM_FORMAT = TextFormat.JIRA
             TO_FORMAT = TextFormat.MARKDOWN
-        elif target_format == TextFormat.JIRA:
+        elif target_format is TextFormat.JIRA:
             FROM_FORMAT = TextFormat.MARKDOWN
             TO_FORMAT = TextFormat.JIRA
         else:
