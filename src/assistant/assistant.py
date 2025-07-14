@@ -40,10 +40,11 @@ class Assistant:
         if target_format == TextFormat.MARKDOWN:
             FROM_FORMAT = TextFormat.JIRA
             TO_FORMAT = TextFormat.MARKDOWN
-        else:
+        elif target_format == TextFormat.JIRA:
             FROM_FORMAT = TextFormat.MARKDOWN
             TO_FORMAT = TextFormat.JIRA
-
+        else:
+            raise ValueError("This should never run")
 
         prompt = CONVERSION_PROMPT_TEMPLATE.format(
             FROM_FORMAT=FROM_FORMAT.value,
