@@ -31,7 +31,6 @@ Don't make any other comments.
 class Assistant:
     def __init__(self, mantis: 'MantisClient'):
         self.mantis = mantis
-        self.TextFormat = TextFormat
 
     def convert_text_format(self, input_text: str, target_format: TextFormat) -> str:
         if target_format is TextFormat.MARKDOWN:
