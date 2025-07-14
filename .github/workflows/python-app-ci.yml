@@ -57,6 +57,12 @@ jobs:
     - name: MyPy
       run: |
         uv run mypy --disallow-untyped-calls --disallow-untyped-defs --disallow-incomplete-defs src
+    - name: Install coveralls-python
+      run: uv run pip install coveralls
+    - name: Run coveralls
+      run: coveralls --service=github-actions
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   check-version-upgrade:
     if: github.event_name == 'pull_request'

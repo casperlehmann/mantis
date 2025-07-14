@@ -1,3 +1,5 @@
+[![Coverage Status](https://coveralls.io/repos/github/casperlehmann/mantis/badge.svg)](https://coveralls.io/github/casperlehmann/mantis)
+
 # Mantis
 
 Command line interface for writing and maintaining your Jira tasks from the command line.
@@ -199,6 +201,10 @@ show_coverage() {
 An example of the coverage report:
 
 ![Markdown coverage report](docs/img/pytest-coverage-html-report.png)
+
+## Coveralls
+
+For online coverage reporting we use [Coveralls](https://coveralls.io/github/casperlehmann/mantis) to generate badges.
 
 ## Running Ruff
 
