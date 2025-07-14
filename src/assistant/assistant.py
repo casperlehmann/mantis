@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from enums.text_format import TextFormat
+from enums import TextFormat
 
 
 if TYPE_CHECKING:

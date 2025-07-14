@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import MagicMock
-from enums.text_format import TextFormat
+from enums import TextFormat
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:

@@ -3,7 +3,7 @@ import re
 from typing import Any, TYPE_CHECKING, Generator
 import frontmatter  # type: ignore
 
-from enums.text_format import TextFormat
+from enums import TextFormat
 from .template_md import template
 
 # To-do: Create converter for Jira syntax to markdown.
