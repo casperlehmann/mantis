@@ -3,7 +3,7 @@
 import json
 from pprint import pprint
 
-from assistant import TextFormat
+from enums import TextFormat
 from jira.issue_field import IssueField
 from mantis.mantis_client import MantisClient
 from mantis.options_loader import OptionsLoader, parse_args

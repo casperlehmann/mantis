@@ -2,6 +2,8 @@ from pathlib import Path
 import re
 from typing import Any, TYPE_CHECKING, Generator
 import frontmatter  # type: ignore
+
+from enums import TextFormat
 from .template_md import template
 
 # To-do: Create converter for Jira syntax to markdown.
@@ -82,7 +84,7 @@ class Draft:
         if self.mantis.options.chat_gpt_activated:
             description = self.mantis.assistant.convert_text_format(
                 input_text=description,
-                target_format=self.mantis.assistant.TextFormat.MARKDOWN
+                target_format=TextFormat.MARKDOWN
             )
         self.template.content = (
             self.template.content

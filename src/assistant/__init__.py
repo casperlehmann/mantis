@@ -1,6 +1,5 @@
-from .assistant import Assistant, TextFormat
+from .assistant import Assistant
 
 all = {
     "Assistant": Assistant,
-    "TextFormat": TextFormat,
 }

@@ -1,5 +1,6 @@
-from enum import Enum
 from typing import TYPE_CHECKING
+
+from enums import TextFormat
 
 
 if TYPE_CHECKING:
@@ -26,24 +27,20 @@ If you have a question or a request, simply say, '{I_HAVE_A_QUESTION}' followed 
 Don't make any other comments.
 """
 
-class TextFormat(Enum):
-    JIRA = "Jira format"
-    MARKDOWN = "Markdown"
-
 
 class Assistant:
     def __init__(self, mantis: 'MantisClient'):
         self.mantis = mantis
-        self.TextFormat = TextFormat
 
     def convert_text_format(self, input_text: str, target_format: TextFormat) -> str:
-        if target_format == TextFormat.MARKDOWN:
+        if target_format is TextFormat.MARKDOWN:
             FROM_FORMAT = TextFormat.JIRA
             TO_FORMAT = TextFormat.MARKDOWN
-        else:
+        elif target_format is TextFormat.JIRA:
             FROM_FORMAT = TextFormat.MARKDOWN
             TO_FORMAT = TextFormat.JIRA
-
+        else:
+            raise ValueError(f'Unrecognized format: {target_format}')
 
         prompt = CONVERSION_PROMPT_TEMPLATE.format(
             FROM_FORMAT=FROM_FORMAT.value,
