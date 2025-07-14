@@ -365,7 +365,7 @@ wheels = [
 
 [[package]]
 name = "mantis"
-version = "0.3.12"
+version = "0.3.13"
 source = { editable = "." }
 dependencies = [
     { name = "datamodel-code-generator" },
