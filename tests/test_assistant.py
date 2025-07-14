@@ -54,6 +54,28 @@ class TestAssistant:
                 'Anything you always wanted to know?',
                 TextFormat.JIRA)
 
+    def test_make_verbose(self, fake_mantis: 'MantisClient'):
+        fake_mantis.open_ai_client.disabled = False
+        fake_mantis.open_ai_client.get_completion = MagicMock()
+        fake_mantis.open_ai_client.get_completion.return_value = "1, 2, 3, 4, 5, 6, 7, 8, 9, 10 - this is a very important and detailed task!"
+        result = fake_mantis.assistant.make_verbose('Count to 10. Very important.')
+        assert result == "1, 2, 3, 4, 5, 6, 7, 8, 9, 10 - this is a very important and detailed task!"
+
+    def test_make_verbose_no_changes_needed(self, fake_mantis: 'MantisClient'):
+        fake_mantis.open_ai_client.disabled = False
+        fake_mantis.open_ai_client.get_completion = MagicMock()
+        fake_mantis.open_ai_client.get_completion.return_value = "No changes needed"
+        result = fake_mantis.assistant.make_verbose('The most verbose text.')
+        assert result == "The most verbose text."
+
+    def test_make_verbose_has_a_question(self, fake_mantis: 'MantisClient'):
+        fake_mantis.open_ai_client.disabled = False
+        fake_mantis.open_ai_client.get_completion = MagicMock()
+        fake_mantis.open_ai_client.get_completion.return_value = "I have a question: Who am I?"
+        with pytest.raises(ValueError, match="Question from AI: Who am I?"):
+            fake_mantis.assistant.make_verbose('Awkward silence.')
+
+
 
 class DummyMantis:
     def __init__(self):
