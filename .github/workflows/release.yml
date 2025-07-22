@@ -66,5 +66,4 @@ jobs:
 
       - name: Push commit and tag
         run: |
-          git push
           git push origin v${{ steps.new_version.outputs.version }}
