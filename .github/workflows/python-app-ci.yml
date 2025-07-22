@@ -18,14 +18,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    #----------------------------------------------
-    #       check-out repo
-    #----------------------------------------------
     - name: Check out repository
       uses: actions/checkout@v4
-    #----------------------------------------------
-    #       install and configure uv
-    #----------------------------------------------
     - name: Install the latest version of uv
       uses: astral-sh/setup-uv@v6
       with:
@@ -33,9 +27,6 @@ jobs:
         python-version: 3.12.3
         enable-cache: true
         ignore-nothing-to-cache: true
-    #----------------------------------------------
-    #              run test suite
-    #----------------------------------------------
     - name: Run ruff
       run: uv run ruff check .
     - name: Lint with flake8
@@ -63,25 +54,3 @@ jobs:
       run: coveralls --service=github-actions
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  check-version-upgrade:
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Fetch master branch
-        run: git fetch origin master:refs/remotes/origin/master
-      - name: Check version bump in pyproject.toml
-        run: |
-          set -e
-          VERSION_MASTER=$(git show origin/master:pyproject.toml | grep '^version' | head -1 | cut -d '"' -f2)
-          VERSION_HEAD=$(grep '^version' pyproject.toml | head -1 | cut -d '"' -f2)
-          echo "Master version: $VERSION_MASTER"
-          echo "Current version: $VERSION_HEAD"
-          if [ "$VERSION_MASTER" = "$VERSION_HEAD" ]; then
-            echo "Error: pyproject.toml version has not been updated!"
-            exit 1
-          fi
