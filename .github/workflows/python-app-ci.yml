@@ -18,14 +18,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    #----------------------------------------------
-    #       check-out repo
-    #----------------------------------------------
     - name: Check out repository
       uses: actions/checkout@v4
-    #----------------------------------------------
-    #       install and configure uv
-    #----------------------------------------------
     - name: Install the latest version of uv
       uses: astral-sh/setup-uv@v6
       with:
@@ -33,9 +27,6 @@ jobs:
         python-version: 3.12.3
         enable-cache: true
         ignore-nothing-to-cache: true
-    #----------------------------------------------
-    #              run test suite
-    #----------------------------------------------
     - name: Run ruff
       run: uv run ruff check .
     - name: Lint with flake8
