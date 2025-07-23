@@ -30,12 +30,12 @@ jobs:
           echo "Commit message: $COMMIT_MSG"
 
           if echo "$FILES_CHANGED" | grep -qE '(^|/)(pyproject\.toml|uv\.lock)$' && \
-             echo "$COMMIT_MSG" | grep -qE '^Bump version to v[0-9]+\.[0-9]+\.[0-9]+\s*\(#\d+\)$'; then
+             echo "$COMMIT_MSG" | grep -qE '^Bump version to v[0-9]+\.[0-9]+\.[0-9]+\s*\(#[0-9]+\)$'; then
             echo "✅ Detected version bump"
-            echo "tag=yes" >> $GITHUB_OUTPUT
+            echo "tag=yes"
           else
             echo "ℹ️ Not a version bump, skipping tag"
-            echo "tag=no" >> $GITHUB_OUTPUT
+            echo "tag=no"
           fi
 
       - name: Extract and validate version from pyproject.toml and uv.lock
