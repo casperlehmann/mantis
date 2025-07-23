@@ -45,7 +45,7 @@ jobs:
           set -e
 
           pyproject_version=$(grep -E '^version[[:space:]]*=' pyproject.toml | sed -E "s/version[[:space:]]*=[[:space:]]*['\"]([^'\"]+)['\"]/v\1/")
-          uvlock_version=$(grep -E '"version"[[:space:]]*:' uv.lock | head -n 1 | sed -E 's/.*"version"[[:space:]]*:[[:space:]]*"([^"]+)".*/v\1/')
+          uvlock_version=$(grep -A 1 'name = "mantis"' uv.lock | grep -E 'version[[:space:]]* = '| head -n 1 | sed -E 's/.*version[[:space:]]*=[[:space:]]*"([^"]+)".*/v\1/')
 
           if [ "$pyproject_version" != "$uvlock_version" ]; then
             echo "Version from pyproject.toml: $pyproject_version"
