@@ -59,7 +59,7 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
         env:
-            GITHUB_TOKEN: ${{ secrets.REPO_SCOPED_TOKEN }}
+            GITHUB_TOKEN: ${{ secrets.AUTO_RELEASE_TOKEN }}
         with:
           token: ${{ env.GITHUB_TOKEN }}
           branch: release/bump-v${{ steps.new_version.outputs.version }}
