@@ -29,7 +29,7 @@ jobs:
           script: |
             const pr = context.payload.pull_request;
             if (
-              pr.user.login === 'github-actions[bot]' &&
+              (pr.user.login === 'github-actions[bot]' || pr.user.login === github.repository_owner ) &&
               pr.title.startsWith('Bump version to v')
             ) {
               await github.rest.pulls.merge({
