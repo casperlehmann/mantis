@@ -61,7 +61,7 @@ jobs:
         env:
             GITHUB_TOKEN: ${{ secrets.REPO_SCOPED_TOKEN }}
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ env.GITHUB_TOKEN }}
           branch: release/bump-v${{ steps.new_version.outputs.version }}
           title: "Bump version to v${{ steps.new_version.outputs.version }}"
           commit-message: "Bump version to v${{ steps.new_version.outputs.version }}"
