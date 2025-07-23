@@ -1,0 +1,88 @@
+name: Tag and Release After Version Bump
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: write
+
+jobs:
+  tag-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check if last commit is a version bump
+        id: should_tag
+        run: |
+          FILES_CHANGED=$(git show --pretty="" --name-only HEAD)
+          COMMIT_MSG=$(git log -1 --pretty=%s)
+
+          echo "Changed files:"
+          echo "$FILES_CHANGED"
+          echo "Commit message: $COMMIT_MSG"
+
+          if echo "$FILES_CHANGED" | grep -qE '(^|/)(pyproject\.toml|uv\.lock)$' && \
+             echo "$COMMIT_MSG" | grep -qE '^Bump version to v[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "✅ Detected version bump"
+            echo "tag=yes" >> $GITHUB_OUTPUT
+          else
+            echo "ℹ️ Not a version bump, skipping tag"
+            echo "tag=no" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Extract and validate version from pyproject.toml and uv.lock
+        id: extract_version
+        if: steps.should_tag.outputs.tag == 'yes'
+        run: |
+          set -e
+
+          pyproject_version=$(grep -E '^version\s*=' pyproject.toml | sed -E "s/version\s*=\s*['\"]([^'\"]+)['\"]/v\1/")
+          uvlock_version=$(grep -E '"version"\s*:' uv.lock | head -n 1 | sed -E 's/.*"version"\s*:\s*"([^"]+)".*/v\1/')
+
+          if [ "$pyproject_version" != "$uvlock_version" ]; then
+            echo "Version from pyproject.toml: $pyproject_version"
+            echo "Version from uv.lock: $uvlock_version"
+            echo "❌ Version mismatch between pyproject.toml ($pyproject_version) and uv.lock ($uvlock_version)"
+            exit 1
+          fi
+
+          echo "✅ Version files match: $pyproject_version"
+          echo "version=$pyproject_version" >> $GITHUB_OUTPUT
+
+      - name: Create Git tag
+        if: steps.should_tag.outputs.tag == 'yes'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a ${{ steps.extract_version.outputs.version }} -m "Release ${{ steps.extract_version.outputs.version }}"
+          git push origin ${{ steps.extract_version.outputs.version }}
+
+      - name: Install uv and Python
+        if: steps.should_tag.outputs.tag == 'yes'
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "latest"
+          python-version: "3.12.3"
+          enable-cache: true
+          ignore-nothing-to-cache: true
+
+      - name: Build the package using uv
+        if: steps.should_tag.outputs.tag == 'yes'
+        run: |
+          uv run -m build
+
+      - name: Upload release to GitHub
+        if: steps.should_tag.outputs.tag == 'yes'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.extract_version.outputs.version }}
+          name: Release ${{ steps.extract_version.outputs.version }}
+          generate_release_notes: true
+          files: |
+            dist/*.whl
+            dist/*.tar.gz
