@@ -44,10 +44,9 @@ jobs:
           pyproject_version=$(grep -E '^version\s*=' pyproject.toml | sed -E "s/version\s*=\s*['\"]([^'\"]+)['\"]/v\1/")
           uvlock_version=$(grep -E '"version"\s*:' uv.lock | head -n 1 | sed -E 's/.*"version"\s*:\s*"([^"]+)".*/v\1/')
 
-          echo "Version from pyproject.toml: $pyproject_version"
-          echo "Version from uv.lock: $uvlock_version"
-
           if [ "$pyproject_version" != "$uvlock_version" ]; then
+            echo "Version from pyproject.toml: $pyproject_version"
+            echo "Version from uv.lock: $uvlock_version"
             echo "❌ Version mismatch between pyproject.toml ($pyproject_version) and uv.lock ($uvlock_version)"
             exit 1
           fi
