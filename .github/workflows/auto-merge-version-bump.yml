@@ -40,7 +40,6 @@ jobs:
               });
               console.log(`✅ Auto-merged PR #${pr.number}`);
             } else {
-            if (
               console.log(`pr.user.login: ${pr.user.login} ${( pr.user.login === 'github-actions[bot]' || pr.user.login === 'casperlehmann' ) ? '✅' : '❌'}`);
               console.log(`pr.title: ${pr.title} ${pr.title.startsWith('Bump version to v') ? '✅' : '❌'}`);
               console.log(`ℹ️ Skipping auto-merge for PR #${pr.number}`);
