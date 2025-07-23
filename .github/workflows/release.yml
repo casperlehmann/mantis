@@ -15,7 +15,7 @@ on:
 
 permissions:
   contents: write
-  packages: write
+  pull-requests: write
 
 jobs:
   release:
@@ -63,6 +63,14 @@ jobs:
           git add pyproject.toml uv.lock
           git commit -m "Bump version to v${{ steps.new_version.outputs.version }}"
 
-      - name: Push commit and tag
-        run: |
-          git push origin v${{ steps.new_version.outputs.version }}
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: release/bump-v${{ steps.new_version.outputs.version }}
+          title: "Bump version to v${{ steps.new_version.outputs.version }}"
+          commit-message: "Bump version to v${{ steps.new_version.outputs.version }}"
+          body: |
+            Automated version bump to `v${{ steps.new_version.outputs.version }}`
+          base: master
+          delete-branch: true
