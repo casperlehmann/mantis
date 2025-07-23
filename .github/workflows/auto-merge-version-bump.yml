@@ -14,7 +14,12 @@ permissions:
 
 jobs:
   auto-merge:
-    if: github.actor == 'github-actions[bot]'
+    if: |
+      startsWith(github.event.pull_request.title, 'Bump version to v') &&
+      (
+        github.actor == 'github-actions[bot]' ||
+        github.actor == github.repository_owner
+      )
     runs-on: ubuntu-latest
     steps:
       - name: Auto-merge PR
