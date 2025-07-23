@@ -35,13 +35,25 @@ jobs:
             echo "tag=no" >> $GITHUB_OUTPUT
           fi
 
-      - name: Extract version from pyproject.toml
+      - name: Extract and validate version from pyproject.toml and uv.lock
         id: extract_version
         if: steps.should_tag.outputs.tag == 'yes'
         run: |
-          version=$(grep -E '^version\s*=' pyproject.toml | sed -E "s/version\s*=\s*['\"]([^'\"]+)['\"]/v\1/")
-          echo "version=$version"
-          echo "version=$version" >> $GITHUB_OUTPUT
+          set -e
+
+          pyproject_version=$(grep -E '^version\s*=' pyproject.toml | sed -E "s/version\s*=\s*['\"]([^'\"]+)['\"]/v\1/")
+          uvlock_version=$(grep -E '"version"\s*:' uv.lock | head -n 1 | sed -E 's/.*"version"\s*:\s*"([^"]+)".*/v\1/')
+
+          echo "Version from pyproject.toml: $pyproject_version"
+          echo "Version from uv.lock: $uvlock_version"
+
+          if [ "$pyproject_version" != "$uvlock_version" ]; then
+            echo "❌ Version mismatch between pyproject.toml ($pyproject_version) and uv.lock ($uvlock_version)"
+            exit 1
+          fi
+
+          echo "✅ Version files match: $pyproject_version"
+          echo "version=$pyproject_version" >> $GITHUB_OUTPUT
 
       - name: Create Git tag
         if: steps.should_tag.outputs.tag == 'yes'
