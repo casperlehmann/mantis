@@ -32,10 +32,10 @@ jobs:
           if echo "$FILES_CHANGED" | grep -qE '(^|/)(pyproject\.toml|uv\.lock)$' && \
              echo "$COMMIT_MSG" | grep -qE '^Bump version to v[0-9]+\.[0-9]+\.[0-9]+[[:space:]]*\(#[0-9]+\)$'; then
             echo "✅ Detected version bump"
-            echo "tag=yes"
+            echo "tag=yes" >> $GITHUB_OUTPUT
           else
             echo "ℹ️ Not a version bump, skipping tag"
-            echo "tag=no"
+            echo "tag=no" >> $GITHUB_OUTPUT
           fi
 
       - name: Extract and validate version from pyproject.toml and uv.lock
@@ -45,7 +45,7 @@ jobs:
           set -e
 
           pyproject_version=$(grep -E '^version[[:space:]]*=' pyproject.toml | sed -E "s/version[[:space:]]*=[[:space:]]*['\"]([^'\"]+)['\"]/v\1/")
-          uvlock_version=$(grep -E '"version"[[:space:]]*:' uv.lock | head -n 1 | sed -E 's/.*"version"[[:space:]]*:[[:space:]]*"([^"]+)".*/v\1/')
+          uvlock_version=$(grep -A 1 'name = "mantis"' uv.lock | grep -E 'version[[:space:]]* = '| head -n 1 | sed -E 's/.*version[[:space:]]*=[[:space:]]*"([^"]+)".*/v\1/')
 
           if [ "$pyproject_version" != "$uvlock_version" ]; then
             echo "Version from pyproject.toml: $pyproject_version"
