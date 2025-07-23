@@ -58,11 +58,10 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Commit and tag version bump
+      - name: Commit version bump
         run: |
           git add pyproject.toml uv.lock
-          git commit -m "Bump version to ${{ steps.new_version.outputs.version }}"
-          git tag -a v${{ steps.new_version.outputs.version }} -m "Version ${{ steps.new_version.outputs.version }}"
+          git commit -m "Bump version to v${{ steps.new_version.outputs.version }}"
 
       - name: Push commit and tag
         run: |
