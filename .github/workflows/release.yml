@@ -21,13 +21,6 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - name: Fail if not Master branch
-        if: github.ref != 'refs/heads/master'
-        
-        run: |
-          echo "Release can only happen from Master branch"
-          exit 1
-
       - name: Checkout code
         uses: actions/checkout@v4
 
