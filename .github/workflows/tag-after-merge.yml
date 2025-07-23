@@ -77,7 +77,7 @@ jobs:
       - name: Build the package using uv
         if: steps.should_tag.outputs.tag == 'yes'
         run: |
-          uv run -m build
+          uv build
 
       - name: Upload release to GitHub
         if: steps.should_tag.outputs.tag == 'yes'
