@@ -1,4 +1,4 @@
-name: Tag Release After Version Bump
+name: Tag and Release After Version Bump
 
 on:
   push:
@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  tag:
+  tag-and-release:
     runs-on: ubuntu-latest
 
     steps:
@@ -62,3 +62,11 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git tag -a ${{ steps.extract_version.outputs.version }} -m "Release ${{ steps.extract_version.outputs.version }}"
           git push origin ${{ steps.extract_version.outputs.version }}
+
+      - name: Create GitHub Release
+        if: steps.should_tag.outputs.tag == 'yes'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.extract_version.outputs.version }}
+          name: Release ${{ steps.extract_version.outputs.version }}
+          generate_release_notes: true
