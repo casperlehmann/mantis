@@ -53,13 +53,9 @@ jobs:
       run: coveralls --service=github-actions
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  allow-auto-merge:
+  auto-merge:
     needs: build
     runs-on: ubuntu-latest
-    outputs:
-      allowed: ${{ steps.check.outputs.allowed }}
-      reason: ${{ steps.check.outputs.reason }}
-      pr_number: ${{ steps.check.outputs.pr_number }}
     steps:
       - name: Decide if auto-merge should run
         id: check
@@ -88,16 +84,13 @@ jobs:
             echo "allowed=false" >> $GITHUB_OUTPUT
             echo "reason=pr.user.login: $PR_USER $( [[ "$PR_USER" == "github-actions[bot]" || "$PR_USER" == "$OWNER" ]] && echo '✅' || echo '❌' ); pr.title: $PR_TITLE $( [[ "$PR_TITLE" == Bump\ version\ to\ v* ]] && echo '✅' || echo '❌' )" >> $GITHUB_OUTPUT
             echo "ℹ️ Skipping auto-merge for PR #$PR_NUMBER" >&2
+            exit 0
           fi
-  auto-merge:
-    needs: [build, allow-auto-merge]
-    if: needs.allow-auto-merge.outputs.allowed == 'true'
-    runs-on: ubuntu-latest
-    steps:
       - name: Auto-merge PR
+        if: steps.check.outputs.allowed == 'true'
         uses: actions/github-script@v7
         env:
-          PR_NUMBER: ${{ needs.allow-auto-merge.outputs.pr_number }}
+          PR_NUMBER: ${{ steps.check.outputs.pr_number }}
         with:
           github-token: ${{ secrets.AUTO_RELEASE_TOKEN }}
           script: |
