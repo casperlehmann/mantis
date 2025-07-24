@@ -109,6 +109,8 @@ jobs:
         if: steps.check-pr-type.outputs.allowed == 'true'
         run: |
           set -e
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           PR_BRANCH=$(git rev-parse --abbrev-ref HEAD)
           echo "Current PR branch: $PR_BRANCH"
           # Get bump type from PR labels
