@@ -55,33 +55,88 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   auto-merge:
     needs: build
-    if: |
-      startsWith(github.event.pull_request.title, 'Bump version to v') &&
-      (
-        github.actor == 'github-actions[bot]' ||
-        github.actor == github.repository_owner
-      )
     runs-on: ubuntu-latest
     steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Decide if auto-merge should run
+        id: check-pr-type
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_USER="${{ github.event.pull_request.user.login }}"
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          OWNER="${{ github.repository_owner }}"
+          ACTOR="${{ github.actor }}"
+          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+
+          is_title_ok=false
+          is_user_ok=false
+          if [[ "$PR_TITLE" == Bump\ version\ to\ v* ]]; then
+            is_title_ok=true
+            reason_title="pr.title: $PR_TITLE ✅"
+          else
+            reason_title="pr.title: $PR_TITLE ❌"
+          fi
+          if [[ "$PR_USER" == "github-actions[bot]" || "$PR_USER" == "$OWNER" ]]; then
+            is_user_ok=true
+            reason_user="pr.user.login: $PR_USER ✅"
+          else
+            reason_user="pr.user.login: $PR_USER ❌"
+          fi
+
+          echo "$reason_title"
+          echo "$reason_user"
+
+          if $is_title_ok && $is_user_ok; then
+            echo "allowed=true" >> $GITHUB_OUTPUT
+            echo "reason=All checks passed: ${reason_title}; ${reason_user}" >> $GITHUB_OUTPUT
+            echo "✅ Auto-merge allowed for PR #$PR_NUMBER" >&2
+          else
+            echo "allowed=false" >> $GITHUB_OUTPUT
+            echo "reason=${reason_user}; ${reason_title}" >> $GITHUB_OUTPUT
+            echo "ℹ️ Skipping auto-merge for PR #$PR_NUMBER" >&2
+            exit 0
+          fi
+      - name: Validate PR is a clean version bump
+        id: validate_bump
+        if: steps.check-pr-type.outputs.allowed == 'true'
+        run: |
+          set -e
+          PR_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+          echo "Current PR branch: $PR_BRANCH"
+          # Get bump type from PR labels
+          BUMP_TYPE=$(gh pr view "$PR_NUMBER" --json labels --jq '.labels[] | select(.name | startswith("bump:")) | .name' | sed 's/bump://')
+          if [ -z "$BUMP_TYPE" ]; then
+            echo "❌ No bump type label found (bump:patch, bump:minor, bump:major)"
+            echo "bump_check=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+          echo "Detected bump type: $BUMP_TYPE"
+          git fetch origin master
+          git checkout origin/master -b _tmp_master
+          uv version --bump "$BUMP_TYPE"
+          git add pyproject.toml uv.lock
+          git commit -m "temp version bump" || true
+          git checkout "$PR_BRANCH"
+          git diff --ignore-space-at-eol --ignore-blank-lines _tmp_master -- pyproject.toml uv.lock > /tmp/compare.diff || true
+          if [ -s /tmp/compare.diff ]; then
+            echo "❌ PR branch does not match a clean version bump from master."
+            cat /tmp/compare.diff
+            echo "bump_check=false" >> $GITHUB_OUTPUT
+            exit 1
+          else
+            echo "✅ PR branch matches a clean version bump from master."
+            echo "bump_check=true" >> $GITHUB_OUTPUT
+          fi
+          git branch -D _tmp_master
+        env:
+          PR_NUMBER: ${{ steps.check-pr-type.outputs.pr_number }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Auto-merge PR
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.AUTO_RELEASE_TOKEN }}
-          script: |
-            const pr = context.payload.pull_request;
-            if (
-              ( pr.user.login === 'github-actions[bot]' || pr.user.login === 'casperlehmann' ) &&
-              pr.title.startsWith('Bump version to v')
-            ) {
-              await github.rest.pulls.merge({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: pr.number,
-                merge_method: 'squash'
-              });
-              console.log(`✅ Auto-merged PR #${pr.number}`);
-            } else {
-              console.log(`pr.user.login: ${pr.user.login} ${( pr.user.login === 'github-actions[bot]' || pr.user.login === 'casperlehmann' ) ? '✅' : '❌'}`);
-              console.log(`pr.title: ${pr.title} ${pr.title.startsWith('Bump version to v') ? '✅' : '❌'}`);
-              console.log(`ℹ️ Skipping auto-merge for PR #${pr.number}`);
-            }
+        if: steps.check-pr-type.outputs.allowed == 'true' && steps.validate_bump.outputs.bump_check == 'true'
+        env:
+          PR_NUMBER: ${{ steps.check-pr-type.outputs.pr_number }}
+          GH_TOKEN: ${{ secrets.AUTO_RELEASE_TOKEN }}
+        run: |
+          gh pr merge "$PR_NUMBER" --squash --delete-branch
+          echo "✅ Auto-merged PR #$PR_NUMBER"

@@ -67,3 +67,4 @@ jobs:
             Automated version bump to `v${{ steps.new_version.outputs.version }}`
           base: master
           delete-branch: true
+          labels: bump:${{ github.event.inputs.release_type }}
