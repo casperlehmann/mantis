@@ -68,17 +68,23 @@ jobs:
           OWNER="${{ github.repository_owner }}"
           ACTOR="${{ github.actor }}"
           echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+
+          is_title_ok=false
+          is_user_ok=false
           if [[ "$PR_TITLE" == Bump\ version\ to\ v* ]]; then
+            is_title_ok=true
             reason_title="pr.title: $PR_TITLE ✅"
           else
             reason_title="pr.title: $PR_TITLE ❌"
           fi
           if [[ "$PR_USER" == "github-actions[bot]" || "$PR_USER" == "$OWNER" ]]; then
+            is_user_ok=true
             reason_user="pr.user.login: $PR_USER ✅"
           else
             reason_user="pr.user.login: $PR_USER ❌"
           fi
-          if [[ "$PR_TITLE" == Bump\ version\ to\ v* ]] && ([[ "$PR_USER" == "github-actions[bot]" ]] || [[ "$PR_USER" == "$OWNER" ]]); then
+
+          if $is_title_ok && $is_user_ok; then
             echo "allowed=true" >> $GITHUB_OUTPUT
             echo "reason=All checks passed: ${reason_title}; ${reason_user}" >> $GITHUB_OUTPUT
             echo "✅ Auto-merge allowed for PR #$PR_NUMBER" >&2
