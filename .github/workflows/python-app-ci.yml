@@ -69,22 +69,22 @@ jobs:
           ACTOR="${{ github.actor }}"
           echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
           if [[ "$PR_TITLE" == Bump\ version\ to\ v* ]]; then
-            echo "pr.title: $PR_TITLE ✅"
+            reason_title="pr.title: $PR_TITLE ✅"
           else
-            echo "pr.title: $PR_TITLE ❌"
+            reason_title="pr.title: $PR_TITLE ❌"
           fi
           if [[ "$PR_USER" == "github-actions[bot]" || "$PR_USER" == "$OWNER" ]]; then
-            echo "pr.user.login: $PR_USER ✅"
+            reason_user="pr.user.login: $PR_USER ✅"
           else
-            echo "pr.user.login: $PR_USER ❌"
+            reason_user="pr.user.login: $PR_USER ❌"
           fi
           if [[ "$PR_TITLE" == Bump\ version\ to\ v* ]] && ([[ "$PR_USER" == "github-actions[bot]" ]] || [[ "$PR_USER" == "$OWNER" ]]); then
             echo "allowed=true" >> $GITHUB_OUTPUT
-            echo "reason=All checks passed" >> $GITHUB_OUTPUT
+            echo "reason=All checks passed: ${reason_title}; ${reason_user}" >> $GITHUB_OUTPUT
             echo "✅ Auto-merge allowed for PR #$PR_NUMBER" >&2
           else
             echo "allowed=false" >> $GITHUB_OUTPUT
-            echo "reason=pr.user.login: $PR_USER $( [[ "$PR_USER" == "github-actions[bot]" || "$PR_USER" == "$OWNER" ]] && echo '✅' || echo '❌' ); pr.title: $PR_TITLE $( [[ "$PR_TITLE" == Bump\ version\ to\ v* ]] && echo '✅' || echo '❌' )" >> $GITHUB_OUTPUT
+            echo "reason=${reason_user}; ${reason_title}" >> $GITHUB_OUTPUT
             echo "ℹ️ Skipping auto-merge for PR #$PR_NUMBER" >&2
             exit 0
           fi
