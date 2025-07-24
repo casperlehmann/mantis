@@ -90,6 +90,7 @@ jobs:
           fi
       - name: Validate PR is a clean version bump
         id: validate_bump
+        if: steps.check.outputs.allowed == 'true'
         run: |
           set -e
           PR_BRANCH=$(git rev-parse --abbrev-ref HEAD)
