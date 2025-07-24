@@ -59,6 +59,13 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+      - name: Install the latest version of uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "latest"
+          python-version: 3.12.3
+          enable-cache: true
+          ignore-nothing-to-cache: true
       - name: Decide if auto-merge should run
         id: check-pr-type
         run: |
