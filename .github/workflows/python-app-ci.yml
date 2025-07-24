@@ -92,9 +92,16 @@ jobs:
           set -e
           PR_BRANCH=$(git rev-parse --abbrev-ref HEAD)
           echo "Current PR branch: $PR_BRANCH"
+          # Get bump type from PR labels
+          BUMP_TYPE=$(gh pr view "$PR_NUMBER" --json labels --jq '.labels[] | select(.name | startswith("bump:")) | .name' | sed 's/bump://')
+          if [ -z "$BUMP_TYPE" ]; then
+            echo "❌ No bump type label found (bump:patch, bump:minor, bump:major)"
+            exit 1
+          fi
+          echo "Detected bump type: $BUMP_TYPE"
           git fetch origin master
           git checkout origin/master -b _tmp_master
-          uv version --bump patch
+          uv version --bump "$BUMP_TYPE"
           git add pyproject.toml uv.lock
           git commit -m "temp version bump" || true
           git checkout "$PR_BRANCH"
@@ -107,6 +114,9 @@ jobs:
             echo "✅ PR branch matches a clean version bump from master."
           fi
           git branch -D _tmp_master
+        env:
+          PR_NUMBER: ${{ steps.check.outputs.pr_number }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Auto-merge PR
         if: steps.check.outputs.allowed == 'true'
         uses: actions/github-script@v7
