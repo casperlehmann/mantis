@@ -58,10 +58,8 @@ jobs:
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
-        env:
-            GITHUB_TOKEN: ${{ secrets.AUTO_RELEASE_TOKEN }}
         with:
-          token: ${{ env.GITHUB_TOKEN }}
+          token: ${{ secrets.AUTO_RELEASE_TOKEN }}
           branch: release/bump-v${{ steps.new_version.outputs.version }}
           title: "Bump version to v${{ steps.new_version.outputs.version }}"
           commit-message: "Bump version to v${{ steps.new_version.outputs.version }}"
