@@ -69,17 +69,13 @@ jobs:
           ACTOR="${{ github.actor }}"
           echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
           if [[ "$PR_TITLE" == Bump\ version\ to\ v* ]]; then
-            echo "title_check=✅" >> $GITHUB_OUTPUT
             echo "pr.title: $PR_TITLE ✅"
           else
-            echo "title_check=❌" >> $GITHUB_OUTPUT
             echo "pr.title: $PR_TITLE ❌"
           fi
           if [[ "$PR_USER" == "github-actions[bot]" || "$PR_USER" == "$OWNER" ]]; then
-            echo "user_check=✅" >> $GITHUB_OUTPUT
             echo "pr.user.login: $PR_USER ✅"
           else
-            echo "user_check=❌" >> $GITHUB_OUTPUT
             echo "pr.user.login: $PR_USER ❌"
           fi
           if [[ "$PR_TITLE" == Bump\ version\ to\ v* ]] && ([[ "$PR_USER" == "github-actions[bot]" ]] || [[ "$PR_USER" == "$OWNER" ]]); then
