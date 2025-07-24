@@ -137,7 +137,6 @@ jobs:
             echo "✅ PR branch matches a clean version bump from master."
             echo "bump_check=true" >> $GITHUB_OUTPUT
           fi
-          git branch -D _tmp_master
         env:
           PR_NUMBER: ${{ steps.check-pr-type.outputs.pr_number }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
