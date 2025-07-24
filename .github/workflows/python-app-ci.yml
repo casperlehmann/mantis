@@ -60,7 +60,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
       - name: Decide if auto-merge should run
-        id: check
+        id: check-pr-type
         run: |
           PR_TITLE="${{ github.event.pull_request.title }}"
           PR_USER="${{ github.event.pull_request.user.login }}"
@@ -90,7 +90,7 @@ jobs:
           fi
       - name: Validate PR is a clean version bump
         id: validate_bump
-        if: steps.check.outputs.allowed == 'true'
+        if: steps.check-pr-type.outputs.allowed == 'true'
         run: |
           set -e
           PR_BRANCH=$(git rev-parse --abbrev-ref HEAD)
@@ -121,12 +121,12 @@ jobs:
           fi
           git branch -D _tmp_master
         env:
-          PR_NUMBER: ${{ steps.check.outputs.pr_number }}
+          PR_NUMBER: ${{ steps.check-pr-type.outputs.pr_number }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Auto-merge PR
-        if: steps.check.outputs.allowed == 'true' && steps.validate_bump.outputs.bump_check == 'true'
+        if: steps.check-pr-type.outputs.allowed == 'true' && steps.validate_bump.outputs.bump_check == 'true'
         env:
-          PR_NUMBER: ${{ steps.check.outputs.pr_number }}
+          PR_NUMBER: ${{ steps.check-pr-type.outputs.pr_number }}
           GH_TOKEN: ${{ secrets.AUTO_RELEASE_TOKEN }}
         run: |
           gh pr merge "$PR_NUMBER" --squash --delete-branch
