@@ -84,6 +84,9 @@ jobs:
             reason_user="pr.user.login: $PR_USER ❌"
           fi
 
+          echo "$reason_title"
+          echo "$reason_user"
+
           if $is_title_ok && $is_user_ok; then
             echo "allowed=true" >> $GITHUB_OUTPUT
             echo "reason=All checks passed: ${reason_title}; ${reason_user}" >> $GITHUB_OUTPUT
