@@ -51,8 +51,6 @@ jobs:
       run: uv run pip install coveralls
     - name: Run coveralls
       run: coveralls --service=github-actions
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   auto-merge:
     needs: build
     if: |
