@@ -96,6 +96,7 @@ jobs:
           BUMP_TYPE=$(gh pr view "$PR_NUMBER" --json labels --jq '.labels[] | select(.name | startswith("bump:")) | .name' | sed 's/bump://')
           if [ -z "$BUMP_TYPE" ]; then
             echo "❌ No bump type label found (bump:patch, bump:minor, bump:major)"
+            echo "bump_check=false" >> $GITHUB_OUTPUT
             exit 1
           fi
           echo "Detected bump type: $BUMP_TYPE"
@@ -109,16 +110,18 @@ jobs:
           if [ -s /tmp/compare.diff ]; then
             echo "❌ PR branch does not match a clean version bump from master."
             cat /tmp/compare.diff
+            echo "bump_check=false" >> $GITHUB_OUTPUT
             exit 1
           else
             echo "✅ PR branch matches a clean version bump from master."
+            echo "bump_check=true" >> $GITHUB_OUTPUT
           fi
           git branch -D _tmp_master
         env:
           PR_NUMBER: ${{ steps.check.outputs.pr_number }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Auto-merge PR
-        if: steps.check.outputs.allowed == 'true'
+        if: steps.check.outputs.allowed == 'true' && steps.validate_bump.outputs.bump_check == 'true'
         env:
           PR_NUMBER: ${{ steps.check.outputs.pr_number }}
           GH_TOKEN: ${{ secrets.AUTO_RELEASE_TOKEN }}
