@@ -53,14 +53,24 @@ jobs:
       run: coveralls --service=github-actions
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  auto-merge:
+  allow-auto-merge:
     needs: build
-    if: |
-      startsWith(github.event.pull_request.title, 'Bump version to v') &&
-      (
-        github.actor == 'github-actions[bot]' ||
-        github.actor == github.repository_owner
-      )
+    runs-on: ubuntu-latest
+    outputs:
+      allowed: ${{ steps.check.outputs.allowed }}
+    steps:
+      - name: Decide if auto-merge should run
+        id: check
+        run: |
+          if [[ "${{ github.event.pull_request.title }}" == Bump\ version\ to\ v* ]] && \
+             ([[ "${{ github.actor }}" == "github-actions[bot]" ]] || [[ "${{ github.actor }}" == "${{ github.repository_owner }}" ]]); then
+            echo "allowed=true" >> $GITHUB_OUTPUT
+          else
+            echo "allowed=false" >> $GITHUB_OUTPUT
+          fi
+  auto-merge:
+    needs: [build, allow-auto-merge]
+    if: needs.allow-auto-merge.outputs.allowed == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Auto-merge PR
