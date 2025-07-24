@@ -1,6 +1,6 @@
 [project]
 name = "mantis"
-version = "0.3.26"
+version = "0.3.27"
 description = "CLI for locally managing Jira issues"
 authors = [{ name = "casperlehmann", email = "6682833+casperlehmann@users.noreply.github.com" }]
 requires-python = "<4.0,>=3.12"
