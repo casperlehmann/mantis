@@ -1,5 +1,4 @@
 """Tests for the AST-based Jira/Markdown converter."""
-import pytest
 from converter import jira_to_markdown, markdown_to_jira
 from converter.nodes import (
     Blockquote,
