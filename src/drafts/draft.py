@@ -6,9 +6,11 @@ import frontmatter  # type: ignore
 from enums import TextFormat
 from .template_md import template
 
-# To-do: Create converter for Jira syntax to markdown.
+from converter import jira_to_markdown
+
+
 def j2m(x: str) -> str:
-        return x
+    return jira_to_markdown(x)
 
 if TYPE_CHECKING:
     from jira import JiraIssue
