@@ -1,14 +1,63 @@
 #!/usr/bin/env python
 
 import json
+import sys
 from pprint import pprint
 
 from enums import TextFormat
 from jira.issue_field import IssueField
 from mantis.mantis_client import MantisClient
-from mantis.options_loader import OptionsLoader, parse_args
+from mantis.options_loader import MANTIS_TOML, OptionsLoader, parse_args
+
+
+def _init() -> None:
+    from xdg_base_dirs import xdg_config_home
+    config_path = xdg_config_home() / 'mantis' / MANTIS_TOML
+
+    if config_path.exists():
+        answer = input(f'Config already exists at {config_path}. Overwrite? [y/N] ')
+        if answer.strip().lower() != 'y':
+            print('Aborted.')
+            return
+
+    print(f'Creating config at {config_path}')
+    print('Press Enter to accept the default shown in brackets.\n')
+
+    def prompt(label: str, default: str = '') -> str:
+        suffix = f' [{default}]' if default else ''
+        value = input(f'{label}{suffix}: ').strip()
+        return value or default
+
+    user = prompt('Jira user email')
+    url = prompt('Jira URL (e.g. https://account.atlassian.net)')
+    project = prompt('Jira project key (e.g. MYPROJECT)')
+    token = prompt('Personal access token')
+    cache_dir = prompt('Cache dir', '.jira_cache')
+    drafts_dir = prompt('Drafts dir', 'drafts')
+    plugins_dir = prompt('Plugins dir', 'plugins')
+
+    config_path.parent.mkdir(parents=True, exist_ok=True)
+    config_path.write_text(
+        '[jira]\n'
+        f'user = "{user}"\n'
+        f'url = "{url}"\n'
+        f'project = "{project}"\n'
+        f'personal-access-token = "{token}"\n'
+        f'cache-dir = "{cache_dir}"\n'
+        f'drafts-dir = "{drafts_dir}"\n'
+        f'plugins-dir = "{plugins_dir}"\n'
+        '\n'
+        '[openai]\n'
+        'chat-gpt-activated = false\n'
+    )
+    print(f'\nConfig written to {config_path}')
+
 
 def main() -> None:
+    if len(sys.argv) > 1 and sys.argv[1] == 'init':
+        _init()
+        return
+
     options = OptionsLoader(parse_args())
     mantis = MantisClient(options)
     jira = mantis.jira

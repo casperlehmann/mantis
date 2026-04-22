@@ -5,7 +5,7 @@ import tomllib
 from xdg_base_dirs import xdg_config_home
 
 
-MANTIS_TOML = "mantis.toml"
+MANTIS_TOML = "config.toml"
 
 
 class OptionsLoader:
@@ -29,7 +29,7 @@ class OptionsLoader:
         config_home = xdg_config_home()
         values = self.load_toml(config_home / 'mantis' / MANTIS_TOML)
         if not values:
-            print(f'# Warning: No mantis.toml found in either XDG config home or home dir. Please see readme and create a file at {config_home / 'mantis' / MANTIS_TOML}')
+            print(f'# Warning: No config found. Run `mantis init` to create one at {config_home / "mantis" / MANTIS_TOML}')
         return values
 
     def cwd_toml(self) -> dict:
